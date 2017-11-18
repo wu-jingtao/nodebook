@@ -2,7 +2,7 @@
     "name": "my-typescript-template",
     "version": "0.0.1",
     "description": "我的typescript项目模板",
-    "main": ".bin/index.js",
+    "main": "./bin/index.js",
     "types": "./bin/index.d.ts",
     "scripts": {
         "test": "mocha --compilers ts:ts-node/register,tsx:ts-node/register ./test/index.test.ts",
