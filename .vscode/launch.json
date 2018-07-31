@@ -15,8 +15,8 @@
                 "--timeout",
                 "999999",
                 "--colors",
-                "--compilers",
-                "ts:ts-node/register,tsx:ts-node/register",
+                "--require",
+                "ts-node/register",
                 "${workspaceRoot}/test/index.test.ts"
             ],
             "internalConsoleOptions": "openOnSessionStart"
