@@ -1,12 +1,9 @@
 const gulp = require("gulp");
 const ts = require("gulp-typescript").createProject('tsconfig.json');
-const sourcemaps = require('gulp-sourcemaps');
 
-//编译TS代码
-gulp.task("compile", function () {
-    return gulp.src('src/**/*.ts')
-        .pipe(sourcemaps.init())
+//编译服务器端TS代码
+gulp.task("compileServer", function () {
+    return gulp.src('src/Server/**/*.ts')
         .pipe(ts())
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest('bin'));
+        .pipe(gulp.dest('bin/Server'));
 });

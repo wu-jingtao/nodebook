@@ -2,13 +2,15 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es2017",
-        "removeComments": false,
+        "removeComments": true,
         "preserveConstEnums": false,
-        "declaration": true,
+        "declaration": false,
         "experimentalDecorators": false,
         "noEmitOnError": true,
         "strict": true,
         "strictPropertyInitialization": false,
+        "jsx": "react",
+        "sourceMap": true,
         "lib": [
             "es2016",
             "dom",

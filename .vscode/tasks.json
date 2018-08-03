@@ -4,14 +4,14 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "编译",
+            "label": "编译服务器端",
             "type": "shell",
-            "command": "npm run compile"
+            "command": "npm run compileServer"
         },
         {
-            "label": "测试",
+            "label": "编译客户端",
             "type": "shell",
-            "command": "npm run test"
+            "command": "npm run compileClient"
         }
     ]
 }
