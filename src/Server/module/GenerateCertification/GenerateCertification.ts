@@ -10,9 +10,9 @@ import log from 'log-formatter';
 export class GenerateCertification extends BaseServiceModule {
 
     async onStart(): Promise<void> {
-        if (await this.checkCertExist()) {
-            log.location(this.name, '开始创建证书');
-            this.generateCert();
+        if (!(await this.checkCertExist())) {
+            log.location.round(this.name, '开始创建证书');
+            await this.generateCert();
         }
     }
 
@@ -21,8 +21,8 @@ export class GenerateCertification extends BaseServiceModule {
      */
     async checkCertExist() {
         try {
-            fs.promises.access('/key/privkey.pem');
-            fs.promises.access('/key/cert.pem');
+            await fs.promises.access('/key/privkey.pem');
+            await fs.promises.access('/key/cert.pem');
             return true;
         } catch {
             return false;
@@ -37,7 +37,7 @@ export class GenerateCertification extends BaseServiceModule {
             child_process.exec(
                 `openssl req -x509 -newkey rsa:4096 -keyout privkey.pem -out cert.pem -days 365 -subj '/CN=${process.env.DOMAIN}' -passout pass:${randomString(30)}`
                 , { cwd: '/key' }
-                , err => err ? resolve() : reject(err)
+                , err => err ? reject(err) : resolve()
             );
         });
     }

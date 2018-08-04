@@ -1,4 +1,4 @@
-FROM registry.cn-hangzhou.aliyuncs.com/wujingtao/node:8.9.0
+FROM registry.cn-hangzhou.aliyuncs.com/wujingtao/node:latest
 
 # 如果容器还缺少curl，那么还需要安装curl(注意curl版本必须大于7.4 不然没有--unix-socket参数)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,13 +17,14 @@ COPY webpack.config.js /app/webpack.config.js
 
 # 编译
 RUN npm install
-RUN npm run compileServer compileClient
+RUN npm run compileServer
+RUN npm run compileClient
 
 # 清除devDependencies包
 RUN npm prune --production
 
 # 删除多余文件
-RUN rm src gulpfile.js tsconfig.json webpack.config.js
+RUN rm -r src gulpfile.js tsconfig.json webpack.config.js
 
 # 确保可执行
 RUN dos2unix /app/node_modules/service-starter/src/Docker/health_check.sh
