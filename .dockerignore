@@ -1,0 +1,6 @@
+*
+!src
+!gulpfile.js
+!package.json
+!tsconfig.json
+!webpack.config.js
