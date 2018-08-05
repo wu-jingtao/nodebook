@@ -7,6 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+# 确保程序代码不会被tast访问
+RUN chmod 700 /app
 
 # 复制代码
 COPY src /app/src
@@ -42,21 +44,17 @@ HEALTHCHECK \
     # 调用程序所暴露出的健康检查接口(要使用绝对路径)
     CMD /app/node_modules/service-starter/src/Docker/health_check.sh
 
-# 建立执行task的用户
-RUN useradd -M -s /usr/sbin/nologin nodebook-task
-
 # 创建存放用户数据目录
-RUN mkdir -m 700 /user-data
+RUN mkdir -m 755 /user-data
+
+# 创建存放任务临时数据目录
+RUN mkdir -m 755 /program-data
 
 # 创建存放openssl key目录
 # 程序第一次启动时会生成临时的秘钥，如果自己有秘钥的话可以通过挂载的方式设置秘钥
 # key：  /key/privkey.pem
 # cert： /key/cert.pem
 RUN mkdir -m 700 /key
-
-# 创建存放任务临时数据目录
-RUN mkdir -m 700 /program-data
-RUN chown nodebook-task:nodebook-task /program-data
 
 # 配置域名，默认localhost
 ENV DOMAIN=localhost
