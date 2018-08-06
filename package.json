@@ -25,6 +25,7 @@
     "homepage": "https://github.com/mx601595686/nodebook#readme",
     "devDependencies": {
         "@types/crypto-random-string": "^1.0.0",
+        "@types/fs-extra": "^5.0.4",
         "@types/lodash": "^4.14.85",
         "@types/node": "^10.5.4",
         "@types/react": "^16.4.7",
@@ -50,8 +51,10 @@
     },
     "dependencies": {
         "crypto-random-string": "^1.0.0",
+        "fs-extra": "^7.0.0",
         "lodash": "^4.17.4",
         "log-formatter": "^0.1.5",
-        "service-starter": "^1.0.3"
+        "service-starter": "^1.0.3",
+        "simple-sqlite-promise": "^0.1.3"
     }
 }

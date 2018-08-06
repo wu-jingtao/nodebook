@@ -6,6 +6,30 @@
     "configurations": [
         {
             "type": "node",
+            "request": "attach",
+            "name": "容器中调试",
+            "address": "localhost",
+            "port": 9229,
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/app"
+            
+            /**
+            * 参考Docker命令
+            *
+            * docker run --rm -it --name nodebook_test -p 443:443 -p 9229:9229 \
+            * -v $(pwd)/bin:/app/bin \
+            * -v $(pwd)/testData/user-data:/user-data \
+            * -v $(pwd)/testData/program-data:/program-data \
+            * -v $(pwd)/testData/key:/key \
+            * nodebook:latest /bin/bash
+            *
+            * 进入容器后启动node调试
+            *
+            * node --inspect-brk=0.0.0.0:9229 .
+            */
+        },
+        {
+            "type": "node",
             "request": "launch",
             "name": "服务器端调试",
             "protocol": "inspector",

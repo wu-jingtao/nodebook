@@ -57,4 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+# 编译后的代码目录
 bin
+
+# 挂载到容器的测试数据目录
+testData
