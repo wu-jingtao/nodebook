@@ -4,7 +4,7 @@ import { BaseServiceModule } from "service-starter";
 import { InitializeDatabase } from './InitializeDatabase';
 
 /**
- * 服务表
+ * 服务表。提供了一些帮助方法便于数据库操作
  */
 export class ServicesTable extends BaseServiceModule {
 

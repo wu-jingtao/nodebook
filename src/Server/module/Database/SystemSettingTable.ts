@@ -4,20 +4,14 @@ import { BaseServiceModule } from 'service-starter';
 import { InitializeDatabase } from './InitializeDatabase';
 
 /**
- * 系统设置表
+ * 系统设置表。提供了一些帮助方法便于数据库操作
  */
 export class SystemSettingTable extends BaseServiceModule {
 
     /**
      * 系统默认值。顺序："key", "value", "is_server", "secret"
      */
-    static readonly _defaultValue: ReadonlyArray<[string, any, boolean, boolean]> = [
-        //服务器端
-        ['password', '', true, true],
-
-        //客户端
-        //[],
-    ];
+    static readonly _defaultValue: Array<[string, any, boolean, boolean]> = [];
 
     private _dbCon: sqlDB;
 

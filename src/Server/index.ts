@@ -4,6 +4,7 @@ import { GenerateCertificate } from './module/OpenSSLCertificate/GenerateCertifi
 import { InitializeDatabase } from './module/Database/InitializeDatabase';
 import { SystemSettingTable } from './module/Database/SystemSettingTable';
 import { ServicesTable } from './module/Database/ServicesTable';
+import { SystemSetting } from './module/SystemSetting/SystemSetting';
 
 const manager = new DockerServicesManager();
 
@@ -14,5 +15,8 @@ manager.registerService(new GenerateCertificate);
 manager.registerService(new InitializeDatabase);
 manager.registerService(new SystemSettingTable);
 manager.registerService(new ServicesTable);
+
+//SystemSetting
+manager.registerService(new SystemSetting);
 
 manager.start();
