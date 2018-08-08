@@ -31,8 +31,7 @@ export class SystemSettingTable extends BaseServiceModule {
      * 创建系统设置表
      */
     private async _createTable() {
-        //创建设置表
-        await this._dbCon.exec(`
+        await this._dbCon.run(`
             CREATE TABLE IF NOT EXISTS "main"."system_setting" (
                 "key" TEXT NOT NULL,	        --键名，如果存在层级则通过'.'进行分割。例如：'font.size'
                 "value" TEXT,	                --键值
@@ -50,8 +49,8 @@ export class SystemSettingTable extends BaseServiceModule {
         for (const item of SystemSettingTable._defaultValue) {
             await this._dbCon.run(`
                 INSERT INTO "main"."system_setting" ("key", "value", "is_server", "secret")
-                VALUES(?, ?, ?, ?)
-            `, item);
+                VALUES (?, ?, ?, ?)
+            `, item).catch(() => { });
         }
     }
 
