@@ -21,19 +21,16 @@ export class InitializeDatabase extends BaseServiceModule {
     public dbCon: sqlDB;
 
     async onStart(): Promise<void> {
-        debugger
-        await this._createDbConnection();
+        await fs.ensureDir(this._dbPath);
+        this.dbCon = await sqlDB.connectDB(this._dbPath + this._dbName);
+    }
+
+    async onStop(): Promise<void> {
+        if (this.dbCon !== undefined)
+            await this.dbCon.close();
     }
 
     async onHealthCheck(): Promise<void> {
         await this.dbCon.exec('select 1;');
-    }
-
-    /**
-     * 创建数据库连接
-     */
-    private async _createDbConnection() {
-        await fs.ensureDir(this._dbPath);
-        this.dbCon = await sqlDB.connectDB(this._dbPath + this._dbName);
     }
 }

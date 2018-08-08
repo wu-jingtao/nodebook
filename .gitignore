@@ -35,6 +35,7 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+package-lock.json
 
 # Typescript v1 declaration files
 typings/
@@ -58,7 +59,7 @@ typings/
 .env
 
 # 编译后的代码目录
-bin
+bin/
 
 # 挂载到容器的测试数据目录
-testData
+testData/
