@@ -11,11 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # 复制代码
-COPY src /app/src
-COPY package.json /app/package.json
-COPY gulpfile.js /app/gulpfile.js
-COPY tsconfig.json /app/tsconfig.json
-COPY webpack.config.js /app/webpack.config.js
+COPY ["src", "package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "LICENSE", "/app/"]
 
 # 编译
 RUN npm install; \ 

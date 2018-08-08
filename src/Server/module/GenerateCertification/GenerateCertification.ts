@@ -37,8 +37,10 @@ export class GenerateCertification extends BaseServiceModule {
             child_process.exec(
                 `openssl req -x509 -newkey rsa:4096 -keyout privkey.pem -out cert.pem -days 365 -subj '/CN=${process.env.DOMAIN}' -passout pass:${randomString(30)}`
                 , { cwd: '/key' }
-                , err => err ? reject(err) : resolve()
-            );
+                , (err, stdout, stderr) => {
+                    err ? reject(err) : resolve();
+                    console.log(stdout, stderr);
+                });
         });
     }
 }
