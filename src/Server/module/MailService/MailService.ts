@@ -28,7 +28,7 @@ export class MailService extends BaseServiceModule {
         this._mailService = settings.get('mail.service') as any;
         this._mailUser = settings.get('mail.user') as any;
         this._mailPass = settings.get('mail.pass') as any;
-        this._userName = settings.get('username') as any;
+        this._userName = settings.get('user.name') as any;
     }
 
     /**
