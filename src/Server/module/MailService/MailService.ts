@@ -1,7 +1,9 @@
 import * as nodemailer from 'nodemailer';
 import { BaseServiceModule } from "service-starter";
+import { ObservableVariable } from 'observable-variable';
 
 import { SystemSettingTable } from "../Database/SystemSettingTable";
+import { SystemSetting } from '../SystemSetting/SystemSetting';
 
 //设置系统变量
 SystemSettingTable._defaultValue.push(
@@ -15,32 +17,39 @@ SystemSettingTable._defaultValue.push(
  */
 export class MailService extends BaseServiceModule {
 
-    private _settingTable: SystemSettingTable;
-
-    private _emailService: string;  //邮件服务商
-    private _user: string;          //账号
-    private _pass: string;          //授权码
-
-    /**
-     * 检查参数是否已经全部配置
-     */
-    get isReady() {
-        return this._emailService != null && this._user != null && this._pass != null;
-    }
+    private _mailService: ObservableVariable<string>;   //邮件服务商
+    private _mailUser: ObservableVariable<string>;      //账号
+    private _mailPass: ObservableVariable<string>;      //授权码
+    private _userName: ObservableVariable<string>;      //登陆用户的用户名
 
     async onStart(): Promise<void> {
-        this._settingTable = this.services.SystemSettingTable;
-        await this.readSetting();
+        const settings = (this.services.SystemSetting as SystemSetting).settings;
+
+        this._mailService = settings.get('mail.service') as any;
+        this._mailUser = settings.get('mail.user') as any;
+        this._mailPass = settings.get('mail.pass') as any;
+        this._userName = settings.get('username') as any;
     }
 
     /**
-     * 从数据库中读取配置
+     * 发送邮件
      */
-    async readSetting() {
-        this._emailService = await this._settingTable.getNormalKey('mail.service');
-        this._user = await this._settingTable.getNormalKey('mail.user');
-        this._pass = await this._settingTable.getNormalKey('mail.pass');
-    }
+    async sendMail(title: string, content: string, files?: { filename: string, content: Buffer }[]): Promise<void> {
+        if (this._mailService.value == null) throw new Error('邮件服务商没有设置');
+        if (this._mailUser.value == null) throw new Error('邮件服务账号没有设置');
+        if (this._mailPass.value == null) throw new Error('邮件服务授权码没有设置');
 
-    
+        const transporter = nodemailer.createTransport({
+            service: this._mailService.value,
+            auth: { user: this._mailUser.value, pass: this._mailPass.value }
+        });
+
+        await transporter.sendMail({
+            from: `NodeBook <${process.env.DOMAIN}>`,
+            to: this._userName.value,
+            subject: title,
+            text: content,
+            attachments: files
+        });
+    }
 }

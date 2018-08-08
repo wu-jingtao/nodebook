@@ -5,6 +5,7 @@ import { InitializeDatabase } from './module/Database/InitializeDatabase';
 import { SystemSettingTable } from './module/Database/SystemSettingTable';
 import { ServicesTable } from './module/Database/ServicesTable';
 import { SystemSetting } from './module/SystemSetting/SystemSetting';
+import { MailService } from './module/MailService/MailService';
 
 const manager = new DockerServicesManager();
 
@@ -18,5 +19,8 @@ manager.registerService(new ServicesTable);
 
 //SystemSetting
 manager.registerService(new SystemSetting);
+
+//MailService
+manager.registerService(new MailService);
 
 manager.start();
