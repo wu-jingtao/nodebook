@@ -1,19 +1,12 @@
-import * as fs from 'fs-extra';
 import sqlDB = require('simple-sqlite-promise');
 import { BaseServiceModule } from 'service-starter';
 
-/**
- * 目前考虑到用户规模不会太大所以先使用Sqlite
- * 数据库文件保存在 '/user-data/db/nodebook_system_data.db' 下面
- */
+import { FileManager } from '../FileManager/FileManager';
 
 /**
  * 初始化数据库和数据库连接
  */
 export class InitializeDatabase extends BaseServiceModule {
-
-    private _dbPath = '/user-data/db/';
-    private _dbName = 'nodebook_system_data.db';
 
     /**
      * 数据库连接
@@ -21,8 +14,7 @@ export class InitializeDatabase extends BaseServiceModule {
     public dbCon: sqlDB;
 
     async onStart(): Promise<void> {
-        await fs.ensureDir(this._dbPath);
-        this.dbCon = await sqlDB.connectDB(this._dbPath + this._dbName);
+        this.dbCon = await sqlDB.connectDB(FileManager._databasePath);
     }
 
     async onStop(): Promise<void> {

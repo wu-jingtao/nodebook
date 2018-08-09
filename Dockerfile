@@ -46,7 +46,11 @@ VOLUME [ "/user-data", "/program-data" ]
 # 程序第一次启动时会生成临时的秘钥，如果自己有秘钥的话可以通过挂载的方式设置秘钥
 # key：  /key/privkey.pem
 # cert： /key/cert.pem
-RUN mkdir -m 700 /key
+RUN mkdir -m 700 /key; \
+# 创建 nodebook-task 账户，在执行用户程序的时候都是这个账户
+    useradd -d /program-data -M -s /usr/sbin/nologin nodebook-task; \
+# 使得用户程序可以修改 /program-data 目录
+    chown nodebook-task:nodebook-task /program-data
 
 # 配置域名，默认localhost
 ENV DOMAIN=localhost

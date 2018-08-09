@@ -31,7 +31,10 @@ export class UserManager extends BaseServiceModule {
         this._mailService = this.services.MailService;
 
         this._userName = settings.get('user.name') as any;
-        this._userName.on('beforeSet', newValue => /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(newValue));
+        this._userName.on('beforeSet', newValue => {
+            if (!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(newValue))
+                throw new Error(`用户名 '${newValue}' 不是有效的电子邮箱格式`);
+        });
 
         this._password = oVar(await settingTable.getSecretKey('user.password'));
         this._password.on('set', newValue => settingTable.updateSecretKey('user.password', newValue).catch(err => log.error.location.content(this.name, err)));

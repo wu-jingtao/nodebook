@@ -34,7 +34,10 @@ export class MailService extends BaseServiceModule {
         this._userName = settings.get('user.name') as any;
 
         //确保设置的service是nodemailer支持的
-        this._mailService.on('beforeSet', newValue => nodemailer_services_list.includes(newValue));
+        this._mailService.on('beforeSet', newValue => {
+            if (!nodemailer_services_list.includes(newValue))
+                throw new Error(`不支持的邮件服务商：${newValue}`);
+        });
     }
 
     /**

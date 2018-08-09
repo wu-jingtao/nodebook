@@ -7,8 +7,12 @@ import { ServicesTable } from './module/Database/ServicesTable';
 import { SystemSetting } from './module/SystemSetting/SystemSetting';
 import { MailService } from './module/MailService/MailService';
 import { UserManager } from './module/UserManager/UserManager';
+import { FileManager } from './module/FileManager/FileManager';
 
 const manager = new DockerServicesManager();
+
+//FileManager
+manager.registerService(new FileManager);
 
 //OpenSSLCertificate
 manager.registerService(new GenerateCertificate);

@@ -57,7 +57,7 @@
         "log-formatter": "^0.1.5",
         "moment": "^2.22.2",
         "nodemailer": "^4.6.7",
-        "observable-variable": "^0.1.1",
+        "observable-variable": "^0.1.2",
         "service-starter": "^1.0.3",
         "simple-sqlite-promise": "^0.1.3"
     }
