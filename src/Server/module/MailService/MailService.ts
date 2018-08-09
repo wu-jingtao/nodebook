@@ -5,6 +5,9 @@ import { ObservableVariable } from 'observable-variable';
 import { SystemSettingTable } from "../Database/SystemSettingTable";
 import { SystemSetting } from '../SystemSetting/SystemSetting';
 
+//nodemailer 内置服务商列表
+const nodemailer_services_list: string[] = Object.keys(require('nodemailer/lib/well-known/services.json'));
+
 //设置系统变量
 SystemSettingTable._defaultValue.push(
     ['mail.service', undefined, true, false],
@@ -29,6 +32,9 @@ export class MailService extends BaseServiceModule {
         this._mailUser = settings.get('mail.user') as any;
         this._mailPass = settings.get('mail.pass') as any;
         this._userName = settings.get('user.name') as any;
+
+        //确保设置的service是nodemailer支持的
+        this._mailService.on('beforeSet', newValue => nodemailer_services_list.includes(newValue));
     }
 
     /**

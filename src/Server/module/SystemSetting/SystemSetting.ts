@@ -1,5 +1,6 @@
 import { ObservableVariable, oVar } from 'observable-variable';
 import { BaseServiceModule } from "service-starter";
+import log from 'log-formatter';
 
 import { SystemSettingTable } from "../Database/SystemSettingTable";
 
@@ -20,7 +21,7 @@ export class SystemSetting extends BaseServiceModule {
         //配置可观察键
         for (const item of data) {
             const variable = oVar(item.value);
-            variable.on("set", newValue => settingTable.updateNormalKey(item.key, newValue));
+            variable.on("set", newValue => settingTable.updateNormalKey(item.key, newValue).catch(err => log.error.location.content(this.name, err)));
 
             (this.settings as Map<string, ObservableVariable<any>>).set(item.key, variable);
         }

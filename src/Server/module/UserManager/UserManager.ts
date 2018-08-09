@@ -2,6 +2,7 @@ import * as crypto from 'crypto';
 import * as moment from 'moment';
 import { BaseServiceModule } from "service-starter";
 import { ObservableVariable, oVar } from "observable-variable";
+import log from 'log-formatter';
 
 import { SystemSettingTable } from "../Database/SystemSettingTable";
 import { SystemSetting } from "../SystemSetting/SystemSetting";
@@ -30,27 +31,22 @@ export class UserManager extends BaseServiceModule {
         this._mailService = this.services.MailService;
 
         this._userName = settings.get('user.name') as any;
+        this._userName.on('beforeSet', newValue => /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(newValue));
+
         this._password = oVar(await settingTable.getSecretKey('user.password'));
-        this._password.on('set', newValue => settingTable.updateSecretKey('user.password', newValue));
+        this._password.on('set', newValue => settingTable.updateSecretKey('user.password', newValue).catch(err => log.error.location.content(this.name, err)));
     }
 
     /**
-     * 更新用户名，用户名必须是邮箱地址
+     * 更新密码，注意：客户端在将密码发给到服务器之前应当进行MD5操作。更新失败则会抛出异常
      */
-    updateUserName(username: string) {
-        if (/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(username))
-            this._userName.value = username;
-        else
-            throw new Error('要更新的用户名格式不正确');
-    }
-
-    /**
-     * 更新密码，注意：客户端在将密码发给到服务器之前应当进行MD5操作
-     */
-    updatePassword(password: string) {
-        if (password.length === 32)
-            this._password.value = password;
-        else
+    updatePassword(newPass: string, oldPass: string) {
+        if (newPass.length === 32 && oldPass.length === 32) {
+            if (this._password.value === oldPass)
+                this._password.value = newPass;
+            else
+                throw new Error('输入的旧密码错误');
+        } else
             throw new Error('传入的密码不是被MD5化后的有效字符串');
     }
 
@@ -74,7 +70,7 @@ export class UserManager extends BaseServiceModule {
 
         if (this._maxRetry === 11) {
             this._maxRetry++;
-            this._mailService.sendMail('NodeBook 连续登陆失败', `NodeBook <${process.env.DOMAIN}> 账号连续登陆失败超过10次。登陆用户IP：${ip}`).catch(() => { });
+            this._mailService.sendMail('NodeBook 连续登陆失败', `NodeBook <${process.env.DOMAIN}> 账号 <${this._userName.value}> 连续登陆失败超过10次。\n登陆用户IP：${ip}`).catch(() => { });
         }
 
         this._loginCountdown = moment().add(1, 'h');
