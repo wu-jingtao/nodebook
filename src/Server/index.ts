@@ -8,6 +8,7 @@ import { SystemSetting } from './module/SystemSetting/SystemSetting';
 import { MailService } from './module/MailService/MailService';
 import { UserManager } from './module/UserManager/UserManager';
 import { FileManager } from './module/FileManager/FileManager';
+import { LibraryManager } from './module/LibraryManager/LibraryManager';
 
 const manager = new DockerServicesManager();
 
@@ -27,6 +28,9 @@ manager.registerService(new SystemSetting);
 
 //MailService
 manager.registerService(new MailService);
+
+//LibraryManager
+manager.registerService(new LibraryManager);
 
 //UserManager
 manager.registerService(new UserManager);
