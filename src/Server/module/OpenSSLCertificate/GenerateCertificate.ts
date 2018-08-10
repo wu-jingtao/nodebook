@@ -9,7 +9,7 @@ import randomString = require('crypto-random-string');
 export class GenerateCertificate extends BaseServiceModule {
 
     async onStart(): Promise<void> {
-        if (!(await this.checkCertExist())) {
+        if (!await this.checkCertExist()) {
             await this.generateCert();
         }
     }
@@ -17,7 +17,7 @@ export class GenerateCertificate extends BaseServiceModule {
     /**
      * 检查证书是否存在
      */
-    async checkCertExist() {
+    async checkCertExist(): Promise<boolean> {
         try {
             await fs.promises.access('/key/privkey.pem');
             await fs.promises.access('/key/cert.pem');

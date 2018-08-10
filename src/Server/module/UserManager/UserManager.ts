@@ -43,7 +43,7 @@ export class UserManager extends BaseServiceModule {
     /**
      * 更新密码，注意：客户端在将密码发给到服务器之前应当进行MD5操作。更新失败则会抛出异常
      */
-    updatePassword(newPass: string, oldPass: string) {
+    updatePassword(newPass: string, oldPass: string): void {
         if (newPass.length === 32 && oldPass.length === 32) {
             if (this._password.value === oldPass)
                 this._password.value = newPass;
@@ -57,7 +57,7 @@ export class UserManager extends BaseServiceModule {
      * 检查登陆账号密码是否正确，如果不正确则抛出异常告知错误原因
      * @param ip 登陆用户的IP地址。如果可以获得的话推荐传入
      */
-    login(username: string, password: string, ip?: string) {
+    login(username: string, password: string, ip?: string): void {
         if (this._maxRetry < 10) {
             if (this._userName.value === username && this._password.value === password) {
                 this._maxRetry = 0;

@@ -18,7 +18,7 @@ export class ServicesTable extends BaseServiceModule {
     /**
      * 创建服务表
      */
-    private async _createTable() {
+    private async _createTable(): Promise<void> {
         await this._dbCon.exec(`
             CREATE TABLE IF NOT EXISTS "main"."services" (
                 "name" TEXT NOT NULL,	            --服务名称
@@ -33,7 +33,7 @@ export class ServicesTable extends BaseServiceModule {
     /**
      * 更新服务配置
      */
-    async updateService(name: string, path: string, auto_restart: boolean, report_error: boolean) {
+    async updateService(name: string, path: string, auto_restart: boolean, report_error: boolean): Promise<void> {
         await this._dbCon.run(`
             UPDATE "main"."services"
             SET "path" = ?, "auto_restart" = ?, "report_error" = ?
@@ -44,7 +44,7 @@ export class ServicesTable extends BaseServiceModule {
     /**
      * 添加一条新的服务配置
      */
-    async addService(name: string, path: string, auto_restart: boolean, report_error: boolean) {
+    async addService(name: string, path: string, auto_restart: boolean, report_error: boolean): Promise<void> {
         await this._dbCon.run(`
             INSERT INTO "main"."system_setting" ("name", "path", "auto_restart", "report_error")
             VALUES (?, ?, ?, ?)
@@ -54,7 +54,7 @@ export class ServicesTable extends BaseServiceModule {
     /**
      * 删除一条服务配置
      */
-    async deleteService(name: string) {
+    async deleteService(name: string): Promise<void> {
         await this._dbCon.run(`
             DELETE FROM "main"."services" WHERE "name" = ?
         `, name);

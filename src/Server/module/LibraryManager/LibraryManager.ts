@@ -39,8 +39,8 @@ export class LibraryManager extends BaseServiceModule {
     /**
      * 安装或更新类库
      */
-    async installLibrary(libraryName: string) {
-        return new Promise((resolve, reject) => {
+    async installLibrary(libraryName: string): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
             libraryName = libraryName.replace(/"/g, '\\"'); //转义引号，防止 bash 脚本注入
 
             child_process.exec(`npm uninstall --save "${libraryName}"`, { cwd: FileManager._userDataDir }, function (err) {

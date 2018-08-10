@@ -24,7 +24,7 @@ export class SystemSettingTable extends BaseServiceModule {
     /**
      * 创建系统设置表
      */
-    private async _createTable() {
+    private async _createTable(): Promise<void> {
         await this._dbCon.run(`
             CREATE TABLE IF NOT EXISTS "main"."system_setting" (
                 "key" TEXT NOT NULL,	        --键名，如果存在层级则通过'.'进行分割。例如：'font.size'
@@ -39,7 +39,7 @@ export class SystemSettingTable extends BaseServiceModule {
     /**
      * 初始化系统表的中的默认值
      */
-    private async _initializeDefaultValue() {
+    private async _initializeDefaultValue(): Promise<void> {
         for (const item of SystemSettingTable._defaultValue) {
             await this._dbCon.run(`
                 INSERT INTO "main"."system_setting" ("key", "value", "is_server", "secret")
@@ -51,7 +51,7 @@ export class SystemSettingTable extends BaseServiceModule {
     /**
      * 更新非私密键
      */
-    async updateNormalKey(key: string, value: any) {
+    async updateNormalKey(key: string, value: any): Promise<void> {
         await this._dbCon.run(`
             UPDATE "main"."system_setting"
             SET "value" = ?
@@ -62,7 +62,7 @@ export class SystemSettingTable extends BaseServiceModule {
     /**
      * 更新私密键
      */
-    async updateSecretKey(key: string, value: any) {
+    async updateSecretKey(key: string, value: any): Promise<void> {
         await this._dbCon.run(`
             UPDATE "main"."system_setting"
             SET "value" = ?

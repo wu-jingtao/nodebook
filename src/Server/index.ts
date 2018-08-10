@@ -9,6 +9,9 @@ import { MailService } from './module/MailService/MailService';
 import { UserManager } from './module/UserManager/UserManager';
 import { FileManager } from './module/FileManager/FileManager';
 import { LibraryManager } from './module/LibraryManager/LibraryManager';
+import { TaskManager } from './module/TaskManager/TaskManager';
+import { LogManager } from './module/TaskManager/LogManager';
+import { ServiceManager } from './module/TaskManager/ServiceManager';
 
 const manager = new DockerServicesManager();
 
@@ -29,10 +32,15 @@ manager.registerService(new SystemSetting);
 //MailService
 manager.registerService(new MailService);
 
+//UserManager
+manager.registerService(new UserManager);
+
 //LibraryManager
 manager.registerService(new LibraryManager);
 
-//UserManager
-manager.registerService(new UserManager);
+//TaskManager
+manager.registerService(new LogManager);
+manager.registerService(new TaskManager);
+manager.registerService(new ServiceManager);
 
 manager.start();
