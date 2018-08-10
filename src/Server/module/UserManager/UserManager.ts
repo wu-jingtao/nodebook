@@ -1,17 +1,14 @@
 import * as crypto from 'crypto';
 import * as moment from 'moment';
 import { BaseServiceModule } from "service-starter";
-import { ObservableVariable, oVar } from "observable-variable";
-import log from 'log-formatter';
+import { ObservableVariable } from "observable-variable";
 
-import { SystemSettingTable } from "../Database/SystemSettingTable";
 import { SystemSetting } from "../SystemSetting/SystemSetting";
 import { MailService } from "../MailService/MailService";
 
-SystemSettingTable._defaultValue.push(
-    ['user.name', 'note@book.com', true, false],
-    ['user.password', crypto.createHash("md5").update('123456').digest('hex'), true, true],
-);
+//设置系统变量默认值
+SystemSetting.addSystemSetting('user.name', 'note@book.com', true, false);                                                 //登陆用户的用户名
+SystemSetting.addSystemSetting('user.password', crypto.createHash("md5").update('123456').digest('hex'), true, true);      //登陆密码
 
 /**
  * 用户管理
@@ -26,18 +23,16 @@ export class UserManager extends BaseServiceModule {
     private _mailService: MailService;
 
     async onStart(): Promise<void> {
-        const settings = (this.services.SystemSetting as SystemSetting).settings;
-        const settingTable = this.services.SystemSettingTable as SystemSettingTable;
         this._mailService = this.services.MailService;
+        const systemSetting = this.services.SystemSetting as SystemSetting;
 
-        this._userName = settings.get('user.name') as any;
+        this._userName = systemSetting.normalSettings.get('user.name') as any;
         this._userName.on('beforeSet', newValue => {
             if (!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(newValue))
                 throw new Error(`用户名 '${newValue}' 不是有效的电子邮箱格式`);
         });
 
-        this._password = oVar(await settingTable.getSecretKey('user.password'));
-        this._password.on('set', newValue => settingTable.updateSecretKey('user.password', newValue).catch(err => log.error.location.content(this.name, err)));
+        this._password = systemSetting.secretSettings.get('user.password') as any;
     }
 
     /**

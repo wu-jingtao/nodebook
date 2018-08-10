@@ -8,17 +8,11 @@ import { InitializeDatabase } from './InitializeDatabase';
  */
 export class SystemSettingTable extends BaseServiceModule {
 
-    /**
-     * 系统默认值。顺序："key", "value", "is_server", "secret"
-     */
-    static readonly _defaultValue: Array<[string, any, boolean, boolean]> = [];
-
     private _dbCon: sqlDB;
 
     async onStart(): Promise<void> {
         this._dbCon = (this.services.InitializeDatabase as InitializeDatabase).dbCon;
         await this._createTable();
-        await this._initializeDefaultValue();
     }
 
     /**
@@ -37,15 +31,13 @@ export class SystemSettingTable extends BaseServiceModule {
     }
 
     /**
-     * 初始化系统表的中的默认值
+     * 添加新的键
      */
-    private async _initializeDefaultValue(): Promise<void> {
-        for (const item of SystemSettingTable._defaultValue) {
-            await this._dbCon.run(`
-                INSERT INTO "main"."system_setting" ("key", "value", "is_server", "secret")
-                VALUES (?, ?, ?, ?)
-            `, item).catch(() => { });
-        }
+    async addNewKey(key: string, value: any, is_server: boolean, secret: boolean): Promise<void> {
+        await this._dbCon.run(`
+            INSERT INTO "main"."system_setting" ("key", "value", "is_server", "secret")
+            VALUES (?, ?, ?, ?)
+        `, key, value, is_server, secret);
     }
 
     /**
@@ -73,25 +65,25 @@ export class SystemSettingTable extends BaseServiceModule {
     /**
      * 获取普通键值
      */
-    async getNormalKey(key: string): Promise<any> {
+    async getNormalKey(key: string): Promise<{ value: any, is_server: boolean }> {
         const result = await this._dbCon.get(`
-            SELECT "value" FROM "main"."system_setting" 
+            SELECT "value", "is_server" FROM "main"."system_setting" 
             WHERE "key" = ? AND "secret" = 0
         `, key);
 
-        return result.value;
+        return result;
     }
 
     /**
      * 获取私密键值
      */
-    async getSecretKey(key: string): Promise<any> {
+    async getSecretKey(key: string): Promise<{ value: any, is_server: boolean }> {
         const result = await this._dbCon.get(`
-            SELECT "value" FROM "main"."system_setting" 
+            SELECT "value", "is_server" FROM "main"."system_setting" 
             WHERE "key" = ? AND "secret" = 1
         `, key);
 
-        return result.value;
+        return result;
     }
 
     /**
@@ -101,6 +93,16 @@ export class SystemSettingTable extends BaseServiceModule {
         return await this._dbCon.all(`
             SELECT "key", "value", "is_server" FROM "main"."system_setting" 
             WHERE "secret" = 0
+        `);
+    }
+
+    /**
+     * 获取所有私密键值
+     */
+    async getAllSecretKey(): Promise<{ key: string, value: any, is_server: boolean }[]> {
+        return await this._dbCon.all(`
+            SELECT "key", "value", "is_server" FROM "main"."system_setting" 
+            WHERE "secret" = 1
         `);
     }
 }
