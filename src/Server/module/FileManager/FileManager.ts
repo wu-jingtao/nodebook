@@ -84,6 +84,15 @@ export class FileManager extends BaseServiceModule {
     }
 
     /**
+     * 创建目录。注意，只允许在 '_userCodeDir' 、'_programDataDir' 之下创建目录。
+     */
+    async createDirectory(path: string): Promise<void> {
+        this._pathStartWith(path, [FileManager._userCodeDir, FileManager._programDataDir]);
+
+        await fs.ensureDir(path);
+    }
+
+    /**
      * 复制文件或整个目录。注意，复制目录的时候，只会将目录中的内容（不包括目录本身）复制到目标目录下。
      * 只允许在 '_userCodeDir' 、'_programDataDir' 、'_recycleDir' 之间复制粘贴内容。
      * 不允许向 '_recycleDir' 中粘贴内容

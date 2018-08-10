@@ -10,7 +10,7 @@ import { UserManager } from './module/UserManager/UserManager';
 import { FileManager } from './module/FileManager/FileManager';
 import { LibraryManager } from './module/LibraryManager/LibraryManager';
 import { TaskManager } from './module/TaskManager/TaskManager';
-import { LogManager } from './module/TaskManager/LogManager';
+import { LogManager } from './module/TaskManager/LogManager/LogManager';
 import { ServiceManager } from './module/TaskManager/ServiceManager';
 
 const manager = new DockerServicesManager();
