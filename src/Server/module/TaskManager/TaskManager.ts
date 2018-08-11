@@ -12,8 +12,8 @@ import { FileManager } from "../FileManager/FileManager";
  */
 export class TaskManager extends BaseServiceModule {
 
-    //存放正在执行的任务。key：文件路径
-    private readonly _taskList: Map<string, child_process.ChildProcess> = new Map();
+    //存放正在执行的任务。key：文件路径。invokeCallback：调用任务内部方法回调，key：随机ID
+    private readonly _taskList: Map<string, { process: child_process.ChildProcess, invokeCallback: Map<string, (jsonResult: string) => void> }> = new Map();
     private _logManager: LogManager;
 
     async onStart(): Promise<void> {
@@ -49,7 +49,19 @@ export class TaskManager extends BaseServiceModule {
                 this._taskList.delete(taskFilePath);
             });
 
-            this._taskList.set(taskFilePath, child);
+            const invokeCallback: Map<string, (jsonResult: string) => void> = new Map();
+
+            child.on('message', (msg: { requestID: string, jsonResult: string }) => {
+                if (_.isObject(msg)) {
+                    const callback = invokeCallback.get(msg.requestID);
+                    if (callback) {
+                        invokeCallback.delete(msg.requestID);
+                        callback(msg.jsonResult);
+                    }
+                }
+            });
+
+            this._taskList.set(taskFilePath, { process: child, invokeCallback });
         }
     }
 
@@ -57,16 +69,16 @@ export class TaskManager extends BaseServiceModule {
      * 删除某个正在运行的任务，如果任务不存在，则不执行任何操作
      */
     destroyTask(taskFilePath: string): void {
-        const child = this._taskList.get(taskFilePath);
-        if (child) child.kill();
+        const task = this._taskList.get(taskFilePath);
+        if (task) task.process.kill();
     }
 
     /**
      * 获取某个正在运行的任务，资源消耗的情况，如果任务不存在则返回空
      */
     async getTaskResourcesConsumption(taskFilePath: string): Promise<pidusage.Stat | undefined> {
-        const child = this._taskList.get(taskFilePath);
-        if (child) return await pidusage(process.pid);
+        const task = this._taskList.get(taskFilePath);
+        if (task) return await pidusage(task.process.pid);
     }
 
     /**
@@ -86,30 +98,31 @@ export class TaskManager extends BaseServiceModule {
     }
 
     /**
-     * 调用任务中暴露出的方法。执行后的结果以 {err:string, data:any} 的json格式返回。如果60秒没有返回结果这判定超时
+     * 调用任务中暴露出的方法。执行后的结果以json格式返回。如果60秒没有返回结果这判定超时
      * @param taskFilePath 任务文件路径
      * @param functionName 要调用的方法名称
      * @param jsonArgs json参数，到达任务进程中后会自动反序列化，然后传给要调用的方法
      */
     invokeTaskFunction(taskFilePath: string, functionName: string, jsonArgs: string): Promise<string> {
         return new Promise((resolve, reject) => {
-            const child = this._taskList.get(taskFilePath) as child_process.ChildProcess;
-            if (child && child.connected) {
+            const task = this._taskList.get(taskFilePath);
+            if (task && task.process.connected) {
                 const requestID = Math.random().toString();
-                const timer = setTimeout(() => reject('{"err":"调用超时"}'), 1000 * 60);
 
-                function callback(msg: { requestID: string, result: string }) {
-                    if (_.isObject(msg) && msg.requestID === requestID) {
-                        child.off('message', callback);
-                        clearTimeout(timer);
-                        resolve(msg.result || '{}');
-                    }
-                }
+                const timer = setTimeout(() => {
+                    task.invokeCallback.delete(requestID);
+                    reject(new Error('调用超时'));
+                }, 1000 * 60);
 
-                child.on('message', callback);
-                child.send({ requestID, functionName, jsonArgs });
+                task.invokeCallback.set(requestID, jsonResult => {
+                    task.invokeCallback.delete(requestID);
+                    clearTimeout(timer);
+                    resolve(jsonResult);
+                });
+
+                task.process.send({ requestID, functionName, jsonArgs });
             } else
-                resolve('{"err":"调用的任务并未运行"}');
+                reject(new Error('要调用的任务的方法无法访问'));
         });
     }
 }
