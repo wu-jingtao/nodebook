@@ -9,7 +9,7 @@ import { TaskLogger } from './TaskLogger';
 
 //设置系统变量默认值
 SystemSetting.addSystemSetting('task.logMaxLength', 3000, true, false);     //日志最大保存数，默认3000条，最小值1
-SystemSetting.addSystemSetting('task.logMaxSaveDays', 30, true, false);     //日志最大保存天数（任务处于停止状态，超过多少天没有更新过日志就会被删除），默认30天，最小值1
+SystemSetting.addSystemSetting('task.logMaxSaveDays', 30, true, false);     //日志最大保存天数（任务处于停止状态，超过多少天没有更新过日志就会被删除），默认30天，最小值1。服务的日志不会受到这个的限制
 
 /**
  * 用户任务日志管理器
@@ -40,7 +40,7 @@ export class LogManager extends BaseServiceModule {
         this._cleanTimeoutLogs = setInterval(() => {
             const timeLine = moment().subtract(this._logMaxSaveDays.value, 'd').valueOf();
             this._loggerList.forEach((logger, taskFilePath) => {
-                if (logger.status !== 'running' && logger.getLastLogDate() < timeLine)
+                if (logger.isService === false && logger.status.value !== 'running' && logger.getLastLogDate() < timeLine)
                     this.deleteTaskLogger(taskFilePath);
             });
         }, 1000 * 60 * 60 * 24);
@@ -57,6 +57,9 @@ export class LogManager extends BaseServiceModule {
         if (!taskFilePath.startsWith(FileManager._userCodeDir))
             throw new Error(`不能为 '${FileManager._userCodeDir}' 目录以外的文件创建任务日志`);
 
+        if (!taskFilePath.endsWith('.js'))
+            throw new Error('只能为 js 类型的文件创建任务日志');
+
         if (this._loggerList.has(taskFilePath))
             return this._loggerList.get(taskFilePath) as any;
         else {
@@ -70,11 +73,19 @@ export class LogManager extends BaseServiceModule {
      * 删除某个任务的日志
      */
     deleteTaskLogger(taskFilePath: string): void {
-        if (this._loggerList.has(taskFilePath)) {
-            const logger = this._loggerList.get(taskFilePath) as TaskLogger;
+        const logger = this._loggerList.get(taskFilePath);
+        if (logger) {
             logger._destroy();
             this._loggerList.delete(taskFilePath);
         }
+    }
+
+    /**
+     * 清空某个任务的日志
+     */
+    cleanTaskLogger(taskFilePath: string): void {
+        const logger = this._loggerList.get(taskFilePath);
+        if (logger) logger.cleanLog();
     }
 
     /**
@@ -82,10 +93,21 @@ export class LogManager extends BaseServiceModule {
      * @param date js 时间戳
      */
     getLogsAfterDate(taskFilePath: string, date?: number): ReadonlyArray<{ date: number, is_error: boolean, text: string }> {
-        if (this._loggerList.has(taskFilePath)) {
-            const logger = this._loggerList.get(taskFilePath) as TaskLogger;
+        const logger = this._loggerList.get(taskFilePath);
+        if (logger) {
             return logger.getLogsAfterDate(date);
         } else
+            return [];
+    }
+
+    /**
+     * 从末尾获取多少条日志，如果任务不存在就直接返回空数组
+     */
+    getLogsFromEnd(taskFilePath: string, size: number): ReadonlyArray<{ date: number, is_error: boolean, text: string }> {
+        const logger = this._loggerList.get(taskFilePath);
+        if (logger)
+            return logger.getLogsFromEnd(size);
+        else
             return [];
     }
 
@@ -94,6 +116,15 @@ export class LogManager extends BaseServiceModule {
      */
     getTaskStatus(taskFilePath: string): 'running' | 'stop' | 'crashed' | undefined {
         const logger = this._loggerList.get(taskFilePath);
-        if (logger) return logger.status;
+        if (logger) return logger.status.value;
+    }
+
+    /**
+     * 获取所有任务的状态
+     */
+    getAllTaskStatus(): ReadonlyArray<{ path: string, status: string }> {
+        const result: { path: string, status: string }[] = [];
+        this._loggerList.forEach(item => result.push({ path: item.taskFilePath, status: item.status.value }));
+        return result;
     }
 }

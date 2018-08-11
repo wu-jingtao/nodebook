@@ -14,17 +14,17 @@ WORKDIR /app
 COPY ["src", "package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "LICENSE", "/app/"]
 
 # 编译
-RUN npm install; \ 
-    npm run compileServer; \
-    npm run compileClient; \
+RUN npm install && \ 
+    npm run compileServer && \
+    npm run compileClient && \
 # 清除devDependencies包
-    npm prune --production; \
+    npm prune --production && \
 # 删除多余文件
-    rm -r src gulpfile.js tsconfig.json webpack.config.js; \
+    rm -r src gulpfile.js tsconfig.json webpack.config.js && \
 # 确保程序代码不会被破坏
-    chmod 700 /app; \
+    chmod 700 /app && \
 # 确保可执行
-    dos2unix /app/node_modules/service-starter/src/Docker/health_check.sh; \
+    dos2unix /app/node_modules/service-starter/src/Docker/health_check.sh && \
     chmod 755 /app/node_modules/service-starter/src/Docker/health_check.sh
 
 HEALTHCHECK \
@@ -40,15 +40,16 @@ HEALTHCHECK \
     CMD /app/node_modules/service-starter/src/Docker/health_check.sh
 
 # 创建存放 用户数据目录 以及 任务临时数据 目录
-VOLUME [ "/user-data", "/program-data" ]
+VOLUME [ "/user_data", "/program_data" ]
 
 # 创建存放openssl key目录
 # 程序第一次启动时会生成临时的秘钥，如果自己有秘钥的话可以通过挂载的方式设置秘钥
 # key：  /key/privkey.pem
 # cert： /key/cert.pem
-RUN mkdir -m 700 /key; \
+RUN mkdir -m 700 /key && \
 # 创建 nodebook-task 账户，在执行用户程序的时候都是这个账户
-    useradd -d /program-data -M -s /usr/sbin/nologin nodebook-task; \
+    groupadd -g 6000 nodebook-task && \
+    useradd -c nodebook-task -d /program-data -g nodebook-task -M -s /usr/sbin/nologin -u 6000 nodebook-task && \
 # 使得用户程序可以修改 /program-data 目录
     chown nodebook-task:nodebook-task /program-data
 

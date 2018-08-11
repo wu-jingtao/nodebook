@@ -21,51 +21,54 @@ export class ServicesTable extends BaseServiceModule {
     private async _createTable(): Promise<void> {
         await this._dbCon.exec(`
             CREATE TABLE IF NOT EXISTS "main"."services" (
-                "name" TEXT NOT NULL,	            --服务名称
                 "path" TEXT NOT NULL,	            --程序文件路径
+                "name" TEXT NOT NULL,	            --服务名称
                 "auto_restart" integer NOT NULL,	--服务是否随服务器自动重启
                 "report_error" integer NOT NULL,	--当服务崩溃时是否发送邮件通知用户
-                PRIMARY KEY ("name")
+                PRIMARY KEY ("path")
             );
+            CREATE UNIQUE INDEX IF NOT EXISTS "main"."services_name" ON "services" ("name");
         `);
     }
 
     /**
      * 更新服务配置
      */
-    async updateService(name: string, path: string, auto_restart: boolean, report_error: boolean): Promise<void> {
+    async updateService(path: string, name: string, auto_restart: boolean, report_error: boolean): Promise<void> {
         await this._dbCon.run(`
             UPDATE "main"."services"
-            SET "path" = ?, "auto_restart" = ?, "report_error" = ?
-            WHERE "name" = ?
-        `, path, auto_restart, report_error, name);
+            SET "name" = ?, "auto_restart" = ?, "report_error" = ?
+            WHERE "path" = ?
+        `, name, auto_restart, report_error, path);
     }
 
     /**
      * 添加一条新的服务配置
      */
-    async addService(name: string, path: string, auto_restart: boolean, report_error: boolean): Promise<void> {
+    async addService(path: string, name: string, auto_restart: boolean, report_error: boolean): Promise<void> {
         await this._dbCon.run(`
-            INSERT INTO "main"."system_setting" ("name", "path", "auto_restart", "report_error")
+            INSERT INTO "main"."system_setting" ("path", "name", "auto_restart", "report_error")
             VALUES (?, ?, ?, ?)
-        `, name, path, auto_restart, report_error);
+        `, path, name, auto_restart, report_error);
     }
 
     /**
      * 删除一条服务配置
      */
-    async deleteService(name: string): Promise<void> {
+    async deleteService(path: string): Promise<void> {
         await this._dbCon.run(`
-            DELETE FROM "main"."services" WHERE "name" = ?
-        `, name);
+            DELETE FROM "main"."services" WHERE "path" = ?
+        `, path);
     }
 
     /**
      * 获取所有服务配置
      */
-    async getAllServices(): Promise<{ name: string, path: string, auto_restart: boolean, report_error: boolean }[]> {
+    async getAllServices(): Promise<ReadonlyArray<ServiceConfig>> {
         return await this._dbCon.all(`
-            SELECT "name", "path", "auto_restart", "report_error" FROM "main"."services" 
+            SELECT "path", "name", "auto_restart", "report_error" FROM "main"."services" 
         `);
     }
 }
+
+export type ServiceConfig = { path: string, name: string, auto_restart: boolean, report_error: boolean };

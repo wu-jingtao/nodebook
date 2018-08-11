@@ -3,7 +3,6 @@ import * as node_path from 'path';
 import * as moment from 'moment';
 import * as archiver from 'archiver';
 import * as unzip from 'unzip';
-
 import { BaseServiceModule } from "service-starter";
 
 /**
@@ -16,12 +15,12 @@ export class FileManager extends BaseServiceModule {
     /**
      * 用户数据存放目录
      */
-    static readonly _userDataDir = '/user-data/';
+    static readonly _userDataDir = '/user_data/';
 
     /**
      * 程序数据存放目录
      */
-    static readonly _programDataDir = '/program-data/';
+    static readonly _programDataDir = '/program_data/';
 
     /**
      *用户代码存放目录
