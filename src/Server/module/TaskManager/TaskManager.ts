@@ -1,6 +1,7 @@
 import * as os from 'os';
 import * as child_process from 'child_process';
 import * as pidusage from 'pidusage';
+import * as _ from 'lodash';
 import { BaseServiceModule } from "service-starter";
 
 import { LogManager } from "./LogManager/LogManager";
@@ -82,5 +83,33 @@ export class TaskManager extends BaseServiceModule {
             freeMemory: os.freemem(),
             uptime: os.uptime() //系统运行了多久了
         };
+    }
+
+    /**
+     * 调用任务中暴露出的方法。执行后的结果以 {err:string, data:any} 的json格式返回。如果60秒没有返回结果这判定超时
+     * @param taskFilePath 任务文件路径
+     * @param functionName 要调用的方法名称
+     * @param jsonArgs json参数，到达任务进程中后会自动反序列化，然后传给要调用的方法
+     */
+    invokeTaskFunction(taskFilePath: string, functionName: string, jsonArgs: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const child = this._taskList.get(taskFilePath) as child_process.ChildProcess;
+            if (child && child.connected) {
+                const requestID = Math.random().toString();
+                const timer = setTimeout(() => reject('{"err":"调用超时"}'), 1000 * 60);
+
+                function callback(msg: { requestID: string, result: string }) {
+                    if (_.isObject(msg) && msg.requestID === requestID) {
+                        child.off('message', callback);
+                        clearTimeout(timer);
+                        resolve(msg.result || '{}');
+                    }
+                }
+
+                child.on('message', callback);
+                child.send({ requestID, functionName, jsonArgs });
+            } else
+                resolve('{"err":"调用的任务并未运行"}');
+        });
     }
 }
