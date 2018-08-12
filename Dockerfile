@@ -8,6 +8,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# 创建存放 用户数据目录 以及 任务数据目录
+VOLUME [ "/user_data", "/program_data" ]
+
+# 创建存放openssl key目录
+# 程序第一次启动时会生成临时的秘钥，如果自己有秘钥的话可以通过挂载的方式设置秘钥
+# key：  /key/privkey.pem
+# cert： /key/cert.pem
+RUN mkdir -m 700 /key && \
+# 创建 nodebook-task 账户，在执行用户程序的时候都是这个账户
+    groupadd -g 6000 nodebook-task && \
+    useradd -c nodebook-task -d /program-data -g nodebook-task -M -s /usr/sbin/nologin -u 6000 nodebook-task && \
+# 使得用户程序可以修改 /program-data 目录
+    chown nodebook-task:nodebook-task /program-data
+
 WORKDIR /app
 
 # 复制代码
@@ -38,20 +52,6 @@ HEALTHCHECK \
     --retries=3 \
     # 调用程序所暴露出的健康检查接口(要使用绝对路径)
     CMD /app/node_modules/service-starter/src/Docker/health_check.sh
-
-# 创建存放 用户数据目录 以及 任务临时数据 目录
-VOLUME [ "/user_data", "/program_data" ]
-
-# 创建存放openssl key目录
-# 程序第一次启动时会生成临时的秘钥，如果自己有秘钥的话可以通过挂载的方式设置秘钥
-# key：  /key/privkey.pem
-# cert： /key/cert.pem
-RUN mkdir -m 700 /key && \
-# 创建 nodebook-task 账户，在执行用户程序的时候都是这个账户
-    groupadd -g 6000 nodebook-task && \
-    useradd -c nodebook-task -d /program-data -g nodebook-task -M -s /usr/sbin/nologin -u 6000 nodebook-task && \
-# 使得用户程序可以修改 /program-data 目录
-    chown nodebook-task:nodebook-task /program-data
 
 # 配置域名，默认localhost
 ENV DOMAIN=localhost

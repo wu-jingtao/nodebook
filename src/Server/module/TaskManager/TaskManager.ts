@@ -1,11 +1,15 @@
 import * as os from 'os';
 import * as child_process from 'child_process';
 import * as pidusage from 'pidusage';
+import * as diskusage from 'diskusage'
+import * as util from 'util';
 import * as _ from 'lodash';
 import { BaseServiceModule } from "service-starter";
 
 import { LogManager } from "./LogManager/LogManager";
 import { FileManager } from "../FileManager/FileManager";
+
+const diskusage_check = util.promisify(diskusage.check);
 
 /**
  * 用户任务管理器
@@ -84,16 +88,18 @@ export class TaskManager extends BaseServiceModule {
     /**
      * 获取计算机的硬件信息
      */
-    getSystemHardwareInfo() {
+    async getSystemHardwareInfo() {
         const cpu = os.cpus();
-
+        
         return {
-            cpuNumber: cpu.length,
-            cpuName: cpu[0].model,
-            domain: process.env.DOMAIN,
-            totalMemory: os.totalmem(),
-            freeMemory: os.freemem(),
-            uptime: os.uptime() //系统运行了多久了
+            cpuNumber: cpu.length,                                              //CPU核心数
+            cpuName: cpu[0].model,                                              //CPU名称
+            domain: process.env.DOMAIN,                                         //域名
+            totalMemory: os.totalmem(),                                         //内存总量
+            freeMemory: os.freemem(),                                           //剩余内存大小
+            uptime: os.uptime(),                                                //系统运行了多久了
+            userDataDir: await diskusage_check(FileManager._userDataDir),       //查看用户数据目录还有多少可用空间
+            programDataDir: await diskusage_check(FileManager._programDataDir)  //查看程序数据目录还有多少可用空间。这两个目录如果位于同一个分区下则大小一样
         };
     }
 

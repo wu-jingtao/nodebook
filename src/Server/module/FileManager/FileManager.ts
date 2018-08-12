@@ -13,6 +13,11 @@ export class FileManager extends BaseServiceModule {
     //#region 系统文件路径
 
     /**
+     * openssl证书目录
+     */
+    static readonly _opensslKeyDir = '/key/';
+
+    /**
      * 用户数据存放目录
      */
     static readonly _userDataDir = '/user_data/';
