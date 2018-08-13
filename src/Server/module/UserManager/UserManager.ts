@@ -1,5 +1,6 @@
 import * as crypto from 'crypto';
 import * as moment from 'moment';
+import log from 'log-formatter';
 import { BaseServiceModule } from "service-starter";
 import { ObservableVariable } from "observable-variable";
 
@@ -58,7 +59,8 @@ export class UserManager extends BaseServiceModule {
                 this._maxRetry = 0;
                 this._loginCountdown = undefined as any;
                 clearTimeout(this._loginTimeout);
-
+                log.location.text(this.name, '用户登录IP：', ip);
+                
                 return;
             } else {
                 this._maxRetry++;

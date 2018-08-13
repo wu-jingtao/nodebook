@@ -18,6 +18,16 @@ export class FileManager extends BaseServiceModule {
     static readonly _opensslKeyDir = '/key/';
 
     /**
+     * openssl私钥路径
+     */
+    static readonly _opensslPrivkeyPath = node_path.join(FileManager._opensslKeyDir, 'privkey.pem');
+
+    /**
+     * openssl公钥路径
+     */
+    static readonly _opensslCertPath = node_path.join(FileManager._opensslKeyDir, 'cert.pem');
+
+    /**
      * 用户数据存放目录
      */
     static readonly _userDataDir = '/user_data/';

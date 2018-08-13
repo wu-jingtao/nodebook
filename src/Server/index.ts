@@ -1,6 +1,6 @@
 import { DockerServicesManager } from 'service-starter';
 
-import { GenerateCertificate } from './module/OpenSSLCertificate/GenerateCertificate';
+import { OpenSSLCertificate } from './module/OpenSSLCertificate/OpenSSLCertificate';
 import { InitializeDatabase } from './module/Database/InitializeDatabase';
 import { SystemSettingTable } from './module/Database/SystemSettingTable';
 import { ServicesTable } from './module/Database/ServicesTable';
@@ -12,6 +12,7 @@ import { LibraryManager } from './module/LibraryManager/LibraryManager';
 import { TaskManager } from './module/TaskManager/TaskManager';
 import { LogManager } from './module/TaskManager/LogManager/LogManager';
 import { ServiceManager } from './module/TaskManager/ServiceManager';
+import { HttpServer } from './module/HttpServer/HttpServer';
 
 const manager = new DockerServicesManager();
 
@@ -19,7 +20,7 @@ const manager = new DockerServicesManager();
 manager.registerService(new FileManager);
 
 //OpenSSLCertificate
-manager.registerService(new GenerateCertificate);
+manager.registerService(new OpenSSLCertificate);
 
 //Database
 manager.registerService(new InitializeDatabase);
@@ -42,5 +43,8 @@ manager.registerService(new LibraryManager);
 manager.registerService(new LogManager);
 manager.registerService(new TaskManager);
 manager.registerService(new ServiceManager);
+
+//HttpServer
+manager.registerService(new HttpServer);
 
 manager.start();

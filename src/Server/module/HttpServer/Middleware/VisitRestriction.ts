@@ -12,7 +12,7 @@ SystemSetting.addSystemSetting('http.ipBlackListRegexp', undefined, true, false)
  */
 export function VisitRestriction(systemSetting: SystemSetting): koa.Middleware {
 
-    const _domain = process.env.DOMAIN;
+    const _domain = (process.env.DOMAIN || '').toLowerCase();
 
     const _ipWhiteListRegexp = systemSetting.normalSettings.get('http.ipWhiteListRegexp') as ObservableVariable<string>;
     const _ipBlackListRegexp = systemSetting.normalSettings.get('http.ipBlackListRegexp') as ObservableVariable<string>;
@@ -24,25 +24,18 @@ export function VisitRestriction(systemSetting: SystemSetting): koa.Middleware {
     _ipBlackListRegexp.on('set', newValue => _ip_black = newValue ? new RegExp(newValue) : undefined as any);
 
     return async function VisitRestriction(ctx, next) {
-        if (ctx.secure) {   //确保是https
-            if (_domain === ctx.host) { //ctx.host 格式："localhost:3000"
-                if (_ip_white !== undefined) {
-                    if (_ip_white.test(ctx.ip)) {
-                        await next();
-                        return;
-                    }
-                } else if (_ip_black !== undefined) {
-                    if (!_ip_black.test(ctx.ip)) {
-                        await next();
-                        return;
-                    }
-                } else {
-                    await next();
-                    return;
-                }
+        if (_domain === ctx.host) { //ctx.host 格式："localhost:3000"
+            if (_ip_white !== undefined) {
+                if (_ip_white.test(ctx.ip))
+                    return next();
+            } else if (_ip_black !== undefined) {
+                if (!_ip_black.test(ctx.ip))
+                    return next();
+            } else {
+                return next();
             }
         }
-        
+
         ctx.throw(403);
     }
 }

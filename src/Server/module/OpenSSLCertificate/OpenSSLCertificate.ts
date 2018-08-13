@@ -9,15 +9,25 @@ import { FileManager } from '../FileManager/FileManager';
 /**
  * 生成自签名openssl证书
  */
-export class GenerateCertificate extends BaseServiceModule {
+export class OpenSSLCertificate extends BaseServiceModule {
 
-    private readonly _privkeyPath = path.join(FileManager._opensslKeyDir, 'privkey.pem');
-    private readonly _certPath = path.join(FileManager._opensslKeyDir, 'cert.pem');
+    privkey: Buffer;
+    cert: Buffer;
 
     async onStart(): Promise<void> {
         if (!await this.checkCertExist()) {
             await this.generateCert();
         }
+
+        await this.readCert();
+    }
+
+    /**
+     * 读取证书到内存
+     */
+    async readCert(): Promise<void> {
+        this.privkey = await fs.promises.readFile(FileManager._opensslPrivkeyPath);
+        this.cert = await fs.promises.readFile(FileManager._opensslCertPath);
     }
 
     /**
@@ -25,8 +35,8 @@ export class GenerateCertificate extends BaseServiceModule {
      */
     async checkCertExist(): Promise<boolean> {
         try {
-            await fs.promises.access(this._privkeyPath);
-            await fs.promises.access(this._certPath);
+            await fs.promises.access(FileManager._opensslPrivkeyPath);
+            await fs.promises.access(FileManager._opensslCertPath);
             return true;
         } catch {
             return false;
