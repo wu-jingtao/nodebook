@@ -27,7 +27,7 @@ export class HttpServer extends BaseServiceModule {
         this._koaServer.use(HealthChecking());
         this._koaServer.use(VisitRestriction(this._systemSetting));
         this._koaServer.use(ErrorHandling());
-        this._koaServer.use(Favicon())
+        this._koaServer.use(Favicon(this._systemSetting))
         this._koaServer.use(BodyParser(this._systemSetting))
 
     }

@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import * as child_process from 'child_process';
 import { BaseServiceModule } from 'service-starter';
 import randomString = require('crypto-random-string');

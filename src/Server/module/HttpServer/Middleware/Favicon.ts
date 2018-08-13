@@ -1,41 +1,16 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as koa from 'koa';
+import log from 'log-formatter';
+import { ObservableVariable } from 'observable-variable';
 
-//网站图标路径
-const _faviconPath = path.resolve(__dirname, 'favicon.ico');
+import { SystemSetting } from '../../SystemSetting/SystemSetting';
 
-//是否设置的有网站图标
-let _hasFavicon = false;
+//配置系统设置变量
+SystemSetting.addDynamicSetting('dynamic.favicon', undefined);
 
-/**
- * 网站图标
- */
-export function Favicon(): koa.Middleware {
-    _checkFavicon();
-
-    return async function Favicon(ctx, next) {
-        if (_hasFavicon && '/favicon.ico' === ctx.originalUrl) {
-            ctx.body = fs.createReadStream(_faviconPath);
-        } else {
-            return next();
-        }
-    }
-}
-
-/**
- * 设置Favicon
- * @param filePath 用户上传的图标文件路径，如果为空则表示清除图标
- */
-export async function setFavicon(filePath?: string): Promise<void> {
-    if (filePath !== undefined) {
-        await fs.move(filePath, _faviconPath, { overwrite: true });
-        await _checkFavicon();
-    } else {
-        await fs.remove(_faviconPath);
-        await _checkFavicon();
-    }
-}
+const _faviconPath = path.resolve(__dirname, 'favicon.ico');    //网站图标路径
+let _hasFavicon = false;                                        //是否设置的有网站图标
 
 //检测是否存在网站图标
 async function _checkFavicon(): Promise<void> {
@@ -44,5 +19,35 @@ async function _checkFavicon(): Promise<void> {
         _hasFavicon = true;
     } catch {
         _hasFavicon = false;
+    }
+}
+
+/**
+ * 网站图标
+ */
+export function Favicon(systemSetting: SystemSetting): koa.Middleware {
+    _checkFavicon();
+
+    const _favicon = systemSetting.normalSettings.get('dynamic.favicon') as ObservableVariable<string | undefined>;
+    _favicon.on('set', async (filePath) => {
+        try {
+            if (filePath !== undefined) {
+                await fs.move(filePath, _faviconPath, { overwrite: true });
+                await _checkFavicon();
+            } else {
+                await fs.remove(_faviconPath);
+                await _checkFavicon();
+            }
+        } catch (err) {
+            log.error.location.text.content(Favicon.name, '替换或删除网站图标时发生异常：', err);
+        }
+    });
+
+    return async function Favicon(ctx, next) {
+        if (_hasFavicon && '/favicon.ico' === ctx.originalUrl) {
+            ctx.body = fs.createReadStream(_faviconPath);
+        } else {
+            return next();
+        }
     }
 }
