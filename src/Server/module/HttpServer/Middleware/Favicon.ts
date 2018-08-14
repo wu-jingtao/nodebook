@@ -1,13 +1,16 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as koa from 'koa';
+import * as koa_compose from 'koa-compose';
 import log from 'log-formatter';
 import { ObservableVariable } from 'observable-variable';
+import koa_conditional = require('koa-conditional-get');
+import koa_etag = require('koa-etag');
 
 import { SystemSetting } from '../../SystemSetting/SystemSetting';
 
 //配置系统设置变量
-SystemSetting.addDynamicSetting('dynamic.favicon', undefined);
+SystemSetting.addDynamicSetting('favicon', undefined);
 
 const _faviconPath = path.resolve(__dirname, 'favicon.ico');    //网站图标路径
 let _hasFavicon = false;                                        //是否设置的有网站图标
@@ -28,7 +31,7 @@ async function _checkFavicon(): Promise<void> {
 export function Favicon(systemSetting: SystemSetting): koa.Middleware {
     _checkFavicon();
 
-    const _favicon = systemSetting.normalSettings.get('dynamic.favicon') as ObservableVariable<string | undefined>;
+    const _favicon = systemSetting.normalSettings.get('favicon') as ObservableVariable<string | undefined>;
     _favicon.on('set', async (filePath) => {
         try {
             if (filePath !== undefined) {
@@ -43,11 +46,12 @@ export function Favicon(systemSetting: SystemSetting): koa.Middleware {
         }
     });
 
-    return async function Favicon(ctx, next) {
-        if (_hasFavicon && '/favicon.ico' === ctx.originalUrl) {
-            ctx.body = fs.createReadStream(_faviconPath);
-        } else {
-            return next();
+    return koa_compose([
+        koa_conditional(),
+        koa_etag(),
+        function Favicon(ctx) {
+            if (_hasFavicon)
+                ctx.body = fs.createReadStream(_faviconPath);
         }
-    }
+    ]);
 }
