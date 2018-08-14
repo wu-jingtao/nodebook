@@ -10,7 +10,7 @@ SystemSetting.addDynamicSetting('_internal.healthCheckingUrlPath', `/${randomStr
 /**
  * server健康检查，健康则返回OK
  */
-export function HealthChecking(systemSetting: SystemSetting): koa.Middleware {
+export function HealthCheck(systemSetting: SystemSetting): koa.Middleware {
     //随机生成的url访问地址
     const healthCheckingUrlPath = systemSetting.normalSettings.get('_internal.healthCheckingUrlPath') as ObservableVariable<string>;
 
