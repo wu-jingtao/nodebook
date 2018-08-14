@@ -1,4 +1,5 @@
 import * as moment from 'moment';
+import * as Error from 'http-errors';
 import { BaseServiceModule } from "service-starter";
 import { ObservableVariable } from "observable-variable";
 
@@ -28,12 +29,12 @@ export class LogManager extends BaseServiceModule {
 
         this._logMaxLength.on('beforeSet', newValue => {
             if (newValue < 1)
-                throw new Error('task.logMaxLength 的值不可以小于 1');
+                throw new Error.BadRequest('task.logMaxLength 的值不可以小于 1');
         });
 
         this._logMaxSaveDays.on('beforeSet', newValue => {
             if (newValue < 1)
-                throw new Error('task.logMaxSaveDays 的值不可以小于 1');
+                throw new Error.BadRequest('task.logMaxSaveDays 的值不可以小于 1');
         });
 
         //每个24小时执行一次清理
@@ -55,10 +56,10 @@ export class LogManager extends BaseServiceModule {
      */
     createTaskLogger(taskFilePath: string): TaskLogger {
         if (!taskFilePath.startsWith(FileManager._userCodeDir))
-            throw new Error(`不能为 '${FileManager._userCodeDir}' 目录以外的文件创建任务日志`);
+            throw new Error.BadRequest(`不能为 '${FileManager._userCodeDir}' 目录以外的文件创建任务日志`);
 
         if (!taskFilePath.endsWith('.js'))
-            throw new Error('只能为 js 类型的文件创建任务日志');
+            throw new Error.BadRequest('只能为 js 类型的文件创建任务日志');
 
         if (this._loggerList.has(taskFilePath))
             return this._loggerList.get(taskFilePath) as any;

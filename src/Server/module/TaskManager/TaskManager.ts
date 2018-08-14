@@ -4,6 +4,7 @@ import * as pidusage from 'pidusage';
 import * as diskusage from 'diskusage';
 import * as util from 'util';
 import * as _ from 'lodash';
+import * as Error from 'http-errors';
 import { BaseServiceModule } from "service-starter";
 
 import { LogManager } from "./LogManager/LogManager";
@@ -30,10 +31,10 @@ export class TaskManager extends BaseServiceModule {
      */
     createTask(taskFilePath: string): void {
         if (!taskFilePath.startsWith(FileManager._userCodeDir))
-            throw new Error(`不能为 '${FileManager._userCodeDir}' 目录外的文件创建任务`);
+            throw new Error.BadRequest(`不能为 '${FileManager._userCodeDir}' 目录外的文件创建任务`);
 
         if (!taskFilePath.endsWith('.js'))
-            throw new Error('只能为 js 类型的文件创建任务');
+            throw new Error.BadRequest('只能为 js 类型的文件创建任务');
 
         if (!this._taskList.has(taskFilePath)) {    //确保要创建的任务并未处于运行状态
             const child = child_process.fork(taskFilePath, [], {

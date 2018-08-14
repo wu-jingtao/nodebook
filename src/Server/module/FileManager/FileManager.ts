@@ -80,7 +80,7 @@ export class FileManager extends BaseServiceModule {
     /**
      * 断言某个路径是否存在
      */
-    static async _isPathExists(path: string) {
+    private static async _isPathExists(path: string) {
         try {
             await fs.promises.access(path);
         } catch  {
@@ -91,7 +91,7 @@ export class FileManager extends BaseServiceModule {
     /**
      * 断言某个路径是一个文件
      */
-    static async _isFile(path: string) {
+    private static async _isFile(path: string) {
         let stats;
 
         try {
@@ -107,7 +107,7 @@ export class FileManager extends BaseServiceModule {
     /**
      * 断言某个路径是一个目录
      */
-    static async _isDirectory(path: string) {
+    private static async _isDirectory(path: string) {
         let stats;
 
         try {
@@ -123,7 +123,7 @@ export class FileManager extends BaseServiceModule {
     /**
      * 判断某个路径是否以什么开头，如果都不匹配则抛出异常
      */
-    static _pathStartWith(path: string, startWith: string[]): void {
+    private static _pathStartWith(path: string, startWith: string[]): void {
         if (!startWith.some(item => path.startsWith(item)))
             throw new Error.Forbidden(`无权操作路径 '${path}'`);
     }

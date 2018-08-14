@@ -7,7 +7,6 @@ import koa_response_time = require('koa-response-time');
 import { BaseServiceModule } from "service-starter";
 import { ObservableVariable } from 'observable-variable';
 
-import { FileManager } from '../FileManager/FileManager';
 import { SystemSetting } from '../SystemSetting/SystemSetting';
 import { OpenSSLCertificate } from '../OpenSSLCertificate/OpenSSLCertificate';
 
@@ -16,7 +15,7 @@ import { HealthChecking } from './Middleware/HealthChecking';
 import { VisitRestriction } from './Middleware/VisitRestriction';
 import { Favicon } from './Middleware/Favicon';
 import { VisitLogger } from './Middleware/VisitLogger';
-import { StaticFileSender } from './Middleware/StaticFileSender';
+import { ClientStaticFileSender } from './Middleware/ClientStaticFileSender';
 import { ApiRouter } from './Middleware/ApiRouter';
 
 export class HttpServer extends BaseServiceModule {
@@ -42,7 +41,7 @@ export class HttpServer extends BaseServiceModule {
         const router = new koa_router();
 
         router.get('favicon', '/favicon.ico', Favicon(this._systemSetting));
-        router.get('static', '/static/:path(.+?\\..+)', StaticFileSender(FileManager._appClientFileDir));
+        router.get('static', '/static/:path(.+?\\..+)', ClientStaticFileSender());
         router.use('/api', ApiRouter(this._systemSetting));
 
         router.redirect('/', '/static/index.html');

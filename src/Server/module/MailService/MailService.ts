@@ -1,4 +1,5 @@
 import * as nodemailer from 'nodemailer';
+import * as Error from 'http-errors';
 import { BaseServiceModule } from "service-starter";
 import { ObservableVariable } from 'observable-variable';
 
@@ -33,7 +34,7 @@ export class MailService extends BaseServiceModule {
         //确保设置的 service 是 nodemailer 支持的
         this._mailService.on('beforeSet', newValue => {
             if (!nodemailer_services_list.includes(newValue))
-                throw new Error(`不支持的邮件服务商：${newValue}`);
+                throw new Error.BadRequest(`不支持的邮件服务商：${newValue}`);
         });
     }
 
@@ -41,9 +42,9 @@ export class MailService extends BaseServiceModule {
      * 发送邮件
      */
     async sendMail(title: string, content: string, files?: { filename: string, content: Buffer }[]): Promise<void> {
-        if (this._mailService.value == null) throw new Error('邮件服务商没有设置');
-        if (this._mailUser.value == null) throw new Error('邮件服务账号没有设置');
-        if (this._mailPass.value == null) throw new Error('邮件服务授权码没有设置');
+        if (this._mailService.value == null) throw new Error.BadRequest('邮件服务商没有设置');
+        if (this._mailUser.value == null) throw new Error.BadRequest('邮件服务账号没有设置');
+        if (this._mailPass.value == null) throw new Error.BadRequest('邮件服务授权码没有设置');
 
         const transporter = nodemailer.createTransport({
             service: this._mailService.value,

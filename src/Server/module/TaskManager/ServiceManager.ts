@@ -1,12 +1,12 @@
 import log from 'log-formatter';
 import * as moment from 'moment';
+import * as Error from 'http-errors';
 import { BaseServiceModule } from "service-starter";
 
 import { TaskManager } from "./TaskManager";
 import { ServicesTable, ServiceConfig } from "../Database/ServicesTable";
 import { LogManager } from "./LogManager/LogManager";
 import { FileManager } from "../FileManager/FileManager";
-import { TaskLogger } from './LogManager/TaskLogger';
 import { MailService } from '../MailService/MailService';
 
 /**
@@ -83,10 +83,10 @@ export class ServiceManager extends BaseServiceModule {
     async createService(path: string, name: string, auto_restart: boolean, report_error: boolean): Promise<void> {
         if (!this._servicesList.has(path)) {
             if (!path.startsWith(FileManager._userCodeDir))
-                throw new Error(`不能为 '${FileManager._userCodeDir}' 目录外的文件创建服务`);
+                throw new Error.BadRequest(`不能为 '${FileManager._userCodeDir}' 目录外的文件创建服务`);
 
             if (!path.endsWith('.js'))
-                throw new Error('只能为 js 类型的文件创建服务');
+                throw new Error.BadRequest('只能为 js 类型的文件创建服务');
 
             await this._servicesTable.addService(path, name, auto_restart, report_error);
 
