@@ -29,6 +29,11 @@ export class FileManager extends BaseServiceModule {
     static readonly _userDataDir = '/user_data/';
 
     /**
+     * 用户数据备份目录
+     */
+    static readonly _userDataBackupDir = '/user_data_backup/';
+
+    /**
      * 程序数据存放目录
      */
     static readonly _programDataDir = '/program_data/';

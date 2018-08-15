@@ -124,7 +124,7 @@ export class TaskManager extends BaseServiceModule {
 
                 const timer = setTimeout(() => {
                     task.invokeCallback.delete(requestID);
-                    reject(new Error('调用超时'));
+                    reject(new Error.BadRequest('调用超时'));
                 }, 1000 * 60);
 
                 task.invokeCallback.set(requestID, jsonResult => {
@@ -135,7 +135,7 @@ export class TaskManager extends BaseServiceModule {
 
                 task.process.send({ requestID, functionName, jsonArgs });
             } else
-                reject(new Error('要调用的任务的方法无法访问'));
+                reject(new Error.BadRequest('要调用的任务的方法无法访问'));
         });
     }
 }

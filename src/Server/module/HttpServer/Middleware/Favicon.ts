@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as koa from 'koa';
 import * as koa_compose from 'koa-compose';
+import * as Error from 'http-errors';
 import log from 'log-formatter';
 import { ObservableVariable } from 'observable-variable';
 import koa_conditional = require('koa-conditional-get');
@@ -52,6 +53,8 @@ export function Favicon(systemSetting: SystemSetting): koa.Middleware {
         function Favicon(ctx) {
             if (_hasFavicon)
                 ctx.body = fs.createReadStream(_faviconPath);
+            else
+                throw new Error.NotFound();
         }
     ]);
 }

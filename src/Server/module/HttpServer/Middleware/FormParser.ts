@@ -6,7 +6,7 @@ import { ObservableVariable } from 'observable-variable';
 import { SystemSetting } from '../../SystemSetting/SystemSetting';
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('http.uploadFileSizeLimit', 1024, true, false);    //文件数据上传大小限制，单位MB，默认1024MB，最小1MB
+SystemSetting.addSystemSetting('http.uploadFileSizeLimit', 100, true, false);    //文件数据上传大小限制，单位MB，默认100MB，最小1MB
 
 /**
  * 表单内容解析工具

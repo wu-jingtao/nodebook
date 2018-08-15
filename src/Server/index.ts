@@ -13,6 +13,7 @@ import { TaskManager } from './module/TaskManager/TaskManager';
 import { LogManager } from './module/TaskManager/LogManager/LogManager';
 import { ServiceManager } from './module/TaskManager/ServiceManager';
 import { HttpServer } from './module/HttpServer/HttpServer';
+import { BackupData } from './module/BackupData/BackupData';
 
 const manager = new DockerServicesManager();
 
@@ -32,6 +33,9 @@ manager.registerService(new SystemSetting);
 
 //MailService
 manager.registerService(new MailService);
+
+//BackupData
+manager.registerService(new BackupData);
 
 //UserManager
 manager.registerService(new UserManager);

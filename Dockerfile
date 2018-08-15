@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# 创建存放 用户数据目录 以及 任务数据目录
-VOLUME [ "/user_data", "/program_data" ]
+# 创建存放 用户数据目录、用户数据备份目录 以及 任务数据目录
+VOLUME [ "/user_data", "/user_data_backup", "/program_data" ]
 
 # 创建存放openssl key目录
 # 程序第一次启动时会生成临时的秘钥，如果自己有秘钥的话可以通过挂载的方式设置秘钥
