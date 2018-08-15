@@ -2,6 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as child_process from 'child_process';
 import * as _ from 'lodash';
+import * as Error from 'http-errors';
 import { BaseServiceModule } from "service-starter";
 
 import { FileManager } from '../FileManager/FileManager';
@@ -17,7 +18,7 @@ export class LibraryManager extends BaseServiceModule {
         //检查 '/user-data/package.json' 是否存在，不存在就初始化一个
         try {
             await fs.promises.access(this._package_json_path);
-        } catch (error) {
+        } catch {
             await fs.writeJson(this._package_json_path, {
                 name: 'nodebook-user-installed-library',
                 version: '0.0.1',
@@ -37,21 +38,32 @@ export class LibraryManager extends BaseServiceModule {
     }
 
     /**
-     * 安装或更新类库
+     * 安装类库
      */
-    async installLibrary(libraryName: string): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            libraryName = libraryName.replace(/"/g, '\\"'); //转义引号，防止 bash 脚本注入
-
-            child_process.exec(`npm uninstall --save "${libraryName}"`, { cwd: FileManager._userDataDir }, function (err) {
-                if (err)
-                    reject(err);
-                else {
-                    child_process.exec(`npm install --save "${libraryName}"`, { cwd: FileManager._userDataDir }, function (err) {
-                        err ? reject(err) : resolve();
-                    });
-                }
+    installLibrary(libraryName: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            child_process.execFile('npm', ['i', '-s', libraryName], { cwd: FileManager._userDataDir }, err => {
+                err ? reject(new Error.BadRequest('安装失败：类库的名称可能不存在或其他原因')) : resolve();
             });
         });
+    }
+
+    /**
+     * 卸载类库
+     */
+    uninstallLibrary(libraryName: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            child_process.execFile('npm', ['uninstall', '-s', libraryName], { cwd: FileManager._userDataDir }, err => {
+                err ? reject(new Error.BadRequest('卸载失败')) : resolve();
+            });
+        });
+    }
+
+    /**
+     * 更新某个类库
+     */
+    async updateLibrary(libraryName: string): Promise<void> {
+        await this.uninstallLibrary(libraryName);
+        await this.installLibrary(libraryName);
     }
 }
