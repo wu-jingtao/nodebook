@@ -3,7 +3,6 @@ import * as node_path from 'path';
 import * as moment from 'moment';
 import * as archiver from 'archiver';
 import * as unzip from 'unzip';
-import * as Error from 'http-errors';
 import { BaseServiceModule } from "service-starter";
 
 /**
@@ -80,60 +79,13 @@ export class FileManager extends BaseServiceModule {
 
     //#endregion
 
-    //#region 断言方法
-
-    /**
-     * 断言某个路径是否存在
-     */
-    private static async _isPathExists(path: string) {
-        try {
-            await fs.promises.access(path);
-        } catch  {
-            throw new Error.BadRequest(`要操作的路径不存在 '${path}'`);
-        }
-    }
-
-    /**
-     * 断言某个路径是一个文件
-     */
-    private static async _isFile(path: string) {
-        let stats;
-
-        try {
-            stats = await fs.promises.stat(path);
-        } catch  {
-            throw new Error.BadRequest(`没有要操作的文件 '${path}'`);
-        }
-
-        if (!stats.isFile())
-            throw new Error.BadRequest(`要操作的不是一个文件 '${path}'`);
-    }
-
-    /**
-     * 断言某个路径是一个目录
-     */
-    private static async _isDirectory(path: string) {
-        let stats;
-
-        try {
-            stats = await fs.promises.stat(path);
-        } catch  {
-            throw new Error.BadRequest(`没有要操作的目录 '${path}'`);
-        }
-
-        if (!stats.isDirectory())
-            throw new Error.BadRequest(`要操作的不是一个目录 '${path}'`);
-    }
-
     /**
      * 判断某个路径是否以什么开头，如果都不匹配则抛出异常
      */
     private static _pathStartWith(path: string, startWith: string[]): void {
         if (path.length > 4000 || !startWith.some(item => path.startsWith(item)))
-            throw new Error.Forbidden(`无权操作路径 '${path}'`);
+            throw new Error(`无权操作路径 '${path}'`);
     }
-
-    //#endregion
 
     async onStart(): Promise<void> {
         //创建程序需要用到的目录
@@ -148,8 +100,6 @@ export class FileManager extends BaseServiceModule {
      */
     async listDirectory(path: string): Promise<{ name: string, isFile: boolean, modifyTime: number, size: number }[]> {
         FileManager._pathStartWith(path, [FileManager._userCodeDir, FileManager._programDataDir, FileManager._recycleDir, FileManager._libraryDir]);
-        await FileManager._isDirectory(path);
-
         const result = [];
 
         for (const name of await fs.promises.readdir(path)) {
@@ -178,7 +128,6 @@ export class FileManager extends BaseServiceModule {
     async copy(from: string, to: string): Promise<void> {
         FileManager._pathStartWith(from, [FileManager._userCodeDir, FileManager._programDataDir, FileManager._recycleDir]);
         FileManager._pathStartWith(to, [FileManager._userCodeDir, FileManager._programDataDir]);
-        await FileManager._isPathExists(from);
 
         await fs.copy(from, to, { dereference: true, overwrite: true });
     }
@@ -190,7 +139,6 @@ export class FileManager extends BaseServiceModule {
     async move(from: string, to: string): Promise<void> {
         FileManager._pathStartWith(from, [FileManager._userCodeDir, FileManager._programDataDir, FileManager._recycleDir]);
         FileManager._pathStartWith(to, [FileManager._userCodeDir, FileManager._programDataDir]);
-        await FileManager._isPathExists(from);
 
         await fs.move(from, to, { overwrite: true });
     }
@@ -209,7 +157,6 @@ export class FileManager extends BaseServiceModule {
      */
     async deleteCodeData(path: string): Promise<void> {
         FileManager._pathStartWith(path, [FileManager._userCodeDir]);
-        await FileManager._isPathExists(path);
 
         //为文件或目录加上时间
         const pathDetail = node_path.parse(path);
@@ -228,7 +175,6 @@ export class FileManager extends BaseServiceModule {
      */
     async deleteCodeDataDirectly(path: string): Promise<void> {
         FileManager._pathStartWith(path, [FileManager._userCodeDir]);
-        await FileManager._isPathExists(path);
 
         await fs.remove(path);
     }
@@ -246,7 +192,6 @@ export class FileManager extends BaseServiceModule {
      */
     async deleteProgramData(path: string): Promise<void> {
         FileManager._pathStartWith(path, [FileManager._programDataDir]);
-        await FileManager._isPathExists(path);
 
         await fs.remove(path);
     }
@@ -256,49 +201,46 @@ export class FileManager extends BaseServiceModule {
      */
     async readFile(path: string): Promise<NodeJS.ReadableStream> {
         FileManager._pathStartWith(path, [FileManager._userCodeDir, FileManager._programDataDir, FileManager._recycleDir, FileManager._libraryDir]);
-        await FileManager._isFile(path);
 
         return fs.createReadStream(path);
     }
 
     /**
-     * 压缩某个文件或目录
+     * 压缩某个文件或目录。注意，只允许在 '_userCodeDir' 、'_programDataDir' 之下创建压缩文件。
      */
     zipData(path: string, to: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             try {
                 FileManager._pathStartWith(path, [FileManager._userCodeDir, FileManager._programDataDir]);
                 FileManager._pathStartWith(to, [FileManager._userCodeDir, FileManager._programDataDir]);
-                await FileManager._isPathExists(path);
 
                 await fs.ensureFile(to);
                 const output = fs.createWriteStream(to);
                 const fileStat = await fs.promises.stat(path);
                 const archive = archiver('zip', { zlib: { level: 9 } });
 
-                if (fileStat.isFile()) {
-                    const pathDetail = node_path.parse(path);
-                    archive.file(path, { name: pathDetail.base });
-                } else if (fileStat.isDirectory())
-                    archive.directory(path, false);
+                output.on('close', resolve);
+                archive.on('error', reject);
+
+                if (fileStat.isFile())
+                    archive.file(path, { name: node_path.basename(path) });
+                else if (fileStat.isDirectory())
+                    archive.directory(path, node_path.basename(path));
 
                 archive.finalize();
-
                 archive.pipe(output);
-                output.on('close', resolve);
             } catch (error) { reject(error); }
         });
     }
 
     /**
-     * 解压压缩文件
+     * 解压压缩文件。注意，只允许解压到 '_userCodeDir' 、'_programDataDir'。
      */
     unzipData(path: string, to: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             try {
                 FileManager._pathStartWith(path, [FileManager._userCodeDir, FileManager._programDataDir]);
                 FileManager._pathStartWith(to, [FileManager._userCodeDir, FileManager._programDataDir]);
-                await FileManager._isFile(path);
 
                 fs.createReadStream(path).pipe(unzip.Extract({ path: to })).on('error', reject).on('close', resolve);
             } catch (error) { reject(error); }
@@ -310,15 +252,13 @@ export class FileManager extends BaseServiceModule {
      */
     async zipDownloadData(path: string): Promise<NodeJS.ReadableStream> {
         FileManager._pathStartWith(path, [FileManager._userCodeDir, FileManager._programDataDir, FileManager._recycleDir, FileManager._libraryDir]);
-        await FileManager._isPathExists(path);
 
         const fileStat = await fs.promises.stat(path);
         const archive = archiver('zip', { zlib: { level: 9 } });
 
-        if (fileStat.isFile()) {
-            const pathDetail = node_path.parse(path);
-            archive.file(path, { name: pathDetail.base });
-        } else if (fileStat.isDirectory())
+        if (fileStat.isFile())
+            archive.file(path, { name: node_path.basename(path) });
+        else if (fileStat.isDirectory())
             archive.directory(path, false);
 
         archive.finalize();

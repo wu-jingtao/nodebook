@@ -11,21 +11,12 @@ export class SystemSetting extends BaseServiceModule {
 
     //系统设置默认值。顺序："key", "value", "is_server", "secret"
     private static readonly _defaultSystemSettingValue: Array<[string, any, boolean, boolean]> = [];
-    //动态系统设置，这个主要是在系统运行期间使用，不会保存到数据库。顺序："key", "value"
-    private static readonly _dynamicSystemSettingValue: Array<[string, any]> = [];
 
     /**
      * 添加系统设置项
      */
     static addSystemSetting(key: string, value: any, is_server: boolean, secret: boolean) {
         SystemSetting._defaultSystemSettingValue.push([key, value, is_server, secret]);
-    }
-
-    /**
-     * 添加系统运行期间变量，这些变量可以在normalSettings中获得
-     */
-    static addDynamicSetting(key: string, value: any) {
-        SystemSetting._dynamicSystemSettingValue.push([key, value]);
     }
 
     private _systemSettingTable: SystemSettingTable;
@@ -57,11 +48,6 @@ export class SystemSetting extends BaseServiceModule {
             variable.on("set", newValue => this._systemSettingTable.updateNormalKey(item.key, newValue).catch(err => log.error.location.content(this.name, err)));
 
             (this.normalSettings as Map<string, ObservableVariable<any>>).set(item.key, variable);
-        }
-        
-        for (const item of SystemSetting._dynamicSystemSettingValue) {
-            const variable = oVar(item[1]);
-            (this.normalSettings as Map<string, ObservableVariable<any>>).set(item[0], variable);
         }
 
         //私密键

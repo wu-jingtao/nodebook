@@ -2,7 +2,6 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as child_process from 'child_process';
 import * as _ from 'lodash';
-import * as Error from 'http-errors';
 import { BaseServiceModule } from "service-starter";
 
 import { FileManager } from '../FileManager/FileManager';
@@ -43,7 +42,7 @@ export class LibraryManager extends BaseServiceModule {
     installLibrary(libraryName: string): Promise<void> {
         return new Promise((resolve, reject) => {
             child_process.execFile('npm', ['i', '-s', libraryName], { cwd: FileManager._userDataDir }, err => {
-                err ? reject(new Error.BadRequest('安装失败：类库的名称可能不存在或其他原因')) : resolve();
+                err ? reject(err) : resolve();
             });
         });
     }
@@ -54,7 +53,7 @@ export class LibraryManager extends BaseServiceModule {
     uninstallLibrary(libraryName: string): Promise<void> {
         return new Promise((resolve, reject) => {
             child_process.execFile('npm', ['uninstall', '-s', libraryName], { cwd: FileManager._userDataDir }, err => {
-                err ? reject(new Error.BadRequest('卸载失败')) : resolve();
+                err ? reject(err) : resolve();
             });
         });
     }

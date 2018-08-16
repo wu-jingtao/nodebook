@@ -3,7 +3,6 @@ import * as os from 'os';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import * as Error from 'http-errors';
 import * as node_pty from 'node-pty';
 import * as archiver from 'archiver';
 import { BaseServiceModule } from "service-starter";

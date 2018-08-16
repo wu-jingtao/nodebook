@@ -1,11 +1,10 @@
 import * as os from 'os';
 import * as child_process from 'child_process';
-import * as pidusage from 'pidusage';
 import * as diskusage from 'diskusage';
 import * as util from 'util';
 import * as _ from 'lodash';
-import * as Error from 'http-errors';
 import { BaseServiceModule } from "service-starter";
+import { pidusage, pidusage_Stat } from './__temp_pidusage_type_definition';
 
 import { LogManager } from "./LogManager/LogManager";
 import { FileManager } from "../FileManager/FileManager";
@@ -30,21 +29,16 @@ export class TaskManager extends BaseServiceModule {
      * 创建一个新的任务。如果任务正在运行，则不执行任何操作
      */
     createTask(taskFilePath: string): void {
-        if (!taskFilePath.startsWith(FileManager._userCodeDir))
-            throw new Error.BadRequest(`不能为 '${FileManager._userCodeDir}' 目录外的文件创建任务`);
-
-        if (!taskFilePath.endsWith('.js'))
-            throw new Error.BadRequest('只能为 js 类型的文件创建任务');
-
         if (!this._taskList.has(taskFilePath)) {    //确保要创建的任务并未处于运行状态
+            LogManager._checkPath(taskFilePath);
+            
             const child = child_process.fork(taskFilePath, [], {
                 cwd: FileManager._programDataDir,
                 uid: 6000,
                 gid: 6000
             });
-
+            
             const logger = this._logManager.createTaskLogger(taskFilePath);
-
             logger.status.value = 'running';
 
             child.stdout.on('data', chunk => logger.addLog(false, chunk.toString()));
@@ -82,7 +76,7 @@ export class TaskManager extends BaseServiceModule {
     /**
      * 获取某个正在运行的任务，资源消耗的情况，如果任务不存在则返回空
      */
-    async getTaskResourcesConsumption(taskFilePath: string): Promise<pidusage.Stat | undefined> {
+    async getTaskResourcesConsumption(taskFilePath: string): Promise<pidusage_Stat | undefined> {
         const task = this._taskList.get(taskFilePath);
         if (task) return await pidusage(task.process.pid);
     }
@@ -98,7 +92,7 @@ export class TaskManager extends BaseServiceModule {
                 resolve({
                     cpuNumber: cpu.length,                                              //CPU核心数
                     cpuName: cpu[0].model,                                              //CPU名称
-                    cpuUsage: cpuUsage,                                                 //CPU使用百分比
+                    cpuUsage,                                                           //CPU使用百分比
                     domain: process.env.DOMAIN || '',                                   //域名
                     totalMemory: os.totalmem(),                                         //内存总量
                     freeMemory: os.freemem(),                                           //剩余内存大小
@@ -124,7 +118,7 @@ export class TaskManager extends BaseServiceModule {
 
                 const timer = setTimeout(() => {
                     task.invokeCallback.delete(requestID);
-                    reject(new Error.BadRequest('调用超时'));
+                    reject(new Error('调用超时'));
                 }, 1000 * 60);
 
                 task.invokeCallback.set(requestID, jsonResult => {
@@ -135,7 +129,7 @@ export class TaskManager extends BaseServiceModule {
 
                 task.process.send({ requestID, functionName, jsonArgs });
             } else
-                reject(new Error.BadRequest('要调用的任务的方法无法访问'));
+                reject(new Error('要调用的任务的方法无法访问'));
         });
     }
 }

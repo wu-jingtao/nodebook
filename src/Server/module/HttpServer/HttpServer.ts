@@ -4,13 +4,12 @@ import * as request from 'request-promise-native';
 import * as koa_compress from 'koa-compress';
 import koa_response_time = require('koa-response-time');
 import { BaseServiceModule } from "service-starter";
-import { ObservableVariable } from 'observable-variable';
 
 import { SystemSetting } from '../SystemSetting/SystemSetting';
 import { OpenSSLCertificate } from '../OpenSSLCertificate/OpenSSLCertificate';
 
 import { ErrorHandling } from './Middleware/ErrorHandling';
-import { HealthCheck } from './Middleware/HealthCheck';
+import { HealthCheck, healthCheckingUrlPath } from './Middleware/HealthCheck';
 import { VisitRestriction } from './Middleware/VisitRestriction';
 import { VisitLogger } from './Middleware/VisitLogger';
 import { Router } from './Middleware/Router';
@@ -19,7 +18,6 @@ export class HttpServer extends BaseServiceModule {
 
     private _systemSetting: SystemSetting;
     private _openSSLCertificate: OpenSSLCertificate;
-    private _healthCheckingUrlPath: ObservableVariable<string>;
 
     private _httpServer: https.Server;
     private _koaServer: koa;
@@ -28,7 +26,7 @@ export class HttpServer extends BaseServiceModule {
      * 注册koa中间件
      */
     private async _registerMiddleware() {
-        this._koaServer.use(HealthCheck(this._systemSetting));
+        this._koaServer.use(HealthCheck());
         this._koaServer.use(VisitRestriction(this._systemSetting));
         this._koaServer.use(VisitLogger());
         this._koaServer.use(ErrorHandling());
@@ -40,7 +38,6 @@ export class HttpServer extends BaseServiceModule {
     async onStart(): Promise<void> {
         this._systemSetting = this.services.SystemSetting;
         this._openSSLCertificate = this.services.OpenSSLCertificate;
-        this._healthCheckingUrlPath = this._systemSetting.normalSettings.get('_internal.healthCheckingUrlPath') as any;
 
         this._koaServer = new koa();
         this._httpServer = https.createServer({ key: this._openSSLCertificate.privkey, cert: this._openSSLCertificate.cert }, this._koaServer.callback());
@@ -57,7 +54,7 @@ export class HttpServer extends BaseServiceModule {
     }
 
     async onHealthCheck(): Promise<void> {
-        const result = (await request.post(`https://${process.env.DOMAIN}${this._healthCheckingUrlPath.value}`, { ca: this._openSSLCertificate.cert })).toString();
+        const result = (await request.post(`https://${process.env.DOMAIN}${healthCheckingUrlPath}`, { ca: this._openSSLCertificate.cert })).toString();
         if ("OK" !== result)
             throw new Error(`健康检查的返回值错误。${result}`);
     }

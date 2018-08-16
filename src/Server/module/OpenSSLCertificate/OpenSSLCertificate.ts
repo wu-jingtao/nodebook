@@ -14,10 +14,9 @@ export class OpenSSLCertificate extends BaseServiceModule {
     cert: Buffer;
 
     async onStart(): Promise<void> {
-        if (!await this.checkCertExist()) {
+        if (!await this.checkCertExist()) 
             await this.generateCert();
-        }
-
+        
         await this.readCert();
     }
 

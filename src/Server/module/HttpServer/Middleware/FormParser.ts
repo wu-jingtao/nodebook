@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import * as KoaBody from 'koa-body';
-import * as Error from 'http-errors';
 import { ObservableVariable } from 'observable-variable';
 
 import { SystemSetting } from '../../SystemSetting/SystemSetting';
@@ -16,10 +15,10 @@ export function FormParser(systemSetting: SystemSetting) {
 
     _uploadFileSizeLimit.on('beforeSet', newValue => {
         if (!_.isNumber(newValue))
-            throw new Error.BadRequest('http.uploadFileSizeLimit 属性的类型必须是数字');
+            throw new Error('http.uploadFileSizeLimit 属性的类型必须是数字');
 
         if (newValue < 1)
-            throw new Error.BadRequest('http.uploadFileSizeLimit 的值必须大于1');
+            throw new Error('http.uploadFileSizeLimit 的值必须大于1');
     });
 
     _uploadFileSizeLimit.on('set', newValue => (_config as any).formidable.maxFileSize = newValue * 1024 * 1024);

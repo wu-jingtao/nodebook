@@ -8,7 +8,7 @@ export class TaskLogger {
     //保存的日志
     private readonly _logList: { date: number, is_error: boolean, text: string }[] = [];
 
-    //日志最大程度改变回调
+    //日志最大长度改变回调
     private readonly _onLogMaxLengthChange = (maxLength: number) => {
         if (this._logList.length > maxLength)
             this._logList.splice(0, maxLength - this._logList.length);

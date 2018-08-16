@@ -8,15 +8,12 @@ import { ObservableVariable } from 'observable-variable';
 import koa_conditional = require('koa-conditional-get');
 import koa_etag = require('koa-etag');
 
-import { SystemSetting } from '../../SystemSetting/SystemSetting';
-
-//配置系统设置变量
-SystemSetting.addDynamicSetting('favicon', undefined);
-
 const _faviconPath = path.resolve(__dirname, 'favicon.ico');    //网站图标路径
 let _hasFavicon = false;                                        //是否设置的有网站图标
 
-//检测是否存在网站图标
+/**
+ * 检测是否存在网站图标
+ */
 async function _checkFavicon(): Promise<void> {
     try {
         await fs.promises.access(_faviconPath);
@@ -27,26 +24,24 @@ async function _checkFavicon(): Promise<void> {
 }
 
 /**
+ * 设置网站图标，如果传入空则表示删除图标
+ */
+export async function setFavicon(filePath?: string): Promise<void> {
+    if (filePath !== undefined) {
+        await fs.move(filePath, _faviconPath, { overwrite: true });
+        await _checkFavicon();
+    } else {
+        await fs.remove(_faviconPath);
+        await _checkFavicon();
+    }
+}
+
+/**
  * 网站图标
  */
-export function Favicon(systemSetting: SystemSetting): koa.Middleware {
+export function Favicon(): koa.Middleware {
     _checkFavicon();
-
-    const _favicon = systemSetting.normalSettings.get('favicon') as ObservableVariable<string | undefined>;
-    _favicon.on('set', async (filePath) => {
-        try {
-            if (filePath !== undefined) {
-                await fs.move(filePath, _faviconPath, { overwrite: true });
-                await _checkFavicon();
-            } else {
-                await fs.remove(_faviconPath);
-                await _checkFavicon();
-            }
-        } catch (err) {
-            log.error.location.text.content(Favicon.name, '替换或删除网站图标时发生异常：', err);
-        }
-    });
-
+    
     return koa_compose([
         koa_conditional(),
         koa_etag(),

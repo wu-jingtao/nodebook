@@ -1,5 +1,4 @@
 import * as moment from 'moment';
-import * as Error from 'http-errors';
 import { BaseServiceModule } from "service-starter";
 import { ObservableVariable } from "observable-variable";
 
@@ -19,8 +18,20 @@ export class LogManager extends BaseServiceModule {
 
     private readonly _loggerList: Map<string, TaskLogger> = new Map();  //日志列表，key：任务文件路径
     private _cleanTimeoutLogs: NodeJS.Timer;                            //清理超过最大保存日期的日志
+
     private _logMaxLength: ObservableVariable<number>;
     private _logMaxSaveDays: ObservableVariable<number>;
+
+    /**
+     * 检查任务路径是否符合要求
+     */
+    static _checkPath(taskFilePath: string): void {
+        if (!taskFilePath.startsWith(FileManager._userCodeDir))
+            throw new Error(`不能为 '${FileManager._userCodeDir}' 目录以外的文件创建任务日志`);
+
+        if (!taskFilePath.endsWith('.js'))
+            throw new Error('只能为 js 类型的文件创建任务日志');
+    }
 
     async onStart(): Promise<void> {
         const systemSetting = this.services.SystemSetting as SystemSetting;
@@ -29,12 +40,12 @@ export class LogManager extends BaseServiceModule {
 
         this._logMaxLength.on('beforeSet', newValue => {
             if (newValue < 1)
-                throw new Error.BadRequest('task.logMaxLength 的值不可以小于 1');
+                throw new Error('task.logMaxLength 的值不可以小于 1');
         });
 
         this._logMaxSaveDays.on('beforeSet', newValue => {
             if (newValue < 1)
-                throw new Error.BadRequest('task.logMaxSaveDays 的值不可以小于 1');
+                throw new Error('task.logMaxSaveDays 的值不可以小于 1');
         });
 
         //每个24小时执行一次清理
@@ -55,11 +66,7 @@ export class LogManager extends BaseServiceModule {
      * 为任务创建一个新的日志记录器。如果存在，则直接返回已经有的
      */
     createTaskLogger(taskFilePath: string): TaskLogger {
-        if (!taskFilePath.startsWith(FileManager._userCodeDir))
-            throw new Error.BadRequest(`不能为 '${FileManager._userCodeDir}' 目录以外的文件创建任务日志`);
-
-        if (!taskFilePath.endsWith('.js'))
-            throw new Error.BadRequest('只能为 js 类型的文件创建任务日志');
+        LogManager._checkPath(taskFilePath);
 
         if (this._loggerList.has(taskFilePath))
             return this._loggerList.get(taskFilePath) as any;

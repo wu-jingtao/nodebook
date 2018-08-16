@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 import * as koa from 'koa';
 import * as koa_compose from 'koa-compose';
 import * as koa_router from 'koa-router';
-import * as Error from 'http-errors';
 
 import { HttpServer } from '../HttpServer';
 import { UserManager } from '../../UserManager/UserManager';
@@ -24,7 +23,7 @@ export function Router(httpServer: HttpServer): koa.Middleware {
 
     router_login.use(LoginCheck(httpServer.services.UserManager));
 
-    router_no_login.get('favicon', '/favicon.ico', Favicon(httpServer.services.SystemSetting));
+    router_no_login.get('favicon', '/favicon.ico', Favicon());
     router_no_login.get('static', '/static/:path(.+?\\..+)', ClientStaticFileSender());
     router_no_login.redirect('/', '/static/index.html');
 
@@ -62,9 +61,19 @@ function User(router_login: koa_router, router_no_login: koa_router, httpServer:
     /**
      * 用户更新自己的令牌
      */
-    router_login.get(_prefix + '/update_token', ctx => {
+    router_login.post(_prefix + '/update_token', ctx => {
         const token = _userManager.updateToken();
         ctx.cookies.set('nodebook_token', token);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 更改用户名
+     * @param username 新用户名
+     * @param password 密码
+     */
+    router_login.post(_prefix + '/updatePassword', ctx => {
+        _userManager.updateUsername(ctx.request.body.username, ctx.request.body.password);
         ctx.body = 'ok';
     });
 
@@ -175,7 +184,7 @@ function File(router: koa_router, httpServer: HttpServer) {
      */
     router.post(_prefix_api + '/uploadFile', async (ctx) => {
         if (_.get(ctx.request.body, 'files.length') !== 1)
-            throw new Error.BadRequest('上传的文件数目不符合要求，每次必须且只能是一个文件');
+            throw new Error('上传的文件数目不符合要求，每次必须且只能是一个文件');
 
         await _fileManager.moveFromOutside(ctx.request.body.files[0].path, ctx.request.body.to);
         ctx.body = 'ok';
@@ -217,10 +226,30 @@ function File(router: koa_router, httpServer: HttpServer) {
     });
 
     /**
-     * 压缩某个文件或目录，便于用户下载
+     * 压缩某个文件或目录
      * @param path
+     * @param to
      */
     router.post(_prefix_api + '/zipData', async (ctx: any) => {
+        await _fileManager.zipData(ctx.request.body.path, ctx.request.body.to);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 解压压缩文件
+     * @param path
+     * @param to
+     */
+    router.post(_prefix_api + '/unzipData', async (ctx: any) => {
+        await _fileManager.unzipData(ctx.request.body.path, ctx.request.body.to);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 压缩某个文件或目录，用于用户下载
+     * @param path
+     */
+    router.post(_prefix_api + '/zipDownloadData', async (ctx: any) => {
         ctx.compress = false;   //确保不会被 koa-compress 压缩
         ctx.body = await _fileManager.zipDownloadData(ctx.request.body.path);
     });
@@ -229,9 +258,9 @@ function File(router: koa_router, httpServer: HttpServer) {
      * 解压用户上传的zip文件到指定目录
      * @param to 
      */
-    router.post(_prefix_api + '/unzipData', async (ctx) => {
+    router.post(_prefix_api + '/unzipUploadData', async (ctx) => {
         if (_.get(ctx.request.body, 'files.length') !== 1)
-            throw new Error.BadRequest('上传的文件数目不符合要求，每次必须且只能是一个文件');
+            throw new Error('上传的文件数目不符合要求，每次必须且只能是一个文件');
 
         await _fileManager.unzipUploadData(ctx.request.body.files[0].path, ctx.request.body.to);
         ctx.body = 'ok';

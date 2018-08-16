@@ -5,7 +5,8 @@
     "main": "./bin/Server/index.js",
     "scripts": {
         "compileServer": "gulp compileServer",
-        "compileClient": "webpack --config webpack.config.js"
+        "compileClient": "webpack --config webpack.config.js",
+        "resetUser": "node ./bin/Server/Tools/ResetUser.js"
     },
     "keywords": [
         "nodebook",

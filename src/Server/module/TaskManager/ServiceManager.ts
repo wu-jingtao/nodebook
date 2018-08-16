@@ -1,6 +1,5 @@
 import log from 'log-formatter';
 import * as moment from 'moment';
-import * as Error from 'http-errors';
 import { BaseServiceModule } from "service-starter";
 
 import { TaskManager } from "./TaskManager";
@@ -35,7 +34,8 @@ export class ServiceManager extends BaseServiceModule {
                 try {
                     this._taskManager.createTask(item.path);
                 } catch (err) {
-                    log.error.location.text.content.content(this.name, '启动用户服务失败', `服务名：${item.name}  服务文件：${item.path}`, err);
+                    log.error.location.text.content.content(this.name, '启动用户服务失败',
+                        `服务名：${item.name}  服务文件：${item.path.replace(FileManager._userCodeDir, '/')}`, err);
                 }
             }
         }
@@ -75,18 +75,14 @@ export class ServiceManager extends BaseServiceModule {
 
     /**
      * 创建一个新的服务。注意：服务创建后不会自动启动运行，如果服务已存在，则不会有任何效果
-     * @param path 要执行的文件路径
+     * @param path 要执行的文件路径(全路径)
      * @param name 服务名称
      * @param auto_restart 是否自动随系统重启
      * @param report_error 是否崩溃时发送邮件报告错误
      */
     async createService(path: string, name: string, auto_restart: boolean, report_error: boolean): Promise<void> {
         if (!this._servicesList.has(path)) {
-            if (!path.startsWith(FileManager._userCodeDir))
-                throw new Error.BadRequest(`不能为 '${FileManager._userCodeDir}' 目录外的文件创建服务`);
-
-            if (!path.endsWith('.js'))
-                throw new Error.BadRequest('只能为 js 类型的文件创建服务');
+            LogManager._checkPath(path);
 
             await this._servicesTable.addService(path, name, auto_restart, report_error);
 
