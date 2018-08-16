@@ -222,7 +222,7 @@ function File(router: koa_router, httpServer: HttpServer) {
      */
     router.post(_prefix_api + '/zipData', async (ctx: any) => {
         ctx.compress = false;   //确保不会被 koa-compress 压缩
-        ctx.body = await _fileManager.zipData(ctx.request.body.path);
+        ctx.body = await _fileManager.zipDownloadData(ctx.request.body.path);
     });
 
     /**
@@ -233,7 +233,7 @@ function File(router: koa_router, httpServer: HttpServer) {
         if (_.get(ctx.request.body, 'files.length') !== 1)
             throw new Error.BadRequest('上传的文件数目不符合要求，每次必须且只能是一个文件');
 
-        await _fileManager.unzipData(ctx.request.body.files[0].path, ctx.request.body.to);
+        await _fileManager.unzipUploadData(ctx.request.body.files[0].path, ctx.request.body.to);
         ctx.body = 'ok';
     });
 }

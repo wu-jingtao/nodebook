@@ -34,11 +34,11 @@ manager.registerService(new SystemSetting);
 //MailService
 manager.registerService(new MailService);
 
-//BackupData
-manager.registerService(new BackupData);
-
 //UserManager
 manager.registerService(new UserManager);
+
+//BackupData
+manager.registerService(new BackupData);
 
 //LibraryManager
 manager.registerService(new LibraryManager);

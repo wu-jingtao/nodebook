@@ -12,7 +12,7 @@ export function ErrorHandling(): koa.Middleware {
         try {
             await next();
         } catch (err) {
-            ctx.status = err.statusCode || err.status || 500;
+            ctx.status = err.statusCode || err.status || 400;
             if (_isDebug) {
                 ctx.body = `<p>错误时间：${moment().format('YYYY-MM-DD HH:mm:ss')}</p><h2>${err.message}</h2><pre>${err.stack}</pre>`;
             } else {
