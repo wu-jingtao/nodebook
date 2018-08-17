@@ -3,10 +3,21 @@ import * as _ from 'lodash';
 import * as koa from 'koa';
 import * as koa_compose from 'koa-compose';
 import * as koa_router from 'koa-router';
+import * as moment from 'moment';
+import { ObservableVariable } from 'observable-variable';
 
 import { HttpServer } from '../HttpServer';
 import { UserManager } from '../../UserManager/UserManager';
 import { FileManager } from '../../FileManager/FileManager';
+import { MainProcessCommunicator } from '../../MainProcess/MainProcessCommunicator';
+import { SystemSetting } from '../../SystemSetting/SystemSetting';
+import { OpenSSLCertificate } from '../../OpenSSLCertificate/OpenSSLCertificate';
+import { MailService } from '../../MailService/MailService';
+import { BackupData } from '../../BackupData/BackupData';
+import { LibraryManager } from '../../LibraryManager/LibraryManager';
+import { LogManager } from '../../TaskManager/LogManager/LogManager';
+import { TaskManager } from '../../TaskManager/TaskManager';
+import { ServiceManager } from '../../TaskManager/ServiceManager';
 
 import { FormParser } from './FormParser';
 import { LoginCheck } from './LoginCheck';
@@ -27,8 +38,13 @@ export function Router(httpServer: HttpServer): koa.Middleware {
     router_no_login.get('static', '/static/:path(.+?\\..+)', ClientStaticFileSender());
     router_no_login.redirect('/', '/static/index.html');
 
-    User(router_login, router_no_login, httpServer);
+    Others(router_login, httpServer);
     File(router_login, httpServer);
+    User(router_login, router_no_login, httpServer);
+    Setting(router_login, httpServer);
+    Backup(router_login, httpServer);
+    Library(router_login, httpServer);
+    Task(router_login, httpServer);
 
     return koa_compose([
         FormParser(httpServer.services.SystemSetting),
@@ -40,56 +56,58 @@ export function Router(httpServer: HttpServer): koa.Middleware {
 }
 
 /**
- * 配置用户相关操作
+ * 一些不好归类的方法
  */
-function User(router_login: koa_router, router_no_login: koa_router, httpServer: HttpServer) {
+function Others(router: koa_router, httpServer: HttpServer) {
+    const _mainProcessCommunicator = httpServer.services.MainProcessCommunicator as MainProcessCommunicator;
+    const _systemSetting = httpServer.services.SystemSetting as SystemSetting;
+    const _openSSLCertificate = httpServer.services.OpenSSLCertificate as OpenSSLCertificate;
+    const _mailService = httpServer.services.MailService as MailService;
 
-    const _userManager: UserManager = httpServer.services.UserManager;
-    const _prefix = '/user';
+    const _userPassword = _systemSetting.secretSettings.get('user.password') as ObservableVariable<string>;
+
+    const _prefix = '/others';
 
     /**
-     * 用户登录。
-     * @param name 用户名
-     * @param pass 登录密码，注意客户端在传递密码之前需要进行MD5操作
+     * 重启服务器
+     * @param password 用户密码
      */
-    router_no_login.post(_prefix + '/login', ctx => {
-        const token = _userManager.login(ctx.request.body.name, ctx.request.body.pass, ctx.ip);
-        ctx.cookies.set('nodebook_token', token);
-        ctx.body = 'ok';
+    router.post(_prefix + '/restart', ctx => {
+        if (_userPassword.value === ctx.request.body.password)
+            _mainProcessCommunicator.restart();
+        else
+            throw new Error('用户密码错误');
     });
 
     /**
-     * 用户更新自己的令牌
+     * 向用户返回他自己的ip
      */
-    router_login.post(_prefix + '/update_token', ctx => {
-        const token = _userManager.updateToken();
-        ctx.cookies.set('nodebook_token', token);
-        ctx.body = 'ok';
+    router.get(_prefix + '/getIP', ctx => {
+        ctx.body = ctx.ip;
     });
 
     /**
-     * 更改用户名
-     * @param username 新用户名
-     * @param password 密码
+     * 重新生成openssl证书
+     * @param password 用户密码
      */
-    router_login.post(_prefix + '/updatePassword', ctx => {
-        _userManager.updateUsername(ctx.request.body.username, ctx.request.body.password);
-        ctx.body = 'ok';
+    router.post(_prefix + '/regenerateCert', async (ctx) => {
+        if (_userPassword.value === ctx.request.body.password)
+            await _openSSLCertificate.generateCert();
+        else
+            throw new Error('用户密码错误');
     });
 
     /**
-     * 更改用户密码
-     * @param new_pass 新密码
-     * @param old_pass 旧密码
+     * 发送测试邮件，用于检测邮箱设置是否正确
      */
-    router_login.post(_prefix + '/updatePassword', ctx => {
-        _userManager.updatePassword(ctx.request.body.new_pass, ctx.request.body.old_pass);
+    router.get(_prefix + '/sendTestMail', async (ctx) => {
+        await _mailService.sendMail('nodebook 测试邮件', `时间:${moment().format('YYYY-MM-DD HH:mm:ss')}\nhost:${process.env.DOMAIN}`);
         ctx.body = 'ok';
     });
 }
 
 /**
- * 配置文件相关操作
+ * 文件相关操作
  */
 function File(router: koa_router, httpServer: HttpServer) {
     const _fileManager: FileManager = httpServer.services.FileManager;
@@ -180,6 +198,7 @@ function File(router: koa_router, httpServer: HttpServer) {
 
     /**
      * 上传文件，一次只允许上传一个文件
+     * @param files
      * @param to 
      */
     router.post(_prefix_api + '/uploadFile', async (ctx) => {
@@ -256,6 +275,7 @@ function File(router: koa_router, httpServer: HttpServer) {
 
     /**
      * 解压用户上传的zip文件到指定目录
+     * @param files
      * @param to 
      */
     router.post(_prefix_api + '/unzipUploadData', async (ctx) => {
@@ -265,4 +285,327 @@ function File(router: koa_router, httpServer: HttpServer) {
         await _fileManager.unzipUploadData(ctx.request.body.files[0].path, ctx.request.body.to);
         ctx.body = 'ok';
     });
+}
+
+/**
+ * 用户相关操作
+ */
+function User(router_login: koa_router, router_no_login: koa_router, httpServer: HttpServer) {
+    const _userManager: UserManager = httpServer.services.UserManager;
+    const _prefix = '/user';
+
+    /**
+     * 用户登录。
+     * @param name 用户名
+     * @param pass 登录密码，注意客户端在传递密码之前需要进行MD5操作
+     */
+    router_no_login.post(_prefix + '/login', ctx => {
+        const token = _userManager.login(ctx.request.body.name, ctx.request.body.pass, ctx.ip);
+        ctx.cookies.set('nodebook_token', token);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 用户更新自己的令牌
+     */
+    router_login.get(_prefix + '/update_token', ctx => {
+        const token = _userManager.updateToken();
+        ctx.cookies.set('nodebook_token', token);
+        ctx.body = 'ok';
+    });
+}
+
+/**
+ * 系统变量设置
+ */
+function Setting(router: koa_router, httpServer: HttpServer) {
+    const _systemSetting = httpServer.services.SystemSetting as SystemSetting;
+    const _prefix = '/setting';
+
+    /**
+     * 更改系统普通设置
+     * @param key
+     * @param value
+     */
+    router.post(_prefix + '/changeNormalSetting', ctx => {
+        _systemSetting.changeNormalSetting(ctx.request.body.key, ctx.request.body.value);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 更改系统私密设置
+     * @param key
+     * @param value
+     * @param password
+     */
+    router.post(_prefix + '/changeSecretSetting', ctx => {
+        _systemSetting.changeSecretSetting(ctx.request.body.key, ctx.request.body.value, ctx.request.body.password);
+        ctx.body = 'ok';
+    });
+}
+
+/**
+ * 用户数据备份
+ */
+function Backup(router: koa_router, httpServer: HttpServer) {
+    const _backupData = httpServer.services.BackupData as BackupData;
+    const _prefix = '/backup';
+
+    /**
+     * 下载某个备份文件。
+     * @param filename
+     */
+    router.post(_prefix + '/readBackupFile', (ctx: any) => {
+        ctx.compress = false;   //确保不会被 koa-compress 压缩
+        ctx.body = _backupData.readBackupFile(ctx.request.body.filename);
+    });
+
+    /**
+     * 将某个备份文件发送到用户邮箱
+     * @param filename
+     */
+    router.post(_prefix + '/sendBackupEmail', async (ctx) => {
+        await _backupData.sendBackupEmail(ctx.request.body.filename);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 列出所有备份文件的文件名
+     */
+    router.get(_prefix + '/listBackupFiles', async (ctx) => {
+        ctx.body = await _backupData.listBackupFiles();
+    });
+
+    /**
+     * 删除某个备份文件
+     * @param filename
+     */
+    router.post(_prefix + '/deleteBackupFiles', async (ctx) => {
+        await _backupData.deleteBackupFiles(ctx.request.body.filename);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 创建一个新的备份
+     */
+    router.get(_prefix + '/createBackupFile', async (ctx) => {
+        ctx.body = await _backupData.createBackupFile();
+    });
+
+    /**
+     * 从备份文件中恢复数据
+     * @param filename
+     * @param password
+     */
+    router.post(_prefix + '/resumeFromBackup', ctx => {
+        _backupData.resumeFromBackup(ctx.request.body.filename, ctx.request.body.password);
+        ctx.body = 'ok';
+    });
+}
+
+/**
+ * 程序类库管理
+ */
+function Library(router: koa_router, httpServer: HttpServer) {
+    const _libraryManager = httpServer.services.LibraryManager as LibraryManager;
+    const _prefix = '/library';
+
+    /**
+     * 获取安装了的类库列表
+     */
+    router.get(_prefix + '/getInstalledLibraries', async (ctx) => {
+        ctx.body = await _libraryManager.getInstalledLibraries();
+    });
+
+    /**
+     * 安装类库
+     * @param name
+     */
+    router.post(_prefix + '/installLibrary', async (ctx) => {
+        await _libraryManager.installLibrary(ctx.request.body.name);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 卸载类库
+     * @param name
+     */
+    router.post(_prefix + '/uninstallLibrary', async (ctx) => {
+        await _libraryManager.uninstallLibrary(ctx.request.body.name);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 更新某个类库
+     * @param name
+     */
+    router.post(_prefix + '/updateLibrary', async (ctx) => {
+        await _libraryManager.updateLibrary(ctx.request.body.name);
+        ctx.body = 'ok';
+    });
+}
+
+/**
+ * 用户任务管理
+ */
+function Task(router: koa_router, httpServer: HttpServer) {
+    const _logManager = httpServer.services.LogManager as LogManager;
+    const _taskManager = httpServer.services.TaskManager as TaskManager;
+    const _serviceManager = httpServer.services.ServiceManager as ServiceManager;
+
+    const _prefix = '/task';
+
+    //#region LogManager
+
+    /**
+     * 清空某个任务的日志
+     * @param path
+     */
+    router.post(_prefix + '/cleanTaskLogger', ctx => {
+        _logManager.cleanTaskLogger(ctx.request.body.path);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 获取某个任务在某个时间点之后的所有日志
+     * @param path
+     * @param date 数字形式
+     */
+    router.post(_prefix + '/getLogsAfterDate', ctx => {
+        ctx.body = _logManager.getLogsAfterDate(
+            ctx.request.body.path,
+            ctx.request.body.date != null ? Number.parseInt(ctx.request.body.date) : undefined
+        );
+    });
+
+    /**
+     * 从末尾获取多少条日志
+     * @param path
+     * @param size 数字形式
+     */
+    router.post(_prefix + '/getLogsFromEnd', ctx => {
+        ctx.body = _logManager.getLogsFromEnd(ctx.request.body.path, Number.parseInt(ctx.request.body.size));
+    });
+
+    /**
+     * 获取某个任务当前的运行状态
+     * @param path
+     */
+    router.post(_prefix + '/getTaskStatus', ctx => {
+        ctx.body = _logManager.getTaskStatus(ctx.request.body.path);
+    });
+
+    /**
+     * 获取所有任务的状态
+     */
+    router.get(_prefix + '/getAllTaskStatus', ctx => {
+        ctx.body = _logManager.getAllTaskStatus();
+    });
+
+    //#endregion
+
+    //#region TaskManager
+
+    /**
+     * 创建一个新的任务
+     * @param path
+     */
+    router.post(_prefix + '/createTask', ctx => {
+        _taskManager.createTask(ctx.request.body.path);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 删除某个正在运行的任务
+     * @param path
+     */
+    router.post(_prefix + '/destroyTask', ctx => {
+        _taskManager.destroyTask(ctx.request.body.path);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 获取某个正在运行的任务，资源消耗的情况
+     * @param path
+     */
+    router.post(_prefix + '/getTaskResourcesConsumption', async (ctx) => {
+        ctx.body = await _taskManager.getTaskResourcesConsumption(ctx.request.body.path);
+    });
+
+    /**
+     * 获取计算机的硬件信息
+     */
+    router.get(_prefix + '/getSystemHardwareInfo', async (ctx) => {
+        ctx.body = await _taskManager.getSystemHardwareInfo();
+    });
+
+    /**
+     * 调用任务中暴露出的方法
+     * @param path
+     * @param function
+     * @param json
+     */
+    router.post(_prefix + '/invokeTaskFunction', async (ctx) => {
+        ctx.body = await _taskManager.invokeTaskFunction(
+            ctx.request.body.path,
+            ctx.request.body.function,
+            ctx.request.body.json
+        );
+    });
+
+    //#endregion
+
+    //#region ServiceManager
+
+    /**
+     * 获取服务列表
+     */
+    router.get(_prefix + '/getServicesList', ctx => {
+        ctx.body = _serviceManager.getServicesList();
+    });
+
+    /**
+     * 创建一个新的服务
+     * @param path
+     * @param name
+     * @param auto_restart
+     * @param report_error
+     */
+    router.post(_prefix + '/createService', async (ctx) => {
+        await _serviceManager.createService(
+            ctx.request.body.path,
+            ctx.request.body.name,
+            ctx.request.body.auto_restart,
+            ctx.request.body.report_error,
+        );
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 更新某个服务的配置
+     * @param path
+     * @param name
+     * @param auto_restart
+     * @param report_error
+     */
+    router.post(_prefix + '/updateService', async (ctx) => {
+        await _serviceManager.updateService(
+            ctx.request.body.path,
+            ctx.request.body.name,
+            ctx.request.body.auto_restart,
+            ctx.request.body.report_error,
+        );
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 删除某个服务
+     * @param path
+     */
+    router.post(_prefix + '/deleteService', async (ctx) => {
+        await _serviceManager.deleteService(ctx.request.body.path);
+        ctx.body = 'ok';
+    });
+
+    //#endregion
 }

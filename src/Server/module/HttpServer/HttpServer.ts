@@ -16,7 +16,6 @@ import { Router } from './Middleware/Router';
 
 export class HttpServer extends BaseServiceModule {
 
-    private _systemSetting: SystemSetting;
     private _openSSLCertificate: OpenSSLCertificate;
 
     private _httpServer: https.Server;
@@ -27,7 +26,7 @@ export class HttpServer extends BaseServiceModule {
      */
     private async _registerMiddleware() {
         this._koaServer.use(HealthCheck());
-        this._koaServer.use(VisitRestriction(this._systemSetting));
+        this._koaServer.use(VisitRestriction(this));
         this._koaServer.use(VisitLogger());
         this._koaServer.use(ErrorHandling());
         this._koaServer.use(koa_response_time());
@@ -36,7 +35,6 @@ export class HttpServer extends BaseServiceModule {
     }
 
     async onStart(): Promise<void> {
-        this._systemSetting = this.services.SystemSetting;
         this._openSSLCertificate = this.services.OpenSSLCertificate;
 
         this._koaServer = new koa();

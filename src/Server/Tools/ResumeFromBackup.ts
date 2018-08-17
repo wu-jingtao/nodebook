@@ -1,6 +1,7 @@
 import * as fs from 'fs-extra';
 import * as node_path from 'path';
 import * as unzip from 'unzip';
+import * as child_process from 'child_process';
 import log from 'log-formatter';
 
 import { FileManager } from '../module/FileManager/FileManager';
@@ -28,7 +29,14 @@ import { FileManager } from '../module/FileManager/FileManager';
     await fs.remove(node_path.join(FileManager._userDataDir, 'package.json'));
     log.round('删除类库目录成功', FileManager._libraryDir);
 
-    fs.createReadStream(path).pipe(unzip.Extract({ path: FileManager._userDataDir }))
-        .on('error', log.error)
-        .on('close', () => log.bold('恢复成功'));
+    await new Promise((resolve, reject) => {
+        fs.createReadStream(path).pipe(unzip.Extract({ path: FileManager._userDataDir }))
+            .on('error', reject).on('close', resolve);
+    });
+    log.round('解压备份文件成功', filename);
+
+    child_process.execFileSync('npm', ['i'], { cwd: FileManager._userDataDir });
+    log.round('类库安装成功');
+
+    log.bold('恢复成功。');
 })();

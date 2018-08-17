@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as koa from 'koa';
 import { ObservableVariable } from 'observable-variable';
 
+import { HttpServer } from '../HttpServer';
 import { SystemSetting } from "../../SystemSetting/SystemSetting";
 
 //设置系统变量默认值
@@ -11,12 +12,12 @@ SystemSetting.addSystemSetting('http.ipBlackListRegexp', undefined, true, true);
 /**
  * 访问限制，用于限制IP地址以及域名
  */
-export function VisitRestriction(systemSetting: SystemSetting): koa.Middleware {
-
+export function VisitRestriction(httpServer: HttpServer): koa.Middleware {
+    const _systemSetting = httpServer.services.SystemSetting as SystemSetting;
     const _domain = (process.env.DOMAIN || '').toLowerCase();
 
-    const _ipWhiteListRegexp = systemSetting.normalSettings.get('http.ipWhiteListRegexp') as ObservableVariable<string>;
-    const _ipBlackListRegexp = systemSetting.normalSettings.get('http.ipBlackListRegexp') as ObservableVariable<string>;
+    const _ipWhiteListRegexp = _systemSetting.secretSettings.get('http.ipWhiteListRegexp') as ObservableVariable<string>;
+    const _ipBlackListRegexp = _systemSetting.secretSettings.get('http.ipBlackListRegexp') as ObservableVariable<string>;
 
     let _ip_white: RegExp = _.isString(_ipWhiteListRegexp.value) ? new RegExp(_ipWhiteListRegexp.value) : undefined as any;
     let _ip_black: RegExp = _.isString(_ipBlackListRegexp.value) ? new RegExp(_ipBlackListRegexp.value) : undefined as any;

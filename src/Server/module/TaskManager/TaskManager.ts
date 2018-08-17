@@ -90,21 +90,23 @@ export class TaskManager extends BaseServiceModule {
      * 获取计算机的硬件信息
      */
     getSystemHardwareInfo() {
-        return new Promise(resolve => {
-            os_utils.cpuUsage(function (cpuUsage: number) {
-                const cpu = os.cpus();
+        return new Promise((resolve, reject) => {
+            os_utils.cpuUsage(async function (cpuUsage: number) {
+                try {
+                    const cpu = os.cpus();
 
-                resolve({
-                    cpuNumber: cpu.length,                                              //CPU核心数
-                    cpuName: cpu[0].model,                                              //CPU名称
-                    cpuUsage,                                                           //CPU使用百分比
-                    domain: process.env.DOMAIN || '',                                   //域名
-                    totalMemory: os.totalmem(),                                         //内存总量
-                    freeMemory: os.freemem(),                                           //剩余内存大小
-                    uptime: os.uptime(),                                                //系统运行了多久了
-                    userDataDir: await diskusage_check(FileManager._userDataDir),       //查看用户数据目录还有多少可用空间
-                    programDataDir: await diskusage_check(FileManager._programDataDir)  //查看程序数据目录还有多少可用空间。这两个目录如果位于同一个分区下则大小一样
-                });
+                    resolve({
+                        cpuNumber: cpu.length,                                              //CPU核心数
+                        cpuName: cpu[0].model,                                              //CPU名称
+                        cpuUsage,                                                           //CPU使用百分比
+                        domain: process.env.DOMAIN || '',                                   //域名
+                        totalMemory: os.totalmem(),                                         //内存总量
+                        freeMemory: os.freemem(),                                           //剩余内存大小
+                        uptime: os.uptime(),                                                //系统运行了多久了
+                        userDataDir: await diskusage_check(FileManager._userDataDir),       //查看用户数据目录还有多少可用空间
+                        programDataDir: await diskusage_check(FileManager._programDataDir)  //查看程序数据目录还有多少可用空间。这两个目录如果位于同一个分区下则大小一样
+                    });
+                } catch (error) { reject(error); }
             });
         });
     }
