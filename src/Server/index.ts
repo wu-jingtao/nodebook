@@ -1,54 +1,52 @@
-import { DockerServicesManager } from 'service-starter';
+import * as _ from 'lodash';
+import * as path from 'path';
+import * as child_process from 'child_process';
+import { BaseServiceModule, NodeServicesManager } from 'service-starter';
 
-import { OpenSSLCertificate } from './module/OpenSSLCertificate/OpenSSLCertificate';
-import { InitializeDatabase } from './module/Database/InitializeDatabase';
-import { SystemSettingTable } from './module/Database/SystemSettingTable';
-import { ServicesTable } from './module/Database/ServicesTable';
-import { SystemSetting } from './module/SystemSetting/SystemSetting';
-import { MailService } from './module/MailService/MailService';
-import { UserManager } from './module/UserManager/UserManager';
-import { FileManager } from './module/FileManager/FileManager';
-import { LibraryManager } from './module/LibraryManager/LibraryManager';
-import { TaskManager } from './module/TaskManager/TaskManager';
-import { LogManager } from './module/TaskManager/LogManager/LogManager';
-import { ServiceManager } from './module/TaskManager/ServiceManager';
-import { HttpServer } from './module/HttpServer/HttpServer';
-import { BackupData } from './module/BackupData/BackupData';
+class NodeBook extends NodeServicesManager {
+    constructor() {
+        super();
+        this.registerService(new MainProcess);
+    }
+}
 
-const manager = new DockerServicesManager();
+class MainProcess extends BaseServiceModule {
 
-//FileManager
-manager.registerService(new FileManager);
+    private _process: child_process.ChildProcess;
+    private _process_onCloseCallback = () => this.servicesManager.stop();
 
-//OpenSSLCertificate
-manager.registerService(new OpenSSLCertificate);
+    async onStart(): Promise<void> {
+        this._process = child_process.fork(path.resolve(__dirname, './ServiceStack.js'));
+        this._process.on('close', this._process_onCloseCallback);
+        this._process.on('message', (msg: { signal: string, args: any[] }) => {
+            if (_.isObject(msg)) {
+                switch (msg.signal) {
+                    case 'restart': //重启服务
+                        this._process.off('close', this._process_onCloseCallback);  //避免关闭主进程
+                        this._process.on('close', () => this.onStart());
+                        this._process.kill();
+                        break;
 
-//Database
-manager.registerService(new InitializeDatabase);
-manager.registerService(new SystemSettingTable);
-manager.registerService(new ServicesTable);
+                    case 'restartAndRun':   //重启服务并执行某些命令
+                        this._process.off('close', this._process_onCloseCallback);  //避免关闭主进程
+                        this._process.on('close', () => {
+                            child_process.execSync(msg.args[0], { cwd: msg.args[1] });
+                            this.onStart()
+                        });
+                        this._process.kill();
+                        break;
 
-//SystemSetting
-manager.registerService(new SystemSetting);
+                    default:
+                        throw new Error('未定义消息类型：' + msg.signal);
+                }
+            } else
+                throw new Error('子进程向主进程返回的消息不是一个有效的对象：' + JSON.stringify(msg));
+        });
+    }
 
-//MailService
-manager.registerService(new MailService);
+    async onStop(): Promise<void> {
+        this._process.kill();
+    }
+}
 
-//UserManager
-manager.registerService(new UserManager);
-
-//BackupData
-manager.registerService(new BackupData);
-
-//LibraryManager
-manager.registerService(new LibraryManager);
-
-//TaskManager
-manager.registerService(new LogManager);
-manager.registerService(new TaskManager);
-manager.registerService(new ServiceManager);
-
-//HttpServer
-manager.registerService(new HttpServer);
-
-manager.start();
+(new NodeBook).start();

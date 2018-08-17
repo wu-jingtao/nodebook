@@ -13,6 +13,7 @@ import randomString = require('crypto-random-string');
 import { SystemSetting } from "../SystemSetting/SystemSetting";
 import { MailService } from "../MailService/MailService";
 import { FileManager } from '../FileManager/FileManager';
+import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 //设置系统变量默认值
 SystemSetting.addSystemSetting('backup.interval', 7, true, true);              //每隔几天备份一次数据，最小0，最大999。如果设置为0则表示不备份
@@ -26,6 +27,7 @@ SystemSetting.addSystemSetting('backup.encryptEmailFile', true, true, true);   /
 export class BackupData extends BaseServiceModule {
 
     private _mailService: MailService;
+    private _mainProcessCommunicator: MainProcessCommunicator
 
     private _interval: ObservableVariable<number>;
     private _maxNumber: ObservableVariable<number>;
@@ -40,6 +42,7 @@ export class BackupData extends BaseServiceModule {
     async onStart(): Promise<void> {
         const _systemSetting: SystemSetting = this.services.SystemSetting;
         this._mailService = this.services.MailService;
+        this._mainProcessCommunicator = this.services.MainProcessCommunicator;
 
         this._interval = _systemSetting.secretSettings.get('backup.interval') as any;
         this._maxNumber = _systemSetting.secretSettings.get('backup.maxNumber') as any;
@@ -166,6 +169,16 @@ export class BackupData extends BaseServiceModule {
             archive.finalize();
             archive.pipe(output);
         });
+    }
+
+    /**
+     * 从备份文件中恢复数据。注意，恢复数据会导致nodebook重启
+     */
+    resumeFromBackup(filename: string, userPassword: string): void {
+        if (this._userPassword.value === userPassword) 
+            this._mainProcessCommunicator.restartAndRun(`npm run resumeFromBackup ${filename}`, FileManager._userDataDir);
+        else
+            throw new Error('用户密码错误');
     }
 
     /**
