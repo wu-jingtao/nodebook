@@ -7,19 +7,18 @@ import * as node_pty from 'node-pty';
 import * as archiver from 'archiver';
 import { BaseServiceModule } from "service-starter";
 import { ObservableVariable } from "observable-variable";
+import log from 'log-formatter';
 import randomString = require('crypto-random-string');
 
 import { SystemSetting } from "../SystemSetting/SystemSetting";
 import { MailService } from "../MailService/MailService";
 import { FileManager } from '../FileManager/FileManager';
 
-const os_tempDir = os.tmpdir();
-
 //设置系统变量默认值
-SystemSetting.addSystemSetting('backup.interval', 7, true, false);              //每隔几天备份一次数据，最小0，最大999。如果设置为0则表示不备份
-SystemSetting.addSystemSetting('backup.maxNumber', 10, true, false);            //最多保存多少个备份，最小1。超过最大备份数后，最旧的一个备份将会被删除
-SystemSetting.addSystemSetting('backup.autoSendEmail', true, true, false);      //是否每当有新的备份产生时自动将备份数据发送到用户邮箱
-SystemSetting.addSystemSetting('backup.encryptEmailFile', true, true, false);   //是否加密发送到邮箱的文件，密码是用户密码的MD5值
+SystemSetting.addSystemSetting('backup.interval', 7, true, true);              //每隔几天备份一次数据，最小0，最大999。如果设置为0则表示不备份
+SystemSetting.addSystemSetting('backup.maxNumber', 10, true, true);            //最多保存多少个备份，最小1。超过最大备份数后，最旧的一个备份将会被删除
+SystemSetting.addSystemSetting('backup.autoSendEmail', true, true, true);      //是否每当有新的备份产生时自动将备份数据发送到用户邮箱
+SystemSetting.addSystemSetting('backup.encryptEmailFile', true, true, true);   //是否加密发送到邮箱的文件，密码是用户密码的MD5值
 
 /**
  * 备份用户数据
@@ -32,6 +31,7 @@ export class BackupData extends BaseServiceModule {
     private _maxNumber: ObservableVariable<number>;
     private _autoSendEmail: ObservableVariable<boolean>;
     private _encryptEmailFile: ObservableVariable<boolean>;
+
     private _userPassword: ObservableVariable<string>;
 
     private _lastBackupTime: moment.Moment = moment();  //上一次备份的时间
@@ -41,26 +41,27 @@ export class BackupData extends BaseServiceModule {
         const _systemSetting: SystemSetting = this.services.SystemSetting;
         this._mailService = this.services.MailService;
 
-        this._interval = _systemSetting.normalSettings.get('backup.interval') as any;
-        this._maxNumber = _systemSetting.normalSettings.get('backup.maxNumber') as any;
-        this._autoSendEmail = _systemSetting.normalSettings.get('backup.autoSendEmail') as any;
-        this._encryptEmailFile = _systemSetting.normalSettings.get('backup.encryptEmailFile') as any;
+        this._interval = _systemSetting.secretSettings.get('backup.interval') as any;
+        this._maxNumber = _systemSetting.secretSettings.get('backup.maxNumber') as any;
+        this._autoSendEmail = _systemSetting.secretSettings.get('backup.autoSendEmail') as any;
+        this._encryptEmailFile = _systemSetting.secretSettings.get('backup.encryptEmailFile') as any;
+
         this._userPassword = _systemSetting.secretSettings.get('user.password') as any;
 
         this._interval.on('beforeSet', newValue => {
             if (!_.isNumber(newValue))
-                throw new Error.BadRequest('backup.interval 属性的类型必须是数字');
+                throw new Error('backup.interval 属性的类型必须是数字');
 
             if (newValue < 0 || newValue > 999)
-                throw new Error.BadRequest('backup.interval 的值并不符合要求的范围');
+                throw new Error('backup.interval 的值并不符合要求的范围');
         });
 
         this._maxNumber.on('beforeSet', newValue => {
             if (!_.isNumber(newValue))
-                throw new Error.BadRequest('backup.maxNumber 属性的类型必须是数字');
+                throw new Error('backup.maxNumber 属性的类型必须是数字');
 
             if (newValue < 1)
-                throw new Error.BadRequest('backup.maxNumber 的值必须大于1');
+                throw new Error('backup.maxNumber 的值必须大于1');
         });
 
         this._interval.on('set', (newValue, oldValue) => {
@@ -70,7 +71,7 @@ export class BackupData extends BaseServiceModule {
 
                 //计算时间差
                 const timeDiff = moment.duration(moment().add(newValue, 'days').diff(this._lastBackupTime)).valueOf();
-                this._timer = setTimeout(() => this._backup(), timeDiff);
+                this._timer = setTimeout(() => this._autoBackup(), timeDiff);
             }
         });
 
@@ -84,38 +85,24 @@ export class BackupData extends BaseServiceModule {
     }
 
     /**
-     * 确保某个备份文件存在
-     */
-    private async _ensureBackupFile(filename: string): Promise<string> {
-        try {
-            const path = node_path.join(FileManager._userDataBackupDir, filename);
-            const stats = await fs.promises.stat(path);
-            if (!stats.isFile()) throw "";
-
-            return path;
-        } catch  {
-            throw new Error.BadRequest(`没有备份文件：${filename}`);
-        }
-    }
-
-    /**
      * 读取某个备份文件。用于用户下载
      */
-    async readBackupFile(filename: string): Promise<fs.ReadStream> {
-        return fs.createReadStream(await this._ensureBackupFile(filename));
+    readBackupFile(filename: string): fs.ReadStream {
+        const path = node_path.join(FileManager._userDataBackupDir, filename);
+        return fs.createReadStream(path);
     }
 
     /**
      * 将某个备份文件发送到用户邮箱
      */
     async sendBackupEmail(filename: string): Promise<void> {
-        const path = await this._ensureBackupFile(filename);
+        const path = node_path.join(FileManager._userDataBackupDir, filename);
         const text = `nodebook 用户数据备份 ${filename}`;
 
         if (this._encryptEmailFile.value) {
             return new Promise<void>((resolve, reject) => {
-                const temp_path = node_path.join(os_tempDir, `nodebook_${randomString(20)}.zip`);   //临时文件目录
-                const process = node_pty.spawn('zipcloak', ['-O', temp_path, path]);                //加密备份文件
+                const temp_path = node_path.join(os.tmpdir(), `nodebook_${randomString(20)}.zip`);   //临时文件目录
+                const process = node_pty.spawn('zipcloak', ['-O', temp_path, path]);                 //加密备份文件
 
                 process.on('data', data => {
                     if (data.includes('password'))  //zipcloak会要求重复输入两次密码
@@ -123,11 +110,17 @@ export class BackupData extends BaseServiceModule {
                 });
 
                 process.on('exit', async (code) => {
-                    if (code === 0) {
-                        this._mailService.sendMail(text, text, [{ filename, content: await fs.promises.readFile(temp_path) }])
-                            .then(resolve).catch(reject).then(() => fs.remove(temp_path).catch(() => { }));
-                    } else
-                        reject(new Error.InternalServerError('加密备份文件失败'));
+                    try {
+                        if (code === 0) {
+                            await this._mailService.sendMail(text, text, [{ filename, content: await fs.promises.readFile(temp_path) }]);
+                            resolve();
+                        } else
+                            reject(new Error('加密备份文件失败'));
+                    } catch (error) {
+                        reject(error);
+                    } finally {
+                        await fs.remove(temp_path).catch(() => { });
+                    }
                 });
             });
         } else
@@ -146,30 +139,73 @@ export class BackupData extends BaseServiceModule {
      * 删除某个备份文件
      */
     async deleteBackupFiles(filename: string): Promise<void> {
-        await fs.remove(await this._ensureBackupFile(filename));
+        await fs.remove(node_path.join(FileManager._userDataBackupDir, filename));
     }
 
     /**
-     * 根据日期返回，备份文件路径
+     * 创建备份。目前只会备份，_userCodeDir、_recycleDir、_databaseDir 和 package.json
      */
-    /*     private _backupFilePath(date: string | moment.Moment): string {
-            if (typeof date === 'string')
-                return node_path.join(FileManager._userDataBackupDir, date + '.zip');
-            else
-                return node_path.join(FileManager._userDataBackupDir, date.format('YYYY-MM-DD_HH∶mm∶ss') + '.zip');
-        } */
+    createBackupFile(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const filename = moment().format('YYYY-MM-DD_HH∶mm∶ss') + '.zip';
+            const path = node_path.join(FileManager._userDataBackupDir, filename);
+            const output = fs.createWriteStream(path);
+            const archive = archiver('zip', { zlib: { level: 9 } });
+
+            output.on('close', () => resolve(filename));
+            archive.on('error', (err) => {
+                fs.remove(path).catch(() => { }); //确保不会生成空压缩包
+                reject(err);
+            });
+
+            archive.file(node_path.join(FileManager._userDataDir, 'package.json'), { name: 'package.json' });
+            archive.directory(FileManager._userCodeDir, node_path.basename(FileManager._userCodeDir));
+            archive.directory(FileManager._recycleDir, node_path.basename(FileManager._recycleDir));
+            archive.directory(FileManager._databaseDir, node_path.basename(FileManager._databaseDir));
+
+            archive.finalize();
+            archive.pipe(output);
+        });
+    }
 
     /**
-     * 备份数据
+     * 定时备份数据
      */
-    private _backup() {
+    private async _autoBackup(): Promise<void> {
+        try {
+            const filename = await this.createBackupFile();
+            await this._cleanOldBackup();
 
+            this._lastBackupTime = moment();
+            this._interval.value = this._interval.value;    //重置计时器
+
+            if (this._autoSendEmail.value) await this.sendBackupEmail(filename);
+        } catch (error) {
+            log.error.location.text.content(this.name, '定时备份数据时发生异常', error);
+        }
     }
 
     /**
      * 清理旧的备份数据
      */
-    private _cleanOldBackup() {
+    private async _cleanOldBackup(): Promise<void> {
+        try {
+            const modifyTime = [];  //检索每个备份文件的创建时间
+            for (const item of await this.listBackupFiles()) {
+                const path = node_path.join(FileManager._userDataBackupDir, item);
+                const stats = await fs.promises.stat(path);
+                modifyTime.push({ path, time: stats.mtime });
+            }
+            modifyTime.sort((a, b) => a.time.valueOf() - b.time.valueOf())  //按照创建时间从早到晚排序
 
+            const deleteNumber = modifyTime.length - this._maxNumber.value;
+            if (deleteNumber > 0) { //如果大于最大保存数目则删除过期的
+                for (const item of modifyTime.slice(0, deleteNumber)) {
+                    await fs.remove(item.path);
+                }
+            }
+        } catch (error) {
+            log.error.location.text.content(this.name, '清理旧的备份数据时发生异常', error);
+        }
     }
 }

@@ -23,5 +23,5 @@ import { InitializeDatabase } from '../module/Database/InitializeDatabase';
 
     await iniDB.onStop();
 
-    console.log('重置用户成功。用户名：note@book.com 密码：123456');
+    console.log('重置用户成功，重启容器后生效。用户名：note@book.com 密码：123456');
 })();

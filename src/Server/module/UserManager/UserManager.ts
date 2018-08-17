@@ -35,39 +35,22 @@ export class UserManager extends BaseServiceModule {
 
         this._userName = _systemSetting.secretSettings.get('user.name') as any;
         this._password = _systemSetting.secretSettings.get('user.password') as any;
+
+        this._userName.on('beforeSet', newValue => {
+            if (!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(newValue))
+                throw new Error(`用户名 '${newValue}' 不是有效的电子邮箱格式`);
+        });
+
+        this._password.on('beforeSet', newValue => {
+            //注意：客户端在将密码发给到服务器之前应当进行MD5操作。更新失败则会抛出异常
+            if (newValue.length !== 32)
+                throw new Error('传入的密码不是被MD5化后的有效字符串');
+        });
     }
 
     async onStop(): Promise<void> {
         this._tokenList.forEach(item => clearTimeout(item[1]));
         this._tokenList.length = 0;
-    }
-
-    /**
-     * 更改用户名
-     * @param username 新用户名
-     * @param password 当前用户密码
-     */
-    updateUsername(username: string, password: string): void {
-        if (!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(username))
-            throw new Error(`用户名 '${username}' 不是有效的电子邮箱格式`);
-
-        if (this._password.value !== password)
-            throw new Error(`输入的用户密码不正确`);
-
-        this._userName.value = username;
-    }
-
-    /**
-     * 更新密码，注意：客户端在将密码发给到服务器之前应当进行MD5操作。更新失败则会抛出异常
-     */
-    updatePassword(newPass: string, oldPass: string): void {
-        if (newPass.length === 32 && oldPass.length === 32) {
-            if (this._password.value === oldPass)
-                this._password.value = newPass;
-            else
-                throw new Error('输入的旧密码错误');
-        } else
-            throw new Error('传入的密码不是被MD5化后的有效字符串');
     }
 
     /**

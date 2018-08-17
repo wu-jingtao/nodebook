@@ -60,7 +60,9 @@ export class ServiceManager extends BaseServiceModule {
                         ${logger.getLogsFromEnd(100).map(item => `[${moment(item.date).format('YYYY-MM-DD HH:mm:ss')}]  ${item.text}`).join('\n')}
                     `;
 
-                    this._mailService.sendMail(`NodeBook 服务'${serviceConfig.name}'崩溃`, content).catch(() => { });
+                    this._mailService.sendMail(`NodeBook 服务'${serviceConfig.name}'崩溃`, content).catch(err => {
+                        log.error.location.text.content(this.name, '发送服务崩溃邮件失败，请检查邮件发送配置是否正确', err);
+                    });
                 }
             });
         }

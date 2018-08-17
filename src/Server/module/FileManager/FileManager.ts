@@ -220,7 +220,10 @@ export class FileManager extends BaseServiceModule {
                 const archive = archiver('zip', { zlib: { level: 9 } });
 
                 output.on('close', resolve);
-                archive.on('error', reject);
+                archive.on('error', (err) => {
+                    fs.remove(to).catch(() => { }); //确保不会生成空压缩包
+                    reject(err);
+                });
 
                 if (fileStat.isFile())
                     archive.file(path, { name: node_path.basename(path) });

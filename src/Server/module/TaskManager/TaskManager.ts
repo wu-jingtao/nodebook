@@ -25,19 +25,24 @@ export class TaskManager extends BaseServiceModule {
         this._logManager = this.services.LogManager;
     }
 
+    async onStop(): Promise<void> {
+        //关闭所有任务
+        this._taskList.forEach(task => task.process.kill());
+    }
+
     /**
      * 创建一个新的任务。如果任务正在运行，则不执行任何操作
      */
     createTask(taskFilePath: string): void {
         if (!this._taskList.has(taskFilePath)) {    //确保要创建的任务并未处于运行状态
             LogManager._checkPath(taskFilePath);
-            
+
             const child = child_process.fork(taskFilePath, [], {
                 cwd: FileManager._programDataDir,
                 uid: 6000,
                 gid: 6000
             });
-            
+
             const logger = this._logManager.createTaskLogger(taskFilePath);
             logger.status.value = 'running';
 
