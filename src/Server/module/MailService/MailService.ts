@@ -8,20 +8,20 @@ import { SystemSetting } from '../SystemSetting/SystemSetting';
 const nodemailer_services_list: string[] = Object.keys(require('nodemailer/lib/well-known/services.json'));
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('mail.service', undefined, true, true);      //邮件服务商
-SystemSetting.addSystemSetting('mail.user', undefined, true, true);         //账号
-SystemSetting.addSystemSetting('mail.pass', undefined, true, true);         //授权码
+SystemSetting.addSystemSetting('mail.service', null, true, true, 'string');      //邮件服务商
+SystemSetting.addSystemSetting('mail.user', null, true, true, 'string');         //账号
+SystemSetting.addSystemSetting('mail.pass', null, true, true, 'string');         //授权码
 
 /**
  * 发送邮件
  */
 export class MailService extends BaseServiceModule {
 
-    private _mailService: ObservableVariable<string>;
-    private _mailUser: ObservableVariable<string>;
-    private _mailPass: ObservableVariable<string>;
+    private _mailService: ObservableVariable<string | null>;
+    private _mailUser: ObservableVariable<string | null>;
+    private _mailPass: ObservableVariable<string | null>;
 
-    private _userName: ObservableVariable<string>;          //登陆用户的用户名
+    private _userName: ObservableVariable<string>;  //登陆用户的用户名
 
     async onStart(): Promise<void> {
         const systemSetting = this.services.SystemSetting as SystemSetting;

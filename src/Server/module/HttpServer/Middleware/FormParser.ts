@@ -1,11 +1,10 @@
-import * as _ from 'lodash';
 import * as KoaBody from 'koa-body';
 import { ObservableVariable } from 'observable-variable';
 
 import { SystemSetting } from '../../SystemSetting/SystemSetting';
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('http.uploadFileSizeLimit', 100, true, false);    //文件数据上传大小限制，单位MB，默认100MB，最小1MB
+SystemSetting.addSystemSetting('http.uploadFileSizeLimit', 100, true, false, 'number');    //文件数据上传大小限制，单位MB，默认100MB，最小1MB
 
 /**
  * 表单内容解析工具
@@ -14,9 +13,6 @@ export function FormParser(systemSetting: SystemSetting) {
     const _uploadFileSizeLimit = systemSetting.normalSettings.get('http.uploadFileSizeLimit') as ObservableVariable<number>;
 
     _uploadFileSizeLimit.on('beforeSet', newValue => {
-        if (!_.isNumber(newValue))
-            throw new Error('http.uploadFileSizeLimit 属性的类型必须是数字');
-
         if (newValue < 1)
             throw new Error('http.uploadFileSizeLimit 的值必须大于1');
     });

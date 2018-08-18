@@ -5,6 +5,11 @@ import { BaseServiceModule } from "service-starter";
  */
 export class MainProcessCommunicator extends BaseServiceModule {
 
+    /**
+     * 是否开启了debug模式。
+     */
+    readonly isDebug = (process.env.DEBUG || '').toLowerCase() === 'true';
+
     async onStart(): Promise<void> { }
 
     private _sendMessage(signal: string, args: any[] = []): void {

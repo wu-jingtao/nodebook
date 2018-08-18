@@ -41,6 +41,15 @@ export class SystemSettingTable extends BaseServiceModule {
     }
 
     /**
+     * 删除过期的键
+     */
+    async removeExpiredKey(key: string, secret: boolean): Promise<void> {
+        await this._dbCon.run(`
+            DELETE FROM "main"."system_setting" WHERE "key" = ? AND "secret" = ?
+        `, key, secret);
+    }
+
+    /**
      * 更新非私密键
      */
     async updateNormalKey(key: string, value: any): Promise<void> {
@@ -71,6 +80,7 @@ export class SystemSettingTable extends BaseServiceModule {
             WHERE "key" = ? AND "secret" = 0
         `, key);
 
+        result.is_server = result.is_server == '1';
         return result;
     }
 
@@ -83,6 +93,7 @@ export class SystemSettingTable extends BaseServiceModule {
             WHERE "key" = ? AND "secret" = 1
         `, key);
 
+        result.is_server = result.is_server == '1';
         return result;
     }
 
@@ -90,19 +101,31 @@ export class SystemSettingTable extends BaseServiceModule {
      * 获取所有普通键值
      */
     async getAllNormalKey(): Promise<{ key: string, value: any, is_server: boolean }[]> {
-        return await this._dbCon.all(`
+        const result = await this._dbCon.all(`
             SELECT "key", "value", "is_server" FROM "main"."system_setting" 
             WHERE "secret" = 0
         `);
+
+        for (const item of result) {
+            item.is_server = item.is_server == '1';
+        }
+
+        return result;
     }
 
     /**
      * 获取所有私密键值
      */
     async getAllSecretKey(): Promise<{ key: string, value: any, is_server: boolean }[]> {
-        return await this._dbCon.all(`
+        const result = await this._dbCon.all(`
             SELECT "key", "value", "is_server" FROM "main"."system_setting" 
             WHERE "secret" = 1
         `);
+
+        for (const item of result) {
+            item.is_server = item.is_server == '1';
+        }
+
+        return result;
     }
 }

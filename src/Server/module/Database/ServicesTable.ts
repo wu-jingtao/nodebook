@@ -65,9 +65,16 @@ export class ServicesTable extends BaseServiceModule {
      * 获取所有服务配置
      */
     async getAllServices(): Promise<ReadonlyArray<ServiceConfig>> {
-        return await this._dbCon.all(`
+        const result = await this._dbCon.all(`
             SELECT "path", "name", "auto_restart", "report_error" FROM "main"."services" 
         `);
+
+        for (const item of result) {
+            item.auto_restart = item.auto_restart == '1';
+            item.report_error = item.report_error == '1';
+        }
+
+        return result;
     }
 }
 

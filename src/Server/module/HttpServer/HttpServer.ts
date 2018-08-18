@@ -27,8 +27,8 @@ export class HttpServer extends BaseServiceModule {
     private async _registerMiddleware() {
         this._koaServer.use(HealthCheck());
         this._koaServer.use(VisitRestriction(this));
-        this._koaServer.use(VisitLogger());
-        this._koaServer.use(ErrorHandling());
+        this._koaServer.use(VisitLogger(this));
+        this._koaServer.use(ErrorHandling(this));
         this._koaServer.use(koa_response_time());
         this._koaServer.use(koa_compress());    //response 头部如果设置了 Content-Encoding 则会使这个无效
         this._koaServer.use(Router(this));
