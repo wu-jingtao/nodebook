@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es2017",
-        "removeComments": true,
+        "removeComments": false,
         "preserveConstEnums": false,
         "declaration": false,
         "experimentalDecorators": false,

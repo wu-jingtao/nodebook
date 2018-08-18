@@ -3,20 +3,24 @@ import * as path from 'path';
 import * as child_process from 'child_process';
 import { BaseServiceModule, NodeServicesManager } from 'service-starter';
 
-class NodeBook extends NodeServicesManager {
+class NodeBook_MainProcess extends NodeServicesManager {
     constructor() {
         super();
-        this.registerService(new MainProcess);
+        this.registerService(new SubprocessCommunicator);
     }
 }
 
-class MainProcess extends BaseServiceModule {
-
+class SubprocessCommunicator extends BaseServiceModule {
+    private _isDebug = (process.env.DEBUG || '').toLowerCase() === 'true';
     private _process: child_process.ChildProcess;
     private _process_onCloseCallback = () => this.servicesManager.stop();
 
     async onStart(): Promise<void> {
-        this._process = child_process.fork(path.resolve(__dirname, './ServiceStack.js'));
+        if (this._isDebug)  //启动时就自动进入调试模式
+            this._process = child_process.spawn('node', ['--inspect-brk=0.0.0.0:9229', path.resolve(__dirname, './ServiceStack.js')], { stdio: [0, 1, 2, 'ipc'] });
+        else
+            this._process = child_process.fork(path.resolve(__dirname, './ServiceStack.js'));
+
         this._process.on('close', this._process_onCloseCallback);
         this._process.on('message', (msg: { signal: string, args: any[] }) => {
             if (_.isObject(msg)) {
@@ -49,4 +53,4 @@ class MainProcess extends BaseServiceModule {
     }
 }
 
-(new NodeBook).start();
+(new NodeBook_MainProcess).start();

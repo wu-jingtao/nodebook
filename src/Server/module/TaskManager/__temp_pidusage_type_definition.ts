@@ -46,4 +46,4 @@ export interface pidusage_Stat {
     timestamp: number;
 }
 
-export const pidusage: pidusage_type = pidusage_o;
+export const pidusage: pidusage_type = pidusage_o as any;

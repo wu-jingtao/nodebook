@@ -21,7 +21,6 @@ import { ServiceManager } from '../../TaskManager/ServiceManager';
 
 import { FormParser } from './FormParser';
 import { LoginCheck } from './LoginCheck';
-import { Favicon } from './Favicon';
 import { ClientStaticFileSender } from './ClientStaticFileSender';
 
 /**
@@ -34,9 +33,9 @@ export function Router(httpServer: HttpServer): koa.Middleware {
 
     router_login.use(LoginCheck(httpServer.services.UserManager));
 
-    router_no_login.get('favicon', '/favicon.ico', Favicon());
     router_no_login.get('static', '/static/:path(.+?\\..+)', ClientStaticFileSender());
     router_no_login.redirect('/', '/static/index.html');
+    router_no_login.redirect('/favicon.ico', '/static/favicon.ico');
 
     Others(router_login, httpServer);
     File(router_login, httpServer);

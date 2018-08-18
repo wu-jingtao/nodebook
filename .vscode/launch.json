@@ -14,18 +14,15 @@
             "remoteRoot": "/app"
             
             /**
-            * 参考Docker命令
-            *
+            * 参考Docker命令。启动后会自动开启node调试，端口9229
+            * 
             * docker run --rm -it --name nodebook_test -p 443:443 -p 9229:9229 \
+            * -e DOMAIN="localhost:443" -e DEBUG="true" \
             * -v $(pwd)/bin:/app/bin \
-            * -v $(pwd)/testData/user-data:/user-data \
-            * -v $(pwd)/testData/program-data:/program-data \
+            * -v $(pwd)/testData/user_data:/user_data \
+            * -v $(pwd)/testData/program_data:/program_data \
             * -v $(pwd)/testData/key:/key \
-            * nodebook:latest /bin/bash
-            *
-            * 进入容器后启动node调试
-            *
-            * node --inspect-brk=0.0.0.0:9229 .
+            * nodebook:latest
             */
         },
         {

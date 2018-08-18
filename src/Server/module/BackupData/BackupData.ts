@@ -105,7 +105,7 @@ export class BackupData extends BaseServiceModule {
         if (this._encryptEmailFile.value) {
             return new Promise<void>((resolve, reject) => {
                 const temp_path = node_path.join(os.tmpdir(), `nodebook_${randomString(20)}.zip`);   //临时文件目录
-                const process = node_pty.spawn('zipcloak', ['-O', temp_path, path]);                 //加密备份文件
+                const process = node_pty.spawn('zipcloak', ['-O', temp_path, path], {});             //加密备份文件
 
                 process.on('data', data => {
                     if (data.includes('password'))  //zipcloak会要求重复输入两次密码
@@ -175,7 +175,7 @@ export class BackupData extends BaseServiceModule {
      * 从备份文件中恢复数据。注意，恢复数据会导致nodebook重启
      */
     resumeFromBackup(filename: string, userPassword: string): void {
-        if (this._userPassword.value === userPassword) 
+        if (this._userPassword.value === userPassword)
             this._mainProcessCommunicator.restartAndRun(`npm run resumeFromBackup ${filename}`, FileManager._userDataDir);
         else
             throw new Error('用户密码错误');

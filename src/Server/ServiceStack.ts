@@ -19,7 +19,7 @@ import { MainProcessCommunicator } from './module/MainProcess/MainProcessCommuni
 /**
  * 将程序模块按照注册的顺序依次启动
  */
-class ServiceStack extends DockerServicesManager {
+class NodeBook_ServiceStack extends DockerServicesManager {
     constructor() {
         super();
 
@@ -62,4 +62,4 @@ class ServiceStack extends DockerServicesManager {
     }
 }
 
-(new ServiceStack).start();
+(new NodeBook_ServiceStack).start();

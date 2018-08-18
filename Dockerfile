@@ -18,14 +18,15 @@ VOLUME [ "/user_data", "/program_data" ]
 RUN mkdir -m 700 /key && \
 # 创建 nodebook-task 账户，在执行用户程序的时候都是这个账户
     groupadd -g 6000 nodebook-task && \
-    useradd -c nodebook-task -d /program-data -g nodebook-task -M -s /usr/sbin/nologin -u 6000 nodebook-task && \
-# 使得用户程序可以修改 /program-data 目录
-    chown nodebook-task:nodebook-task /program-data
+    useradd -c nodebook-task -d /program_data -g nodebook-task -M -s /usr/sbin/nologin -u 6000 nodebook-task && \
+# 使得用户程序可以修改 /program_data 目录
+    chown nodebook-task:nodebook-task /program_data
 
 WORKDIR /app
 
 # 复制代码
-COPY ["src", "package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "LICENSE", "/app/"]
+COPY ["src", "/app/src/"]
+COPY ["package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "LICENSE", "/app/"]
 
 # 编译
 RUN npm install && \ 
@@ -55,7 +56,7 @@ HEALTHCHECK \
 
 # DOMAIN：配置域名，默认localhost
 # DEBUG： 是否开启了debug模式。如果开启了,则会将错误的堆栈信息也输出给用户
-ENV DOMAIN=localhost DEBUG=false
+ENV DOMAIN=localhost:443 DEBUG=false
 
 # 只暴露https
 EXPOSE 443
