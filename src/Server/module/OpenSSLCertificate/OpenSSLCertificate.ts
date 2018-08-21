@@ -10,13 +10,25 @@ import { FileManager } from '../FileManager/FileManager';
  */
 export class OpenSSLCertificate extends BaseServiceModule {
 
+    /**
+     * 私钥
+     */
     privkey: Buffer;
+
+    /**
+     * 公钥
+     */
     cert: Buffer;
 
+    /**
+     * 私钥密码
+     */
+    password: string | undefined;
+
     async onStart(): Promise<void> {
-        if (!await this.checkCertExist()) 
+        if (!await this.checkCertExist())
             await this.generateCert();
-        
+
         await this.readCert();
     }
 
@@ -26,6 +38,7 @@ export class OpenSSLCertificate extends BaseServiceModule {
     async readCert(): Promise<void> {
         this.privkey = await fs.promises.readFile(FileManager._opensslPrivkeyPath);
         this.cert = await fs.promises.readFile(FileManager._opensslCertPath);
+        this.password = await fs.promises.readFile(FileManager._opensslPasswordPath).then(data => data.toString()).catch(() => undefined);
     }
 
     /**
@@ -46,10 +59,11 @@ export class OpenSSLCertificate extends BaseServiceModule {
      */
     generateCert(): Promise<void> {
         return new Promise((resolve, reject) => {
+            const password = randomString(1024);
             child_process.exec(
-                `openssl req -x509 -newkey rsa:4096 -keyout privkey.pem -out cert.pem -days 365 -subj '/CN=${process.env.DOMAIN}' -passout pass:${randomString(30)}`
+                `openssl req -x509 -newkey rsa:4096 -keyout privkey.pem -out cert.pem -days 365 -subj '/CN=${process.env.DOMAIN}' -passout pass:${password}`
                 , { cwd: FileManager._opensslKeyDir }
-                , err => err ? reject(err) : resolve());
+                , err => err ? reject(err) : fs.writeFile(FileManager._opensslPasswordPath, password, err => err ? reject(err) : resolve()));
         });
     }
 }

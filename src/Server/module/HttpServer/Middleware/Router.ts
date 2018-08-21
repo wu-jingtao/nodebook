@@ -473,7 +473,7 @@ function Task(router: koa_router, httpServer: HttpServer) {
     router.post(_prefix + '/getLogsAfterDate', ctx => {
         ctx.body = _logManager.getLogsAfterDate(
             ctx.request.body.path,
-            ctx.request.body.date != null ? Number.parseInt(ctx.request.body.date) : undefined
+            ctx.request.body.date ? Number.parseInt(ctx.request.body.date) : undefined
         );
     });
 
@@ -574,8 +574,8 @@ function Task(router: koa_router, httpServer: HttpServer) {
         await _serviceManager.createService(
             ctx.request.body.path,
             ctx.request.body.name,
-            ctx.request.body.auto_restart,
-            ctx.request.body.report_error,
+            ctx.request.body.auto_restart == 'true',
+            ctx.request.body.report_error == 'true',
         );
         ctx.body = 'ok';
     });
@@ -591,8 +591,8 @@ function Task(router: koa_router, httpServer: HttpServer) {
         await _serviceManager.updateService(
             ctx.request.body.path,
             ctx.request.body.name,
-            ctx.request.body.auto_restart,
-            ctx.request.body.report_error,
+            ctx.request.body.auto_restart == 'true',
+            ctx.request.body.report_error == 'true',
         );
         ctx.body = 'ok';
     });

@@ -73,6 +73,11 @@ export class FileManager extends BaseServiceModule {
     static readonly _opensslCertPath = node_path.join(FileManager._opensslKeyDir, 'cert.pem');
 
     /**
+     * openssl私钥密码
+     */
+    static readonly _opensslPasswordPath = node_path.join(FileManager._opensslKeyDir, 'password.txt');
+
+    /**
      * 数据库文件路径
      */
     static readonly _databasePath = node_path.join(FileManager._databaseDir, 'nodebook_system_data.db');

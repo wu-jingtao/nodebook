@@ -5,7 +5,6 @@ import * as koa_compress from 'koa-compress';
 import koa_response_time = require('koa-response-time');
 import { BaseServiceModule } from "service-starter";
 
-import { SystemSetting } from '../SystemSetting/SystemSetting';
 import { OpenSSLCertificate } from '../OpenSSLCertificate/OpenSSLCertificate';
 
 import { ErrorHandling } from './Middleware/ErrorHandling';
@@ -38,11 +37,15 @@ export class HttpServer extends BaseServiceModule {
         this._openSSLCertificate = this.services.OpenSSLCertificate;
 
         this._koaServer = new koa();
-        this._httpServer = https.createServer({ key: this._openSSLCertificate.privkey, cert: this._openSSLCertificate.cert }, this._koaServer.callback());
+        this._httpServer = https.createServer({
+            key: this._openSSLCertificate.privkey,
+            cert: this._openSSLCertificate.cert,
+            passphrase: this._openSSLCertificate.password
+        }, this._koaServer.callback());
 
         await this._registerMiddleware();
 
-        this._httpServer.listen(443);
+        this._httpServer.listen(443, '0.0.0.0');
     }
 
     onStop(): Promise<void> {
@@ -52,8 +55,14 @@ export class HttpServer extends BaseServiceModule {
     }
 
     async onHealthCheck(): Promise<void> {
-        const result = (await request.post(`https://${process.env.DOMAIN}${healthCheckingUrlPath}`, { ca: this._openSSLCertificate.cert })).toString();
-        if ("OK" !== result)
-            throw new Error(`健康检查的返回值错误。${result}`);
+        try {
+            const result = (await request.post(`https://${process.env.DOMAIN}${healthCheckingUrlPath}`, { ca: this._openSSLCertificate.cert })).toString();
+            if ("OK" !== result)
+                throw new Error(`健康检查的返回值错误。${result}`);
+        } catch (error) { //由于 request 返回的错误不是标准的Error，在打印的时候
+            const err = new Error(error.message);
+            err.stack = error.stack;
+            throw err;
+        }
     }
 }

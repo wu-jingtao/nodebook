@@ -17,9 +17,9 @@ class SubprocessCommunicator extends BaseServiceModule {
 
     async onStart(): Promise<void> {
         if (this._isDebug)  //启动时就自动进入调试模式
-            this._process = child_process.spawn('node', ['--inspect-brk=0.0.0.0:9229', path.resolve(__dirname, './ServiceStack.js')], { stdio: [0, 1, 2, 'ipc'] });
+            this._process = child_process.spawn('node', ['--inspect-brk=0.0.0.0:9229', path.resolve(__dirname, './Nodebook_Subprocess.js')], { stdio: [0, 1, 2, 'ipc'] });
         else
-            this._process = child_process.fork(path.resolve(__dirname, './ServiceStack.js'));
+            this._process = child_process.fork(path.resolve(__dirname, './Nodebook_Subprocess.js'));
 
         this._process.on('close', this._process_onCloseCallback);
         this._process.on('message', (msg: { signal: string, args: any[] }) => {
@@ -35,7 +35,7 @@ class SubprocessCommunicator extends BaseServiceModule {
                         this._process.off('close', this._process_onCloseCallback);  //避免关闭主进程
                         this._process.on('close', () => {
                             child_process.execSync(msg.args[0], { cwd: msg.args[1] });
-                            this.onStart()
+                            this.onStart();
                         });
                         this._process.kill();
                         break;
@@ -48,8 +48,11 @@ class SubprocessCommunicator extends BaseServiceModule {
         });
     }
 
-    async onStop(): Promise<void> {
-        this._process.kill();
+    onStop(): Promise<void> {
+        return new Promise((resolve) => {
+            this._process.on('close', resolve);
+            this._process.kill();
+        });
     }
 }
 
