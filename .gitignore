@@ -63,3 +63,6 @@ bin/
 
 # 挂载到容器的测试数据目录
 testData/
+
+# settings.json
+.vscode/settings.json

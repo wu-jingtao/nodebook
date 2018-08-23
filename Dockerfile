@@ -13,8 +13,10 @@ VOLUME [ "/user_data", "/program_data" ]
 
 # 创建存放openssl key目录
 # 程序第一次启动时会生成临时的秘钥，如果自己有秘钥的话可以通过挂载的方式设置秘钥
-# key：  /key/privkey.pem
-# cert： /key/cert.pem
+# 如果私钥有密码的话，需要将密码放置到password.txt中
+# key：         /key/privkey.pem
+# cert：        /key/cert.pem
+# password：    /key/password.txt
 RUN mkdir -m 700 /key && \
 # 创建 nodebook-task 账户，在执行用户程序的时候都是这个账户
     groupadd -g 6000 nodebook-task && \
