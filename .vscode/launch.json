@@ -6,6 +6,12 @@
     "configurations": [
         {
             "type": "node",
+            "request": "launch",
+            "name": "单个文件调试",
+            "program": "${file}"
+        },
+        {
+            "type": "node",
             "request": "attach",
             "name": "容器中调试",
             "address": "localhost",
@@ -24,16 +30,6 @@
             * -v $(pwd)/testData/key:/key \
             * nodebook:latest
             */
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "服务器端调试",
-            "protocol": "inspector",
-            "args": ["src/Server/index.ts"],
-            "cwd": "${workspaceRoot}",
-            "runtimeArgs": ["-r", "ts-node/register"],
-            "internalConsoleOptions": "openOnSessionStart"
         }
     ]
 }

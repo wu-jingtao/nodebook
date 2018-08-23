@@ -21,19 +21,19 @@ class SubprocessCommunicator extends BaseServiceModule {
         else
             this._process = child_process.fork(path.resolve(__dirname, './Nodebook_Subprocess.js'));
 
-        this._process.on('close', this._process_onCloseCallback);
-        this._process.on('message', (msg: { signal: string, args: any[] }) => {
+        this._process.once('close', this._process_onCloseCallback);
+        this._process.once('message', (msg: { signal: string, args: any[] }) => {   //使用once是因为现在只有重启的选项，同时为了确保稳定
             if (_.isObject(msg)) {
                 switch (msg.signal) {
                     case 'restart': //重启服务
                         this._process.off('close', this._process_onCloseCallback);  //避免关闭主进程
-                        this._process.on('close', () => this.onStart());
+                        this._process.once('close', () => this.onStart());
                         this._process.kill();
                         break;
 
                     case 'restartAndRun':   //重启服务并执行某些命令
                         this._process.off('close', this._process_onCloseCallback);  //避免关闭主进程
-                        this._process.on('close', () => {
+                        this._process.once('close', () => {
                             child_process.execSync(msg.args[0], { cwd: msg.args[1] });
                             this.onStart();
                         });
@@ -50,7 +50,7 @@ class SubprocessCommunicator extends BaseServiceModule {
 
     onStop(): Promise<void> {
         return new Promise((resolve) => {
-            this._process.on('close', resolve);
+            this._process.once('close', resolve);
             this._process.kill();
         });
     }

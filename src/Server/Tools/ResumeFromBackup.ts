@@ -29,6 +29,7 @@ import { FileManager } from '../module/FileManager/FileManager';
     await fs.remove(node_path.join(FileManager._userDataDir, 'package.json'));
     log.round('删除类库目录成功', FileManager._libraryDir);
 
+    //todo 这里需要测试
     await new Promise((resolve, reject) => {
         fs.createReadStream(path).pipe(unzip.Extract({ path: FileManager._userDataDir }))
             .on('error', reject).on('close', resolve);

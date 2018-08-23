@@ -56,8 +56,8 @@ HEALTHCHECK \
     # 调用程序所暴露出的健康检查接口(要使用绝对路径)
     CMD /app/node_modules/service-starter/src/Docker/health_check.sh
 
-# DOMAIN：配置域名，默认localhost
-# DEBUG： 是否开启了debug模式。如果开启了,则会将错误的堆栈信息也输出给用户
+# DOMAIN：配置域名，默认localhost:443
+# DEBUG： 是否开启了debug模式。
 ENV DOMAIN=localhost:443 DEBUG=false
 
 # 只暴露https
