@@ -100,7 +100,7 @@ function Others(router: koa_router, httpServer: HttpServer) {
      * 发送测试邮件，用于检测邮箱设置是否正确
      */
     router.get(_prefix + '/sendTestMail', async (ctx) => {
-        await _mailService.sendMail('nodebook 测试邮件', `时间:${moment().format('YYYY-MM-DD HH:mm:ss')}\nhost:${process.env.DOMAIN}`);
+        await _mailService.sendMail('nodebook 测试邮件', `时间:${moment().format('YYYY-MM-DD HH:mm:ss')}\nhost:${_openSSLCertificate.domain}`);
         ctx.body = 'ok';
     });
 }

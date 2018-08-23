@@ -7,6 +7,7 @@ import { ServicesTable, ServiceConfig } from "../Database/ServicesTable";
 import { LogManager } from "./LogManager/LogManager";
 import { FileManager } from "../FileManager/FileManager";
 import { MailService } from '../MailService/MailService';
+import { OpenSSLCertificate } from '../OpenSSLCertificate/OpenSSLCertificate';
 
 /**
  * 用户服务管理器。服务是一种特殊的任务，主要区别在于它可以随系统重启，崩溃的时候可以给用户发送邮件通知
@@ -20,12 +21,14 @@ export class ServiceManager extends BaseServiceModule {
     private _logManager: LogManager;
     private _servicesTable: ServicesTable;
     private _mailService: MailService;
+    private _openSSLCertificate: OpenSSLCertificate;
 
     async onStart(): Promise<void> {
         this._taskManager = this.services.TaskManager;
         this._logManager = this.services.LogManager;
         this._servicesTable = this.services.ServicesTable;
         this._mailService = this.services.MailService;
+        this._openSSLCertificate = this.services.OpenSSLCertificate;
 
         for (const item of await this._servicesTable.getAllServices()) {
             this._servicesList.set(item.path, item);
@@ -51,7 +54,7 @@ export class ServiceManager extends BaseServiceModule {
             logger.status.on('set', newValue => {
                 if (serviceConfig.report_error && newValue === 'crashed') {
                     const content = `
-                        NodeBook <${process.env.DOMAIN}>
+                        NodeBook <${this._openSSLCertificate.domain}>
                         崩溃时间：${moment().format('YYYY-MM-DD HH:mm:ss')}
                         服务名称：${serviceConfig.name}
                         程序文件路径：${serviceConfig.path.replace(FileManager._userCodeDir, '/')}

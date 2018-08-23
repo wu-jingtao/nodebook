@@ -45,7 +45,7 @@ export class HttpServer extends BaseServiceModule {
 
         await this._registerMiddleware();
 
-        this._httpServer.listen(443, '0.0.0.0');
+        this._httpServer.listen(443);
     }
 
     onStop(): Promise<void> {
@@ -55,14 +55,12 @@ export class HttpServer extends BaseServiceModule {
     }
 
     async onHealthCheck(): Promise<void> {
-        try {
-            const result = (await request.post(`https://${process.env.DOMAIN}${healthCheckingUrlPath}`, { ca: this._openSSLCertificate.cert })).toString();
-            if ("OK" !== result)
-                throw new Error(`健康检查的返回值错误。${result}`);
-        } catch (error) { //由于 request 返回的错误不是标准的Error，在打印的时候
-            const err = new Error(error.message);
-            err.stack = error.stack;
-            throw err;
-        }
+        const result = await request.post(`https://${this._openSSLCertificate.domain}${healthCheckingUrlPath}`, {
+            ca: this._openSSLCertificate.cert,
+            rejectUnauthorized: false
+        });
+
+        if ("OK" !== result.toString())
+            throw new Error(`健康检查的返回值错误。${result}`);
     }
 }

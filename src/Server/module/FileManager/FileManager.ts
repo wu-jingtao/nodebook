@@ -35,7 +35,7 @@ export class FileManager extends BaseServiceModule {
     /**
      * nodebook客户端程序文件目录
      */
-    static readonly _appClientFileDir = node_path.join(FileManager._appDir, 'Client/');
+    static readonly _appClientFileDir = node_path.join(FileManager._appDir, 'bin/Client/');
 
     /**
      *用户代码存放目录
