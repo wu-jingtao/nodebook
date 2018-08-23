@@ -13,6 +13,7 @@ import { HealthCheck, healthCheckingUrlPath } from './Middleware/HealthCheck';
 import { VisitRestriction } from './Middleware/VisitRestriction';
 import { VisitLogger } from './Middleware/VisitLogger';
 import { Router } from './Middleware/Router';
+import { ContentType } from './Middleware/ContentType';
 
 export class HttpServer extends BaseServiceModule {
 
@@ -32,6 +33,7 @@ export class HttpServer extends BaseServiceModule {
         this._koaServer.use(ErrorHandling(this));
         this._koaServer.use(koa_response_time());
         this._koaServer.use(koa_compress());    //response 头部如果设置了 Content-Encoding 则会使这个无效
+        this._koaServer.use(ContentType());
         this._koaServer.use(Router(this));
     }
 

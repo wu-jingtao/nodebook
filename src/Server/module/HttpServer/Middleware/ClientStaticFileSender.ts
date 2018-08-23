@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as koa from 'koa';
 import * as koa_compose from 'koa-compose';
-import * as mime from 'mime-types';
 import * as Error from 'http-errors';
 import koa_conditional = require('koa-conditional-get');
 import koa_etag = require('koa-etag');
@@ -19,7 +18,6 @@ export function ClientStaticFileSender(): koa.Middleware {
         async function StaticFileSender(ctx) {
             try {
                 ctx.body = fs.createReadStream(path.join(FileManager._appClientFileDir, ctx.params.path));
-                ctx.type = mime.contentType(path.extname((ctx.body as fs.ReadStream).path.toString())) || 'application/octet-stream';
             } catch {
                 throw new Error.NotFound();
             }
