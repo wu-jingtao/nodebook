@@ -3,7 +3,7 @@ import { BaseServiceModule } from "service-starter";
 import { ObservableVariable } from 'observable-variable';
 
 import { SystemSetting } from '../SystemSetting/SystemSetting';
-import { OpenSSLCertificate } from '../OpenSSLCertificate/OpenSSLCertificate';
+import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 //nodemailer 内置服务商列表
 const nodemailer_services_list: string[] = Object.keys(require('nodemailer/lib/well-known/services.json'));
@@ -18,7 +18,7 @@ SystemSetting.addSystemSetting('mail.pass', null, true, true, 'string');        
  */
 export class MailService extends BaseServiceModule {
 
-    private _openSSLCertificate: OpenSSLCertificate;
+    private _mainProcessCommunicator: MainProcessCommunicator;
 
     private _mailService: ObservableVariable<string | null>;
     private _mailUser: ObservableVariable<string | null>;
@@ -27,7 +27,7 @@ export class MailService extends BaseServiceModule {
     private _userName: ObservableVariable<string>;  //登陆用户的用户名
 
     async onStart(): Promise<void> {
-        this._openSSLCertificate = this.services.OpenSSLCertificate;
+        this._mainProcessCommunicator = this.services.MainProcessCommunicator;
         const systemSetting = this.services.SystemSetting as SystemSetting;
 
         this._mailService = systemSetting.secretSettings.get('mail.service') as any;
@@ -56,7 +56,7 @@ export class MailService extends BaseServiceModule {
         });
 
         await transporter.sendMail({
-            from: `NodeBook <${this._openSSLCertificate.domain}>`,
+            from: `NodeBook <${this._mainProcessCommunicator.domain}>`,
             to: this._userName.value,
             subject: title,
             text: content,

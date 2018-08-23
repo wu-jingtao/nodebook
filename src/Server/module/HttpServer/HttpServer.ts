@@ -6,6 +6,7 @@ import koa_response_time = require('koa-response-time');
 import { BaseServiceModule } from "service-starter";
 
 import { OpenSSLCertificate } from '../OpenSSLCertificate/OpenSSLCertificate';
+import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 import { ErrorHandling } from './Middleware/ErrorHandling';
 import { HealthCheck, healthCheckingUrlPath } from './Middleware/HealthCheck';
@@ -16,6 +17,7 @@ import { Router } from './Middleware/Router';
 export class HttpServer extends BaseServiceModule {
 
     private _openSSLCertificate: OpenSSLCertificate;
+    private _mainProcessCommunicator: MainProcessCommunicator;
 
     private _httpServer: https.Server;
     private _koaServer: koa;
@@ -55,9 +57,9 @@ export class HttpServer extends BaseServiceModule {
     }
 
     async onHealthCheck(): Promise<void> {
-        const path = healthCheckingUrlPath;
+        const path = healthCheckingUrlPath; //这里保存一个是因为健康检查的地址每次都会变
 
-        const result = await request.post(`https://${this._openSSLCertificate.domain}${path}`, {
+        const result = await request.post(`https://${this._mainProcessCommunicator.domain}${path}`, {
             ca: this._openSSLCertificate.cert,
             rejectUnauthorized: false
         });

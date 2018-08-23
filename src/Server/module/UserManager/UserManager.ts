@@ -8,7 +8,7 @@ import randomString = require('crypto-random-string');
 
 import { SystemSetting } from "../SystemSetting/SystemSetting";
 import { MailService } from "../MailService/MailService";
-import { OpenSSLCertificate } from '../OpenSSLCertificate/OpenSSLCertificate';
+import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 //设置系统变量默认值
 SystemSetting.addSystemSetting('user.name', 'note@book.com', true, true, 'string');                                               //登陆用户的用户名
@@ -20,7 +20,7 @@ SystemSetting.addSystemSetting('user.password', crypto.createHash("md5").update(
 export class UserManager extends BaseServiceModule {
 
     private _mailService: MailService;
-    private _openSSLCertificate: OpenSSLCertificate;
+    private _mainProcessCommunicator: MainProcessCommunicator;
 
     private _userName: ObservableVariable<string>;
     private _password: ObservableVariable<string>;
@@ -33,7 +33,7 @@ export class UserManager extends BaseServiceModule {
 
     async onStart(): Promise<void> {
         this._mailService = this.services.MailService;
-        this._openSSLCertificate = this.services.OpenSSLCertificate;
+        this._mainProcessCommunicator = this.services.MainProcessCommunicator;
         const _systemSetting = this.services.SystemSetting as SystemSetting;
 
         this._userName = _systemSetting.secretSettings.get('user.name') as any;
@@ -104,7 +104,7 @@ export class UserManager extends BaseServiceModule {
 
         if (this._maxRetry === 11) {
             this._maxRetry++;
-            this._mailService.sendMail('NodeBook 连续登陆失败', `NodeBook <${this._openSSLCertificate.domain}> 账号 <${this._userName.value}> 连续登陆失败超过10次。\n登陆用户IP：${ip}`).catch(() => { });
+            this._mailService.sendMail('NodeBook 连续登陆失败', `NodeBook <${this._mainProcessCommunicator.domain}> 账号 <${this._userName.value}> 连续登陆失败超过10次。\n登陆用户IP：${ip}`).catch(() => { });
         }
 
         this._loginCountdown = moment().add(1, 'h');

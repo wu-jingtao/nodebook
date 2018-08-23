@@ -9,7 +9,12 @@ export class MainProcessCommunicator extends BaseServiceModule {
      * 是否开启了debug模式。
      */
     readonly isDebug = (process.env.DEBUG || '').toLowerCase() === 'true';
-
+    
+    /**
+     * 本机的域名
+     */
+    domain = (process.env.DOMAIN || 'localhost').trim().toLowerCase().replace(/:443$/, ''); //去掉443是因为浏览器不会把443端口号发过来
+    
     async onStart(): Promise<void> { }
 
     private _sendMessage(signal: string, args: any[] = []): void {

@@ -8,7 +8,7 @@ import { pidusage, pidusage_Stat } from './__temp_pidusage_type_definition';
 
 import { LogManager } from "./LogManager/LogManager";
 import { FileManager } from "../FileManager/FileManager";
-import { OpenSSLCertificate } from '../OpenSSLCertificate/OpenSSLCertificate';
+import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 const os_utils = require('os-utils');
 const diskusage_check = util.promisify(diskusage.check);
@@ -21,11 +21,11 @@ export class TaskManager extends BaseServiceModule {
     //存放正在执行的任务。key：文件路径。invokeCallback：调用任务内部方法回调，key：随机ID
     private readonly _taskList: Map<string, { process: child_process.ChildProcess, invokeCallback: Map<string, (jsonResult: string) => void> }> = new Map();
     private _logManager: LogManager;
-    private _openSSLCertificate: OpenSSLCertificate;
+    private _mainProcessCommunicator: MainProcessCommunicator;
 
     async onStart(): Promise<void> {
         this._logManager = this.services.LogManager;
-        this._openSSLCertificate = this.services.OpenSSLCertificate;
+        this._mainProcessCommunicator = this.services.MainProcessCommunicator;
     }
 
     async onStop(): Promise<void> {
@@ -102,7 +102,7 @@ export class TaskManager extends BaseServiceModule {
                         cpuNumber: cpu.length,                                              //CPU核心数
                         cpuName: cpu[0].model,                                              //CPU名称
                         cpuUsage,                                                           //CPU使用百分比
-                        domain: this._openSSLCertificate.domain,                            //域名
+                        domain: this._mainProcessCommunicator.domain,                       //域名
                         totalMemory: os.totalmem(),                                         //内存总量
                         freeMemory: os.freemem(),                                           //剩余内存大小
                         uptime: os.uptime(),                                                //系统运行了多久了
