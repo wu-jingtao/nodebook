@@ -12,7 +12,7 @@ export let healthCheckingUrlPath = `/${randomString(31)}`;
 export function HealthCheck(): koa.Middleware {
     return async function HealthChecking(ctx, next) {
         if (ctx.originalUrl === healthCheckingUrlPath && ctx.method === 'POST') {
-            ctx.body = 'OK';
+            ctx.body = healthCheckingUrlPath;
             healthCheckingUrlPath = `/${randomString(31)}`;   //更新随机访问地址
         } else {
             return next();

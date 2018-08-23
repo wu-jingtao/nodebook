@@ -55,12 +55,14 @@ export class HttpServer extends BaseServiceModule {
     }
 
     async onHealthCheck(): Promise<void> {
-        const result = await request.post(`https://${this._openSSLCertificate.domain}${healthCheckingUrlPath}`, {
+        const path = healthCheckingUrlPath;
+
+        const result = await request.post(`https://${this._openSSLCertificate.domain}${path}`, {
             ca: this._openSSLCertificate.cert,
             rejectUnauthorized: false
         });
 
-        if ("OK" !== result.toString())
-            throw new Error(`健康检查的返回值错误。${result}`);
+        if (path !== result.toString())
+            throw new Error(`健康检查的返回值与请求路径不批配`);
     }
 }
