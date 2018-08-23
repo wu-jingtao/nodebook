@@ -11,7 +11,7 @@ export function ContentType(): koa.Middleware {
     return async function ContentType(ctx, next) {
         await next();
 
-        if ('path' in ctx.body && isStream(ctx.body))
+        if (isStream(ctx.body) && 'path' in ctx.body)
             ctx.type = mime.contentType(path.extname((ctx.body as fs.ReadStream).path.toString())) || 'application/octet-stream';
     }
 }
