@@ -37,6 +37,7 @@ export class HttpServer extends BaseServiceModule {
 
     async onStart(): Promise<void> {
         this._openSSLCertificate = this.services.OpenSSLCertificate;
+        this._mainProcessCommunicator = this.services.MainProcessCommunicator;
 
         this._koaServer = new koa();
         this._httpServer = https.createServer({
