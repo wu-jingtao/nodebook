@@ -7,6 +7,7 @@
         "compileServer": "gulp compileServer",
         "compileClient": "webpack --config webpack.config.js",
         "resetUser": "node ./bin/Server/Tools/ResetUser.js",
+        "cleanIPFilter": "node ./bin/Server/Tools/cleanIPFilter.js",
         "resumeFromBackup": "node ./bin/Server/Tools/ResumeFromBackup.js"
     },
     "keywords": [
@@ -58,6 +59,7 @@
         "less": "^3.8.1",
         "less-loader": "^4.1.0",
         "less-plugin-clean-css": "^1.5.1",
+        "normalize.css": "^8.0.0",
         "react": "^16.4.2",
         "react-dom": "^16.4.2",
         "style-loader": "^0.22.1",
