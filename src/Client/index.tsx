@@ -1,18 +1,8 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
+require('./index.less');
 
-const style = require('./index.less');
-
-class Test extends React.Component {
-
-    state = { date: '' };
-
-    componentDidMount() {
-        setInterval(() => {
-            this.setState({ date: (new Date).toLocaleTimeString() });
-        }, 1000);
-    }
-
+class Index extends React.Component {
     render() {
         return (<>
             <span className={style.test}>hello world</span>

@@ -9,9 +9,9 @@ import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator'
 const nodemailer_services_list: string[] = Object.keys(require('nodemailer/lib/well-known/services.json'));
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('mail.service', null, true, true, 'string');      //邮件服务商
-SystemSetting.addSystemSetting('mail.user', null, true, true, 'string');         //账号
-SystemSetting.addSystemSetting('mail.pass', null, true, true, 'string');         //授权码
+SystemSetting.addSystemSetting('mail.service', null, true, 'string');      //邮件服务商
+SystemSetting.addSystemSetting('mail.user', null, true, 'string');         //账号
+SystemSetting.addSystemSetting('mail.pass', null, true, 'string');         //授权码
 
 /**
  * 发送邮件

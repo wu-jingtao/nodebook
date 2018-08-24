@@ -6,8 +6,8 @@ import { SystemSetting } from "../../SystemSetting/SystemSetting";
 import { MainProcessCommunicator } from '../../MainProcess/MainProcessCommunicator';
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('http.ipWhiteListRegexp', null, true, true, 'string');    //ip访问白名单正则表达式。如果设置了白名单则黑名单将失效
-SystemSetting.addSystemSetting('http.ipBlackListRegexp', null, true, true, 'string');    //ip访问黑名单正则表达式
+SystemSetting.addSystemSetting('http.ipWhiteListRegexp', null, true, 'string');    //ip访问白名单正则表达式。如果设置了白名单则黑名单将失效
+SystemSetting.addSystemSetting('http.ipBlackListRegexp', null, true, 'string');    //ip访问黑名单正则表达式
 
 /**
  * 访问限制，用于限制IP地址以及域名

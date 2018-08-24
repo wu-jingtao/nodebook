@@ -8,8 +8,8 @@ import { FileManager } from "../../FileManager/FileManager";
 import { TaskLogger } from './TaskLogger';
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('task.logMaxLength', 3000, true, false, 'number');     //日志最大保存数，默认3000条，最小值1
-SystemSetting.addSystemSetting('task.logMaxSaveDays', 30, true, false, 'number');     //日志最大保存天数（任务处于停止状态，超过多少天没有更新过日志就会被删除），默认30天，最小值1。服务的日志不会受到这个的限制
+SystemSetting.addSystemSetting('task.logMaxLength', 3000, false, 'number');     //日志最大保存数，默认3000条，最小值1
+SystemSetting.addSystemSetting('task.logMaxSaveDays', 30, false, 'number');     //日志最大保存天数（任务处于停止状态，超过多少天没有更新过日志就会被删除），默认30天，最小值1。服务的日志不会受到这个的限制
 
 /**
  * 用户任务日志管理器

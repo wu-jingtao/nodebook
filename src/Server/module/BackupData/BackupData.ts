@@ -16,10 +16,10 @@ import { FileManager } from '../FileManager/FileManager';
 import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('backup.interval', 7, true, true, 'number');              //每隔几天备份一次数据，最小0，最大999。如果设置为0则表示不备份
-SystemSetting.addSystemSetting('backup.maxNumber', 10, true, true, 'number');            //最多保存多少个备份，最小1。超过最大备份数后，最旧的一个备份将会被删除
-SystemSetting.addSystemSetting('backup.autoSendEmail', true, true, true, 'boolean');     //是否每当有新的备份产生时自动将备份数据发送到用户邮箱
-SystemSetting.addSystemSetting('backup.encryptEmailFile', true, true, true, 'boolean');  //是否加密发送到邮箱的文件，密码是用户密码的MD5值
+SystemSetting.addSystemSetting('backup.interval', 7, true, 'number');              //每隔几天备份一次数据，最小0，最大999。如果设置为0则表示不备份
+SystemSetting.addSystemSetting('backup.maxNumber', 10, true, 'number');            //最多保存多少个备份，最小1。超过最大备份数后，最旧的一个备份将会被删除
+SystemSetting.addSystemSetting('backup.autoSendEmail', true, true, 'boolean');     //是否每当有新的备份产生时自动将备份数据发送到用户邮箱
+SystemSetting.addSystemSetting('backup.encryptEmailFile', true, true, 'boolean');  //是否加密发送到邮箱的文件，密码是用户密码的MD5值
 
 /**
  * 备份用户数据
