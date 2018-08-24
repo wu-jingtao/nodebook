@@ -17,6 +17,7 @@ class Test extends React.Component {
         return (<>
             <span className={style.test}>hello world</span>
             <span className={style.test}>{this.state.date}</span>
+            <img src="./img/logo/brand.png" />
         </>);
     }
 }

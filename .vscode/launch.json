@@ -14,7 +14,8 @@
             "type": "node",
             "request": "attach",
             "name": "容器中调试",
-            "address": "localhost",
+            //"address": "localhost",
+            "address": "192.168.232.190",
             "port": 9229,
             "localRoot": "${workspaceFolder}",
             "remoteRoot": "/app"

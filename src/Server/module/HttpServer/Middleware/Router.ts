@@ -35,7 +35,7 @@ export function Router(httpServer: HttpServer): koa.Middleware {
 
     router_no_login.get('static', '/static/:path(.+?\\..+)', ClientStaticFileSender());
     router_no_login.redirect('/', '/static/index.html');
-    router_no_login.redirect('/favicon.ico', '/static/favicon.ico');
+    router_no_login.redirect('/favicon.ico', '/static/img/logo/favicon.ico');
 
     Others(router_login, httpServer);
     File(router_login, httpServer);

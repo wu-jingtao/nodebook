@@ -17,10 +17,6 @@ module.exports = {
         rules: [
             { test: /\.tsx?$/, use: 'ts-loader' },
             {
-                test: /\.(png|jpg|gif)$/,
-                use: [{ loader: 'url-loader', options: { limit: 1024 * 8 } }]
-            },
-            {
                 test: /\.less$/,
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',
@@ -34,7 +30,8 @@ module.exports = {
     },
     plugins: [
         new CopyWebpackPlugin([
-            //{ from: 'src/Client/index.html', to: 'bin/Client/index.html' }
+            { from: 'src/Client/img', to: './img' },
+            { from: 'src/Client/font', to: './font' },
         ]),
         new ExtractTextPlugin("index.css"),
         new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/Client/index.html' }),
