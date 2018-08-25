@@ -5,6 +5,7 @@
     height: 100%;
     background-color: @backColor;
     position: relative;
+    overflow: hidden;
 }
 
 // 程序logo
@@ -18,8 +19,7 @@
 :local(.loginForm) {
     width: 250px;
     height: 100px;
-    top: 20vh;
-    margin: 0 auto;
+    margin: 20vh auto 0;
     padding: 0;
 
     > div {
@@ -33,7 +33,7 @@
 
         > i {
             position: absolute;
-            color: @lightBackColor;
+            color: lighten(@backColor, 25%, relative);
             font-size: 25px;
             top: 10px;
             left: 17px;
@@ -47,6 +47,24 @@
             width: ~"calc(100% - 50px)";
             margin-left: 50px;
             border: none !important;
+        }
+    }
+}
+
+//登陆按钮
+:local(.button) {
+    display: block;
+    margin: 40px auto 0;
+    width: 180px;
+    height: 37px;
+    line-height: 19px;
+
+    &.loading { //调整一下加载动画
+        font-size: .5em;
+
+        &::after,   
+        &::before {
+            top: 45%;
         }
     }
 }

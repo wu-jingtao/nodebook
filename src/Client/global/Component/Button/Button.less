@@ -1,0 +1,25 @@
+@import "../../ThemeColor.less";
+@import "./LoadingAnimation.less";
+
+:local(.button) {
+    position: relative;
+    outline: none;
+    border: 0;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: @lightBackColor;
+    text-align: center;
+    color: @darkFontColor;
+
+    &:hover {
+        background-color: darken(@lightBackColor, 10%, relative);
+    }
+
+    &:active {
+        background-color: darken(@lightBackColor, 25%, relative);
+    }
+
+    &.loading{
+        .LoadingAnimation();
+    }
+}

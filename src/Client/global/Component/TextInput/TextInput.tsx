@@ -10,18 +10,18 @@ interface Args {
      * 输入值
      */
     value: ObservableVariable<string>;
-
-    type: 'text' | 'password';
+    type: 'text' | 'password' | 'email';
     placeholder?: string;
     className?: any;
     style?: any;
     maxLength?: number;
+    required?: boolean;
 }
 
 /**
- * 容器。带有圆角矩形带边框的div
+ * 文本输入框
  */
-export const TextInput: React.StatelessComponent<Args> = ({ maxLength, type, value, placeholder, className, style }) => {
+export const TextInput: React.StatelessComponent<Args> = ({ required, maxLength, type, value, placeholder, className, style }) => {
     return (
         <input type={type}
             maxLength={maxLength}
@@ -29,6 +29,8 @@ export const TextInput: React.StatelessComponent<Args> = ({ maxLength, type, val
             className={classnames(styles.input, className)}
             value={value.value}
             onChange={e => value.value = e.target.value}
-            placeholder={placeholder} />
+            placeholder={placeholder}
+            required={required}
+        />
     );
 };

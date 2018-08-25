@@ -39,5 +39,6 @@ module.exports = {
         ]),
         new ExtractTextPlugin("index.css"),
         new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/Client/module/IndexPage/index.html' }),
+        new webpack.ProvidePlugin({ $: 'jquery', jQuery: 'jquery' })
     ]
 };
