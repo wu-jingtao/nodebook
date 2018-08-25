@@ -2,16 +2,17 @@
 
 :local .Container {
     border-radius: 5px;
-    padding: 5px;
+    padding: 15px;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 :local .border {
-    border: 1px solid @borderColor;
+    border: 1px solid @lightBackColor;
 }
 
 :local .darkBack {
     background-color: @darkBackColor;
-    box-shadow: inset 0 0 5px 0 @backColor;
+    box-shadow: inset 0 0 20px 0 darken(@darkBackColor, 15%, relative);
 }

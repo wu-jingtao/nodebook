@@ -14,4 +14,39 @@
     margin: 20vh auto 0;
 }
 
+//登陆窗口
+:local(.loginForm) {
+    width: 250px;
+    height: 100px;
+    top: 20vh;
+    margin: 0 auto;
+    padding: 0;
 
+    > div {
+        position: relative;
+        height: 50px;
+        line-height: 30px;
+
+        &:first-child {
+            border-bottom: 1px solid lighten(@darkBackColor, 15%, relative);
+        }
+
+        > i {
+            position: absolute;
+            color: @lightBackColor;
+            font-size: 25px;
+            top: 10px;
+            left: 17px;
+        }
+
+        > input {
+            display: inline-block;
+            background-color: transparent;
+            height: 50px;
+            line-height: 50px;
+            width: ~"calc(100% - 50px)";
+            margin-left: 50px;
+            border: none !important;
+        }
+    }
+}

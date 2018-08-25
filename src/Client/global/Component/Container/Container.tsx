@@ -15,14 +15,7 @@ interface Args {
      */
     darkBack?: boolean;
 
-    /**
-     * 类名
-     */
     className?: any;
-
-    /**
-     * 样式
-     */
     style?: any;
 }
 
