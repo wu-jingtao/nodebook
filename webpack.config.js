@@ -7,11 +7,15 @@ const CleanCSSPlugin = require("less-plugin-clean-css");
 module.exports = {
     mode: 'development',
     //mode: 'production',
+    watch: true,
     devtool: "inline-source-map",
-    entry: './src/Client/index.tsx',
+    entry: './src/Client/module/IndexPage/index.tsx',
     output: {
         path: path.resolve(__dirname, 'bin/Client'),
         filename: 'index.js'
+    },
+    resolve: {
+        extensions: [".ts", ".tsx", ".js"]
     },
     module: {
         rules: [
@@ -30,10 +34,10 @@ module.exports = {
     },
     plugins: [
         new CopyWebpackPlugin([
-            { from: 'src/Client/img', to: './img' },
-            { from: 'src/Client/font', to: './font' },
+            { from: 'src/Client/res/img', to: './res/img' },
+            { from: 'src/Client/res/font', to: './res/font' },
         ]),
         new ExtractTextPlugin("index.css"),
-        new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/Client/index.html' }),
+        new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/Client/module/IndexPage/index.html' }),
     ]
 };

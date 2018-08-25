@@ -28,6 +28,7 @@
     "homepage": "https://github.com/mx601595686/nodebook#readme",
     "devDependencies": {
         "@types/archiver": "^2.1.2",
+        "@types/classnames": "^2.2.6",
         "@types/crypto-random-string": "^1.0.0",
         "@types/fs-extra": "^5.0.4",
         "@types/http-errors": "^1.6.1",
@@ -67,7 +68,8 @@
         "ts-node": "^7.0.1",
         "typescript": "^3.0.1",
         "webpack": "^4.17.0",
-        "webpack-cli": "^3.1.0"
+        "webpack-cli": "^3.1.0",
+        "classnames": "^2.2.6"
     },
     "dependencies": {
         "archiver": "^2.1.1",
