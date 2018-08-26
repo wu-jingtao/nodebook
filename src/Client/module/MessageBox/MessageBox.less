@@ -2,31 +2,43 @@
 
 #MessageBox {
     position: absolute;
+    display: flex;
+    flex-direction: column-reverse;
     z-index: 999;
-    right: 20px;
-    bottom: 20px;
+    right: 0;
+    bottom: 0;
+    padding: 20px 15px; 
     width: 20vw;
-    min-width: 100px;
-    max-height: 55vh;
+    min-width: 300px;
     overflow: hidden;
 }
 
 :local(.messageItem) {
-    margin-top: 20px;
+    flex-shrink: 0;
+    margin-top: 15px;
     width: 100%;
     overflow: hidden;
     opacity: 0;
-    height: 0;
-    transform: translateX(-100%);
-    transition: opacity,height,transform 1s ease;
+    transform: translateX(-150%) scaleY(0);
+    transition: opacity, transform;
+    display: none;
+
+    //只显示最新的5条
+    &:nth-child(-n+5) {
+        display: block;
+    }
 
     &.moveIn {
         opacity: 1;
-        height: auto;
-        transform: translateX(0);
+        transform: translateX(0) scaleY(1);
+        transition-timing-function: cubic-bezier(0, 0, 0, 1);
+        transition-duration: .6s;
     }
 
     &.moveOut {
-        transform: translateX(100%);
+        opacity: 0;
+        transform: translateX(150%) scaleY(0);
+        transition-timing-function: cubic-bezier(0, 0, 1, 0);
+        transition-duration: .4s;
     }
 }

@@ -10,7 +10,7 @@ import { MessageItem } from './MessageItem';
 const less = require('./MessageBox.less');
 
 /**
- * 登陆页面
+ * 消息弹窗
  */
 export class MessageBox extends ObservableComponent {
 
@@ -20,9 +20,9 @@ export class MessageBox extends ObservableComponent {
         _messageList.on('add', (item, key) => {
             if (this._messageBox) {
                 const node = $(`<div class="${less.messageItem}" data-tag="${key}"></div>`);
-                this._messageBox.append(node);
+                this._messageBox.prepend(node);
                 ReactDom.render(<MessageItem arg={item} onClose={() => _messageList.delete(key)} />, node[0]);
-                node.addClass('moveIn');
+                setTimeout(() => node.addClass('moveIn'), 5);
             }
         });
 
@@ -33,7 +33,7 @@ export class MessageBox extends ObservableComponent {
                     ReactDom.unmountComponentAtNode(node[0]);
                     node.remove();
                 });
-                node.removeClass('moveIn').addClass('moveOut');
+                node.addClass('moveOut');
             }
         });
     }

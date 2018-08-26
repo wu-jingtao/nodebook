@@ -54,9 +54,11 @@ export class LoginPage extends ObservableComponent {
                 <Button className={less.button} loading={this._logging.value} disabled={this._logging.value}>登陆</Button>
 
 
-                <button onClick={() => showMessageBox({ title: '123' })}>a</button>
+                <button type="button" onClick={() => showMessageBox({ icon: 'warning', title: 'abc-' + a++, autoClose: false })}>a</button>
             </form>
 
         );
     }
 }
+
+let a = 0;

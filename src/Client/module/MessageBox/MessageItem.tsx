@@ -11,7 +11,7 @@ const less = require('./MessageItem.less');
  */
 export class MessageItem extends ObservableComponent<{ arg: MessageBoxOptions, onClose: () => void }> {
 
-    private _timer: NodeJS.Timer;
+    private _timer: number;
 
     private _progressUpdate = (value: number) => {
         this.forceUpdate();
@@ -23,7 +23,7 @@ export class MessageItem extends ObservableComponent<{ arg: MessageBoxOptions, o
         if (this.props.arg.progress)
             this.props.arg.progress.on('set', this._progressUpdate);
         else if (this.props.arg.autoClose !== false && this.props.arg.buttons == null)
-            this._timer = setTimeout(() => this.props.onClose(), 10 * 1000);
+            this._timer = setTimeout(() => this.props.onClose(), 10 * 1000) as any;
     }
 
     componentWillUnmount() {
@@ -37,8 +37,8 @@ export class MessageItem extends ObservableComponent<{ arg: MessageBoxOptions, o
 
         return (
             <div className={less.MessageItem}>
-                <span className={less.close}>x</span>
-                {argument.icon && <img className={less.icon} src={`./res/img/messageLogo/${argument.icon}.png`} />}
+                <span className={less.close} onClick={this.props.onClose}>x</span>
+                {argument.icon && <img className={less.icon} src={`./res/img/messageIcon/${argument.icon}.png`} />}
                 <div className={less.right}>
                     <div className={less.title}>{argument.title}</div>
                     {argument.progress &&
