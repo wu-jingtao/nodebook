@@ -1,0 +1,32 @@
+@import "../../global/ThemeColor.less";
+
+#MessageBox {
+    position: absolute;
+    z-index: 999;
+    right: 20px;
+    bottom: 20px;
+    width: 20vw;
+    min-width: 100px;
+    max-height: 55vh;
+    overflow: hidden;
+}
+
+:local(.messageItem) {
+    margin-top: 20px;
+    width: 100%;
+    overflow: hidden;
+    opacity: 0;
+    height: 0;
+    transform: translateX(-100%);
+    transition: opacity,height,transform 1s ease;
+
+    &.moveIn {
+        opacity: 1;
+        height: auto;
+        transform: translateX(0);
+    }
+
+    &.moveOut {
+        transform: translateX(100%);
+    }
+}

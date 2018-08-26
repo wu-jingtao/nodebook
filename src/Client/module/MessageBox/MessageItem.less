@@ -1,0 +1,92 @@
+@import "../../global/ThemeColor.less";
+
+:local(.MessageItem) {
+    background-color: @darkBackColor;
+    border: 1px solid @borderColor;
+    box-shadow: 0 0 20px 0 darken(@darkBackColor, 15%, relative);
+}
+
+:local(.close) {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: @darkFontColor;
+    cursor: pointer;
+
+    &:hover {
+        color: @fontColor;
+    }
+}
+
+:local(.icon) {
+    width: 30%;
+    display: block;
+}
+
+:local(.right) {
+    position: absolute;
+    width: 70%;
+    right: 10px;
+    top: 10px;
+    bottom: 10px;
+}
+
+:local(.title) {
+    font-size: 2em;
+    font-weight: bold;
+    color: @fontColor;
+}
+
+:local(.progress) {
+    position: relative;
+
+    &::before {
+        content: '';
+        display: block;
+        background-color: @backColor;
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        right: 35px;
+        height: 5px;
+    }
+
+    > span:first-child {
+        display: block;
+        background-color: cyan;
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        width: 0;
+        height: 5px;
+    }
+
+    > span:last-child {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+}
+
+:local(.content) {
+    font-size: .7em;
+    color: @darkFontColor;
+}
+
+:local(.buttons) {
+    padding: 5px;
+
+    &::after {
+        content: '';
+        display: block;
+        height: 0;
+        clear: both;
+        visibility: hidden;
+    }
+
+    > button {
+        float: right;
+        background-color: cyan;
+        margin: 5px;
+    }
+}

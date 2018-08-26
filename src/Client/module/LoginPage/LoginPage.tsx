@@ -2,12 +2,14 @@ import * as React from 'react';
 import { oVar } from 'observable-variable';
 import md5 = require('blueimp-md5');
 
-import { SystemState } from '../../global/SystemState';
+import * as Ajax from '../../global/Tools/Ajax';
+
 import { ObservableComponent } from '../../global/Tools/ObservableComponent';
 import { Container } from '../../global/Component/Container/Container';
 import { TextInput } from '../../global/Component/TextInput/TextInput';
 import { Button } from '../../global/Component/Button/Button';
-import * as Ajax from '../../global/Tools/Ajax';
+
+import { showMessageBox } from '../MessageBox/MessageBox';
 
 const less = require('./LoginPage.less');
 
@@ -19,6 +21,7 @@ export class LoginPage extends ObservableComponent {
     private readonly _userName = oVar('');      //用户名
     private readonly _password = oVar('');      //密码
     private readonly _logging = oVar(false);    //是否正在登陆
+    private readonly _logged = oVar(false);     //是否已经登陆
 
     /**
      * 登陆系统
@@ -49,7 +52,11 @@ export class LoginPage extends ObservableComponent {
                     </div>
                 </Container>
                 <Button className={less.button} loading={this._logging.value} disabled={this._logging.value}>登陆</Button>
+
+
+                <button onClick={() => showMessageBox({ title: '123' })}>a</button>
             </form>
+
         );
     }
 }

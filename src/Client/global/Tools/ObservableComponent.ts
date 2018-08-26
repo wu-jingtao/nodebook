@@ -4,7 +4,7 @@ import { ObservableVariable, watch } from 'observable-variable';
 /**
  * 可观察改变容器，方便与 ObservableVariable 结合使用
  */
-export class ObservableComponent extends React.Component {
+export class ObservableComponent<p = {}> extends React.Component<p> {
 
     private _unobserve: Function;
 
@@ -16,7 +16,7 @@ export class ObservableComponent extends React.Component {
     }
 
     componentWillUnmount() {
-        this._unobserve();
+        this._unobserve && this._unobserve();
     }
 
     shouldComponentUpdate() {
