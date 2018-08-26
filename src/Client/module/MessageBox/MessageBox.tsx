@@ -29,7 +29,7 @@ export class MessageBox extends ObservableComponent {
         _messageList.on('remove', (item, key) => {
             if (this._messageBox) {
                 const node = this._messageBox.children(`[data-tag="${key}"]`);
-                node.on('transitionend', () => {
+                node.one('transitionend', () => {
                     ReactDom.unmountComponentAtNode(node[0]);
                     node.remove();
                 });
