@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as classnames from 'classnames';
 import { ObservableVariable } from 'observable-variable';
 
-const styles = require('./TextInput.less');
+const less = require('./TextInput.less');
 
 interface Args {
 
@@ -10,27 +10,28 @@ interface Args {
      * 输入值
      */
     value: ObservableVariable<string>;
+
     type: 'text' | 'password' | 'email';
     placeholder?: string;
-    className?: any;
-    style?: any;
-    maxLength?: number;
     required?: boolean;
+    maxLength?: number;
+    className?: any;
+    disabled?: boolean;
 }
 
 /**
  * 文本输入框
  */
-export const TextInput: React.StatelessComponent<Args> = ({ required, maxLength, type, value, placeholder, className, style }) => {
+export const TextInput: React.StatelessComponent<Args> = ({ value, type, placeholder, required, maxLength, className, disabled }) => {
     return (
         <input type={type}
             maxLength={maxLength}
-            style={style}
-            className={classnames(styles.input, className)}
+            className={classnames(less.input, className)}
             value={value.value}
             onChange={e => value.value = e.target.value}
             placeholder={placeholder}
             required={required}
+            disabled={disabled}
         />
     );
 };

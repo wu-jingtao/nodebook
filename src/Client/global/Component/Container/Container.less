@@ -1,6 +1,6 @@
 @import "../../ThemeColor.less";
 
-:local .Container {
+:local(.Container) {
     border-radius: 5px;
     padding: 15px;
     position: relative;
@@ -8,11 +8,11 @@
     box-sizing: border-box;
 }
 
-:local .border {
+:local(.border) {
     border: 1px solid @lightBackColor;
 }
 
-:local .darkBack {
+:local(.darkBack) {
     background-color: @darkBackColor;
     box-shadow: inset 0 0 20px 0 darken(@darkBackColor, 15%, relative);
 }

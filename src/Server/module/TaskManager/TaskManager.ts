@@ -3,8 +3,8 @@ import * as child_process from 'child_process';
 import * as diskusage from 'diskusage';
 import * as util from 'util';
 import * as _ from 'lodash';
+import pidusage, { Stat } from 'pidusage';
 import { BaseServiceModule } from "service-starter";
-import { pidusage, pidusage_Stat } from './__temp_pidusage_type_definition';
 
 import { LogManager } from "./LogManager/LogManager";
 import { FileManager } from "../FileManager/FileManager";
@@ -84,7 +84,7 @@ export class TaskManager extends BaseServiceModule {
     /**
      * 获取某个正在运行的任务，资源消耗的情况，如果任务不存在则返回空
      */
-    async getTaskResourcesConsumption(taskFilePath: string): Promise<pidusage_Stat | undefined> {
+    async getTaskResourcesConsumption(taskFilePath: string): Promise<Stat | undefined> {
         const task = this._taskList.get(taskFilePath);
         if (task) return await pidusage(task.process.pid);
     }

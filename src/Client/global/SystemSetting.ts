@@ -1,5 +1,5 @@
 import { ObservableVariable } from "observable-variable";
-import * as alias from 'jquery';
+
 /**
  * 系统设置
  */

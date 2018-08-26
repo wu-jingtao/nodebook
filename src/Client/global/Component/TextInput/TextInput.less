@@ -1,14 +1,19 @@
 @import "../../ThemeColor.less";
 
-:local .input {
+:local(.input) {
     background-color: @lightBackColor;
     color: @darkFontColor;
     border: none;
     outline: none;
     padding: 10px;
     box-sizing: border-box;
-    
+
     &:focus {
         border: 1px solid @borderColor;
+    }
+
+    &:disabled {
+        border: none !important;
+        background-color: darken(@lightBackColor, 20%, relative) !important;
     }
 }

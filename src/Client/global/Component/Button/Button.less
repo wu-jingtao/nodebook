@@ -19,7 +19,11 @@
         background-color: darken(@lightBackColor, 25%, relative);
     }
 
-    &.loading{
+    &:disabled {
+        background-color: darken(@lightBackColor, 18%, relative) !important;
+    }
+
+    &.loading {
         .LoadingAnimation();
     }
 }

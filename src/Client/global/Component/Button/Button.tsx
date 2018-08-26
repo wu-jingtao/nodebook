@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
 
-const styles = require('./Button.less');
+const less = require('./Button.less');
 
 interface Args {
     /**
@@ -10,16 +10,16 @@ interface Args {
     loading?: boolean;
 
     className?: any;
-    style?: any;
     onClick?: React.MouseEventHandler<HTMLButtonElement>;
+    disabled?: boolean;
 }
 
 /**
  * 按钮
  */
-export const Button: React.StatelessComponent<Args> = ({ onClick, loading, className, style, children }) => {
+export const Button: React.StatelessComponent<Args> = ({ loading, className, onClick, disabled, children }) => {
     return (
-        <button className={classnames(styles.button, { loading: loading }, className)} style={style} onClick={onClick}>
+        <button className={classnames(less.button, { loading: loading }, className)} onClick={onClick} disabled={disabled}>
             {!loading && children}
         </button>
     );
