@@ -16,7 +16,7 @@ export const ServerApi = {
          */
         async login(username: string, password: string): Promise<void> {
             expect(/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(username), true, '传入的电子邮箱格式不正确');
-            expect(await Post('/user/login', { user: username, pass: md5(password) }), 'ok', '登陆失败');
+            expect(await Post('/user/login', { name: username, pass: md5(password) }), 'ok', '登陆失败');
         },
 
         /**

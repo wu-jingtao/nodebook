@@ -7,7 +7,6 @@ const CleanCSSPlugin = require("less-plugin-clean-css");
 module.exports = {
     mode: 'development',
     //mode: 'production',
-    watch: true,
     devtool: "inline-source-map",
     entry: './src/Client/module/IndexPage/index.tsx',
     output: {

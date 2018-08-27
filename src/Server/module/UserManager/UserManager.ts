@@ -11,7 +11,7 @@ import { MailService } from "../MailService/MailService";
 import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('user.name', 'note@book.com', true, 'string');                                               //登陆用户的用户名
+SystemSetting.addSystemSetting('user.name', 'node@book.com', true, 'string');                                               //登陆用户的用户名
 SystemSetting.addSystemSetting('user.password', crypto.createHash("md5").update('123456').digest('hex'), true, 'string');   //登陆密码
 
 /**

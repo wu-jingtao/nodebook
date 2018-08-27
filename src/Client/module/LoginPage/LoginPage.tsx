@@ -19,6 +19,7 @@ export class LoginPage extends ObservableComponent {
     private readonly _password = oVar('');      //密码
     private readonly _logging = oVar(true);     //是否正在登陆
     private readonly _logged = oVar(false);     //是否已经登陆
+    private _timer: number;                     //定时更新令牌计时器
 
     /**
      * 登陆系统
@@ -53,7 +54,19 @@ export class LoginPage extends ObservableComponent {
 
     componentDidMount() {
         this.watch(this._userName, this._password, this._logging, this._logged);
-        this._updateToken();
+
+        this._logged.on('set', (value) => {
+            if (value)
+                this._timer = setInterval(() => this._updateToken(), 5 * 60 * 1000) as any;
+            else
+                clearInterval(this._timer);
+        });
+
+        this._updateToken(false);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this._timer);
     }
 
     render() {

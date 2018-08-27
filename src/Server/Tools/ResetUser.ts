@@ -13,7 +13,7 @@ import { InitializeDatabase } from '../module/Database/InitializeDatabase';
         UPDATE "main"."system_setting"
         SET "value" = ?
         WHERE "key" = ? AND "secret" = 1
-    `, 'note@book.com', 'user.name');
+    `, 'node@book.com', 'user.name');
 
     await iniDB.dbCon.run(`
         UPDATE "main"."system_setting"
@@ -23,5 +23,5 @@ import { InitializeDatabase } from '../module/Database/InitializeDatabase';
 
     await iniDB.onStop();
 
-    console.log('重置用户成功，重启容器后生效。用户名：note@book.com 密码：123456');
+    console.log('重置用户成功，重启容器后生效。用户名：node@book.com 密码：123456');
 })();

@@ -6,6 +6,7 @@
     "scripts": {
         "compileServer": "gulp compileServer",
         "compileClient": "webpack --config webpack.config.js",
+        "compileClientWatch": "webpack -w --config webpack.config.js",
         "resetUser": "node ./bin/Server/Tools/ResetUser.js",
         "cleanIPFilter": "node ./bin/Server/Tools/cleanIPFilter.js",
         "resumeFromBackup": "node ./bin/Server/Tools/ResumeFromBackup.js"
