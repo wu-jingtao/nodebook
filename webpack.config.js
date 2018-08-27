@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -39,7 +38,6 @@ module.exports = {
             { from: 'src/Client/res/font', to: './res/font' },
         ]),
         new ExtractTextPlugin("index.css"),
-        new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/Client/module/IndexPage/index.html' }),
-        new webpack.ProvidePlugin({ $: 'jquery', jQuery: 'jquery' })
+        new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/Client/module/IndexPage/index.html' })
     ]
 };

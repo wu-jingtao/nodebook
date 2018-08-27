@@ -3,12 +3,10 @@ import { oVar } from 'observable-variable';
 import md5 = require('blueimp-md5');
 
 import * as Ajax from '../../global/Tools/Ajax';
-
 import { ObservableComponent } from '../../global/Tools/ObservableComponent';
 import { Container } from '../../global/Component/Container/Container';
 import { TextInput } from '../../global/Component/TextInput/TextInput';
 import { Button } from '../../global/Component/Button/Button';
-
 import { showMessageBox } from '../MessageBox/MessageBox';
 
 const less = require('./LoginPage.less');
@@ -54,7 +52,24 @@ export class LoginPage extends ObservableComponent {
                 <Button className={less.button} loading={this._logging.value} disabled={this._logging.value}>登陆</Button>
 
 
-                <button type="button" onClick={() => showMessageBox({ icon: 'warning', title: 'abc-' + a++, autoClose: false })}>a</button>
+                <button type="button" onClick={() => showMessageBox({ icon: 'warning', title: 'abc-' + a++, autoClose: 0 })}>a</button>
+                <button type="button" onClick={() => showMessageBox({ icon: 'warning', title: 'abc-' + a++, autoClose: 0, content: 'a'.repeat(50) })}>b</button>
+                <button type="button" onClick={() => {
+                    const progress = oVar(0);
+                    showMessageBox({ icon: 'attachment', title: 'abc-' + a++, progress, content: 'a'.repeat(50) })
+                    setInterval(() => {
+                        progress.value++;
+                    }, 100);
+                }}>c</button>
+
+                <button type="button" onClick={() => {
+                    const progress = oVar(0);
+                    showMessageBox({ icon: 'attachment', title: 'abc-' + a++, buttons:{ok(){console.log('pl');},cancel(){console.log('cancel')}},autoClose: 0, progress, content: 'a'.repeat(80) })
+                    setInterval(() => {
+                        progress.value++;
+                    }, 100);
+                }}>d</button>
+
             </form>
 
         );

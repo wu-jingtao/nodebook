@@ -14,3 +14,14 @@
 
 //边框颜色
 @borderColor: #8e806c;
+
+//清除浮动
+.clearFloat() {
+    &::after {
+        content: '';
+        display: block;
+        height: 0;
+        clear: both;
+        visibility: hidden;
+    }
+}

@@ -26,12 +26,12 @@ export interface MessageBoxOptions {
     buttons?: { ok?: () => void, cancel?: () => void };
 
     /**
-     * 显示进度条，0 - 100 。当到达100后，如果 autoClose == true 则自动关闭消息框
+     * 显示进度条，0 - 100 。当到达100后，如果 autoClose > 0 则自动关闭消息框
      */
     progress?: ObservableVariable<number>
 
     /**
-     * 是否自动关闭，如果没有设置 buttons 或 progress 则10秒后关闭，默认 true
+     * 是否自动关闭，如果没有设置 buttons 或 progress 则默认7秒后关闭。单位秒。设置为0则表示不关闭
      */
-    autoClose?: boolean;
+    autoClose?: number;
 }

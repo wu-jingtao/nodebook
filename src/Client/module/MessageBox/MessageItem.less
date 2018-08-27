@@ -2,92 +2,125 @@
 
 :local(.MessageItem) {
     background-color: @darkBackColor;
-    border: 1px solid @borderColor;
-    box-shadow: 0 0 20px 0 darken(@darkBackColor, 15%, relative);
+    border: 1px solid lighten(@backColor, 100%, relative);
+    .clearFloat();
+
+    &:hover {
+        border-color: @borderColor;
+    }
 }
 
 :local(.close) {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    color: @darkFontColor;
-    cursor: pointer;
     z-index: 100;
+    right: 12px;
+    top: 3px;
+    font-size: 1.5em;
+    color: darken(@darkFontColor, 50%, relative);
+    cursor: pointer;
 
     &:hover {
-        color: @fontColor;
+        color: @darkFontColor;
     }
 }
 
 :local(.icon) {
-    width: 30%;
+    width: 50px;
+    height: 50px;
+    margin: 7px 0 7px 10px;
     display: block;
+    float: left;
 }
 
 :local(.right) {
-    position: absolute;
-    width: 70%;
-    right: 10px;
-    top: 10px;
-    bottom: 10px;
+    float: left;
+    width: 100%;
+    min-height: 64px;
+
+    //是否显示的有icon
+    &.hasIcon {
+        width: ~"calc(100% - 60px)";
+    }
 }
 
 :local(.title) {
-    font-size: 2em;
+    font-size: 1.2em;
+    padding: 10px 30px 10px 10px;
+    word-wrap: break-word;
     font-weight: bold;
     color: @fontColor;
 }
 
 :local(.progress) {
     position: relative;
+    height: 30px;
+    width: 100%;
 
     &::before {
         content: '';
         display: block;
-        background-color: @backColor;
+        background-color: lighten(@backColor, 100%, relative);
         position: absolute;
         left: 10px;
-        top: 10px;
-        right: 35px;
-        height: 5px;
+        top: 8px;
+        right: 52px;
+        height: 3px;
     }
 
-    > span:first-child {
-        display: block;
-        background-color: cyan;
+    > .bar {
         position: absolute;
+        z-index: 10;
         left: 10px;
-        top: 10px;
-        width: 0;
-        height: 5px;
+        top: 8px;
+        right: 52px;
+        height: 3px;
+
+        > span {
+            display: block;
+            height: 100%;
+            background-color: #1fa9ff;
+            width: 0;
+            transition: width .5s cubic-bezier(0, 0, 0, 0);
+        }
     }
 
-    > span:last-child {
+    > .value {
         position: absolute;
+        font-size: .7em;
         right: 10px;
-        top: 10px;
+        top: 1px;
+        color: @fontColor;
     }
 }
 
 :local(.content) {
     font-size: .7em;
     color: @darkFontColor;
+    padding: 0 10px 10px;
+    width: 100%;
+    box-sizing: border-box;
+    word-wrap: break-word;
 }
 
 :local(.buttons) {
-    padding: 5px;
-
-    &::after {
-        content: '';
-        display: block;
-        height: 0;
-        clear: both;
-        visibility: hidden;
-    }
+    padding: 0px 20px 10px;
+    .clearFloat();
 
     > button {
+        font-size: .8em;
+        padding: 7px 8px;
+        margin-left: 5px;
+        background-color: transparent;
         float: right;
-        background-color: cyan;
-        margin: 5px;
+
+        &:hover {
+            cursor: pointer;
+            color: @fontColor;
+            background-color: transparent;
+        }
+
+        &:active {
+            background-color: darken(@darkBackColor, 30%, relative);
+        }
     }
 }
