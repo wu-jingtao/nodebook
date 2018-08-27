@@ -1,9 +1,9 @@
 @import "../../global/ThemeColor.less";
+@import "../../global/Component/Button/LoadingAnimation.less";
 
 #LoginPage {
     width: 100%;
     height: 100%;
-    background-color: @backColor;
     position: relative;
     overflow: hidden;
 }
@@ -58,14 +58,27 @@
     width: 180px;
     height: 37px;
     line-height: 19px;
+}
 
-    &.loading {
-        //调整一下加载动画
-        font-size: .5em;
+//正在登陆
+:local(.logging) {
+    height: 30px;
+    width: 150px;
+    margin: 30vh auto 0;
 
-        &::after,
-        &::before {
-            top: 45%;
-        }
+    > i {
+        display: inline-block;
+        position: relative;
+        width: 30px;
+        height: 30px;
+        .LoadingAnimation();
+    }
+
+    > span {
+        font-size: 1.1em;
+        color: @fontColor;
+        position: relative;
+        top: -6px;
+        left: 20px;
     }
 }

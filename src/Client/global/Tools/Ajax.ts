@@ -23,14 +23,14 @@ function Ajax(method: 'GET' | 'POST', url: string, data: any, setting: JQuery.Aj
 /**
  * 发送 Get请求
  */
-export async function Get(url: string, data: any): Promise<any> {
+export async function Get(url: string, data?: any): Promise<any> {
     return await Ajax('GET', url, data);
 }
 
 /**
  * 发送 Post请求
  */
-export async function Post(url: string, data: any, files?: File[]): Promise<any> {
+export async function Post(url: string, data?: any, files?: File[]): Promise<any> {
     if (files) {
         const formData = new FormData();
         jQuery.each(data, (key: string, value) => formData.append(key, value));
