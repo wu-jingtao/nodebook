@@ -1,5 +1,5 @@
 import * as koa from 'koa';
-import * as moment from 'moment';
+import log from 'log-formatter';
 
 import { HttpServer } from '../HttpServer';
 import { MainProcessCommunicator } from '../../MainProcess/MainProcessCommunicator';
@@ -16,11 +16,10 @@ export function ErrorHandling(httpServer: HttpServer): koa.Middleware {
             await next();
         } catch (err) {
             ctx.status = err.statusCode || err.status || 400;
-            if (_mainProcessCommunicator.isDebug) {
-                ctx.body = `<p>错误时间：${moment().format('YYYY-MM-DD HH:mm:ss')}</p><h2>${err.message}</h2><pre>${err.stack}</pre>`;
-            } else {
-                ctx.body = err.message;
-            }
+            ctx.body = err.message;
+
+            if (_mainProcessCommunicator.isDebug)   //打印错误消息
+                log.error.location.content(ctx.request.path, err);
         }
     }
 }

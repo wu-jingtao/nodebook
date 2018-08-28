@@ -7,6 +7,7 @@ import { TextInput } from '../../global/Component/TextInput/TextInput';
 import { Button } from '../../global/Component/Button/Button';
 import { showMessageBox } from '../MessageBox/MessageBox';
 import { ServerApi } from '../../global/ServerApi';
+import { _loadSystemSetting } from '../../global/SystemSetting';
 
 const less = require('./LoginPage.less');
 
@@ -20,6 +21,7 @@ export class LoginPage extends ObservableComponent {
     private readonly _logging = oVar(true);     //是否正在登陆
     private readonly _logged = oVar(false);     //是否已经登陆
     private _timer: number;                     //定时更新令牌计时器
+    private _settingLoaded: boolean = false;    //是否已经加载过系统设置了
 
     /**
      * 登陆系统
@@ -28,6 +30,8 @@ export class LoginPage extends ObservableComponent {
         this._logging.value = true;
         try {
             await ServerApi.user.login(this._userName.value, this._password.value);
+            await _loadSystemSetting();
+            this._settingLoaded = true;
             this._logged.value = true;
         } catch (error) {
             showMessageBox({ icon: 'error', title: error.message });
@@ -43,6 +47,10 @@ export class LoginPage extends ObservableComponent {
     private async _updateToken(showErrorMessage: boolean = true): Promise<void> {
         try {
             await ServerApi.user.updateToken();
+            if (this._settingLoaded === false) {
+                await _loadSystemSetting();
+                this._settingLoaded = true;
+            }
             this._logged.value = true;
         } catch (error) {
             if (showErrorMessage) showMessageBox({ icon: "error", title: error.message });

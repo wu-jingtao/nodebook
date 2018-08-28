@@ -102,7 +102,7 @@ export class UserManager extends BaseServiceModule {
             }
         }
 
-        if (this._maxRetry === 11) {
+        if (this._maxRetry === 10) {
             this._maxRetry++;
             this._mailService.sendMail('NodeBook 连续登陆失败', `NodeBook <${this._mainProcessCommunicator.domain}> 账号 <${this._userName.value}> 连续登陆失败超过10次。\n登陆用户IP：${ip}`).catch(() => { });
         }

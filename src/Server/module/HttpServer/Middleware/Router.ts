@@ -18,6 +18,7 @@ import { LibraryManager } from '../../LibraryManager/LibraryManager';
 import { LogManager } from '../../TaskManager/LogManager/LogManager';
 import { TaskManager } from '../../TaskManager/TaskManager';
 import { ServiceManager } from '../../TaskManager/ServiceManager';
+import { SystemSettingTable } from '../../Database/SystemSettingTable';
 
 import { FormParser } from './FormParser';
 import { LoginCheck } from './LoginCheck';
@@ -319,7 +320,23 @@ function User(router_login: koa_router, router_no_login: koa_router, httpServer:
  */
 function Setting(router: koa_router, httpServer: HttpServer) {
     const _systemSetting = httpServer.services.SystemSetting as SystemSetting;
+    const _systemSettingTable = httpServer.services.SystemSettingTable as SystemSettingTable;
     const _prefix = '/setting';
+
+    /**
+     * 获取所有普通设置
+     */
+    router.get(_prefix + '/getAllNormalKey', async (ctx) => {
+        ctx.body = await _systemSettingTable.getAllNormalKey();
+    });
+
+    /**
+     * 获取所有私密设置。除了密码
+     */
+    router.get(_prefix + '/getAllSecretKey', async (ctx) => {
+        const result = await _systemSettingTable.getAllSecretKey();
+        ctx.body = result.filter(item => item.key !== 'user.password');
+    });
 
     /**
      * 更改系统普通设置
