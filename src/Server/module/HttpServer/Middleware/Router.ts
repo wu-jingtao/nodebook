@@ -145,6 +145,14 @@ function Logo(router_login: koa_router, router_no_login: koa_router) {
         await fs.move(ctx.request.body.files[0].path, FilePath._logoFaviconPath);
         ctx.body = 'ok';
     });
+
+    /**
+     * 重置
+     */
+    router_login.get(_prefix + '/reset', async (ctx) => {
+        await fs.copy(node_path.join(FilePath._appClientFileDir, './res/img/logo'), FilePath._logoDir);
+        ctx.body = 'ok';
+    });
 }
 
 /**

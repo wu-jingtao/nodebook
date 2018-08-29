@@ -29,8 +29,6 @@ WORKDIR /app
 # 复制代码
 COPY ["src", "/app/src/"]
 COPY ["package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "LICENSE", "/app/"]
-# 这个必须使用COPE来进行复制，如果使用命令cp的话，挂载volume会覆盖掉复制的内容
-COPY ["src/Logo", "/user_data/logo"]
 
 # 编译
 RUN npm install && \ 
