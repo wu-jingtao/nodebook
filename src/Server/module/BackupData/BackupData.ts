@@ -14,6 +14,7 @@ import * as FilePath from '../../FilePath';
 import { SystemSetting } from "../SystemSetting/SystemSetting";
 import { MailService } from "../MailService/MailService";
 import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
+import { FileManager } from '../FileManager/FileManager';
 
 //设置系统变量默认值
 SystemSetting.addSystemSetting('backup.interval', 7, true, 'number');              //每隔几天备份一次数据，最小0，最大999。如果设置为0则表示不备份
@@ -85,8 +86,9 @@ export class BackupData extends BaseServiceModule {
     /**
      * 读取某个备份文件。用于用户下载
      */
-    readBackupFile(filename: string): fs.ReadStream {
+    async readBackupFile(filename: string): Promise<fs.ReadStream> {
         const path = node_path.join(FilePath._userDataBackupDir, filename);
+        await FileManager._isFile(path);
         return fs.createReadStream(path);
     }
 

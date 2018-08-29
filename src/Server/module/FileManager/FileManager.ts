@@ -20,6 +20,22 @@ export class FileManager extends BaseServiceModule {
             throw new Error(`无权操作路径 '${path}'`);
     }
 
+    /**
+     * 断言给出的路径是一个文件
+     */
+    static async _isFile(path: string): Promise<void> {
+        if (!(await fs.promises.stat(path)).isFile())
+            throw new Error(`路径 '${path}' 不是一个文件`);
+    }
+
+    /**
+     * 断言给出的路径是一个目录
+     */
+    static async _isDirectory(path: string): Promise<void> {
+        if (!(await fs.promises.stat(path)).isDirectory())
+            throw new Error(`路径 '${path}' 不是一个目录`);
+    }
+
     async onStart(): Promise<void> {
         //创建程序需要用到的目录
         await fs.ensureDir(FilePath._userCodeDir);
@@ -135,7 +151,7 @@ export class FileManager extends BaseServiceModule {
      */
     async readFile(path: string): Promise<NodeJS.ReadableStream> {
         FileManager._pathStartWith(path, [FilePath._userCodeDir, FilePath._programDataDir, FilePath._recycleDir, FilePath._libraryDir]);
-
+        await FileManager._isFile(path);
         return fs.createReadStream(path);
     }
 
@@ -178,7 +194,8 @@ export class FileManager extends BaseServiceModule {
             try {
                 FileManager._pathStartWith(path, [FilePath._userCodeDir, FilePath._programDataDir]);
                 FileManager._pathStartWith(to, [FilePath._userCodeDir, FilePath._programDataDir]);
-
+                await FileManager._isFile(path);
+                
                 fs.createReadStream(path).pipe(unzip.Extract({ path: to })).on('error', reject).on('close', resolve);
             } catch (error) { reject(error); }
         });

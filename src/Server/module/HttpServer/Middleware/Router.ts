@@ -5,7 +5,6 @@ import * as koa from 'koa';
 import * as koa_compose from 'koa-compose';
 import * as koa_router from 'koa-router';
 import * as moment from 'moment';
-import * as http_error from 'http-errors';
 import { ObservableVariable } from 'observable-variable';
 import koa_conditional = require('koa-conditional-get');
 import koa_etag = require('koa-etag');
@@ -119,12 +118,10 @@ function Static(router_no_login: koa_router) {
     router_no_login.get('/static/:path(.+?\\..+)',
         koa_conditional(),
         koa_etag(),
-        function StaticFileSender(ctx) {
-            try {
-                ctx.body = fs.createReadStream(node_path.join(FilePath._appClientFileDir, ctx.params.path));
-            } catch {
-                throw new http_error.NotFound();
-            }
+        async function StaticFileSender(ctx) {
+            const path = node_path.join(FilePath._appClientFileDir, ctx.params.path);
+            await FileManager._isFile(path);
+            ctx.body = fs.createReadStream(path);
         }
     );
 }
@@ -138,9 +135,11 @@ function Logo(router_login: koa_router, router_no_login: koa_router) {
     router_no_login.get(_prefix + '/:path(.+?\\..+)',
         koa_conditional(),
         koa_etag(),
-        function StaticFileSender(ctx) {
+        async function StaticFileSender(ctx) {
             try {
-                ctx.body = fs.createReadStream(node_path.join(FilePath._logoDir, ctx.params.path));
+                const path = node_path.join(FilePath._logoDir, ctx.params.path);
+                await FileManager._isFile(path);
+                ctx.body = fs.createReadStream(path).on('error', () => { });
             } catch {
                 ctx.redirect(node_path.join('/static/res/img/logo', ctx.params.path));
             }
@@ -435,9 +434,9 @@ function Backup(router: koa_router, httpServer: HttpServer) {
      * 下载某个备份文件。
      * @param filename
      */
-    router.post(_prefix + '/readBackupFile', (ctx: any) => {
+    router.post(_prefix + '/readBackupFile',async (ctx: any) => {
         ctx.compress = false;   //确保不会被 koa-compress 压缩
-        ctx.body = _backupData.readBackupFile(ctx.request.body.filename);
+        ctx.body = await _backupData.readBackupFile(ctx.request.body.filename);
     });
 
     /**

@@ -110,7 +110,7 @@ export class LoginPage extends ObservableComponent {
 
             return (
                 <form id="LoginPage" onSubmit={e => { e.preventDefault(); this._login(); }}>
-                    <img className={less.logo} src="./logo/brand.png" alt="nodebook" />
+                    <img className={less.logo} src="/logo/brand.png" alt="nodebook" />
                     {content}
                 </form>
             );
