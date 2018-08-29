@@ -5,7 +5,10 @@ import * as koa from 'koa';
 import * as koa_compose from 'koa-compose';
 import * as koa_router from 'koa-router';
 import * as moment from 'moment';
+import * as http_error from 'http-errors';
 import { ObservableVariable } from 'observable-variable';
+import koa_conditional = require('koa-conditional-get');
+import koa_etag = require('koa-etag');
 
 import * as FilePath from '../../../FilePath';
 
@@ -25,7 +28,6 @@ import { SystemSettingTable } from '../../Database/SystemSettingTable';
 
 import { FormParser } from './FormParser';
 import { LoginCheck } from './LoginCheck';
-import { StaticFileSender } from './StaticFileSender';
 
 /**
  * 路由控制
@@ -37,9 +39,8 @@ export function Router(httpServer: HttpServer): koa.Middleware {
 
     router_login.use(LoginCheck(httpServer.services.UserManager));
 
-    router_no_login.get('/static/:path(.+?\\..+)', StaticFileSender(FilePath._appClientFileDir));
-
     Others(router_login, httpServer);
+    Static(router_no_login);
     Logo(router_login, router_no_login);
     File(router_login, httpServer);
     User(router_login, router_no_login, httpServer);
@@ -112,45 +113,59 @@ function Others(router: koa_router, httpServer: HttpServer) {
 }
 
 /**
+ * 客户端静态文件发送
+ */
+function Static(router_no_login: koa_router) {
+    router_no_login.get('/static/:path(.+?\\..+)',
+        koa_conditional(),
+        koa_etag(),
+        function StaticFileSender(ctx) {
+            try {
+                ctx.body = fs.createReadStream(node_path.join(FilePath._appClientFileDir, ctx.params.path));
+            } catch {
+                throw new http_error.NotFound();
+            }
+        }
+    );
+}
+
+/**
  * 修改程序Logo
  */
 function Logo(router_login: koa_router, router_no_login: koa_router) {
     const _prefix = '/logo';
 
-    router_no_login.get(_prefix + '/:path(.+?\\..+)', StaticFileSender(FilePath._logoDir));
-
-    /**
-     * 修改程序登录页图片
-     * @param files
-     */
-    router_login.post(_prefix + '/changeBrand', async (ctx) => {
-        await fs.move(ctx.request.body.files[0].path, FilePath._logoBrandPath);
-        ctx.body = 'ok';
-    });
+    router_no_login.get(_prefix + '/:path(.+?\\..+)',
+        koa_conditional(),
+        koa_etag(),
+        function StaticFileSender(ctx) {
+            try {
+                ctx.body = fs.createReadStream(node_path.join(FilePath._logoDir, ctx.params.path));
+            } catch {
+                ctx.redirect(node_path.join('/static/res/img/logo', ctx.params.path));
+            }
+        }
+    );
 
     /**
      * 修改程序图标
+     * @param filename
      * @param files
      */
-    router_login.post(_prefix + '/changeIcon', async (ctx) => {
-        await fs.move(ctx.request.body.files[0].path, FilePath._logoIconPath);
-        ctx.body = 'ok';
-    });
-
-    /**
-     * 修改程序登录页图片
-     * @param files
-     */
-    router_login.post(_prefix + '/changeFavicon', async (ctx) => {
-        await fs.move(ctx.request.body.files[0].path, FilePath._logoFaviconPath);
-        ctx.body = 'ok';
+    router_login.post(_prefix + '/change', async (ctx) => {
+        if (['brand.png', 'icon.png', 'favicon.ico'].includes(ctx.request.body.filename)) {
+            await fs.move(ctx.request.body.files[0].path, node_path.join(FilePath._logoDir, ctx.request.body.filename));
+            ctx.body = 'ok';
+        } else {
+            throw new Error(`上传程序Logo文件名错误。[${ctx.request.body.filename}]`);
+        }
     });
 
     /**
      * 重置
      */
     router_login.get(_prefix + '/reset', async (ctx) => {
-        await fs.copy(node_path.join(FilePath._appClientFileDir, './res/img/logo'), FilePath._logoDir);
+        await fs.emptyDir(FilePath._logoDir);
         ctx.body = 'ok';
     });
 }
