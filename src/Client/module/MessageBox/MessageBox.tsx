@@ -39,7 +39,7 @@ export class MessageBox extends ObservableComponent {
     componentDidMount() {
         _messageList.on('add', (item, key) => {
             if (this._messageBox) {
-                const node = $(`<div class="${less.messageItem}" data-tag="${key}"></div>`);
+                const node = $(`<div class="${less.messageItemAnimation}" data-tag="${key}"></div>`);
                 this._messageBox.prepend(node);
                 ReactDom.render(<MessageItem arg={item} onClose={() => _messageList.delete(key)} />, node[0]);
                 setTimeout(() => node.addClass('moveIn'), 5);

@@ -3,7 +3,8 @@ import * as child_process from 'child_process';
 import { BaseServiceModule } from 'service-starter';
 import randomString = require('crypto-random-string');
 
-import { FileManager } from '../FileManager/FileManager';
+import * as FilePath from '../../FilePath';
+
 import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 /**
@@ -41,9 +42,9 @@ export class OpenSSLCertificate extends BaseServiceModule {
      * 读取证书到内存
      */
     async readCert(): Promise<void> {
-        this.privkey = await fs.promises.readFile(FileManager._opensslPrivkeyPath);
-        this.cert = await fs.promises.readFile(FileManager._opensslCertPath);
-        this.password = await fs.promises.readFile(FileManager._opensslPasswordPath).then(data => data.toString()).catch(() => undefined);
+        this.privkey = await fs.promises.readFile(FilePath._opensslPrivkeyPath);
+        this.cert = await fs.promises.readFile(FilePath._opensslCertPath);
+        this.password = await fs.promises.readFile(FilePath._opensslPasswordPath).then(data => data.toString()).catch(() => undefined);
     }
 
     /**
@@ -51,8 +52,8 @@ export class OpenSSLCertificate extends BaseServiceModule {
      */
     async checkCertExist(): Promise<boolean> {
         try {
-            await fs.promises.access(FileManager._opensslPrivkeyPath);
-            await fs.promises.access(FileManager._opensslCertPath);
+            await fs.promises.access(FilePath._opensslPrivkeyPath);
+            await fs.promises.access(FilePath._opensslCertPath);
             return true;
         } catch {
             return false;
@@ -67,8 +68,8 @@ export class OpenSSLCertificate extends BaseServiceModule {
             const password = randomString(1024);
             child_process.exec(
                 `openssl req -x509 -newkey rsa:4096 -keyout privkey.pem -out cert.pem -days 365 -subj '/CN=${this._mainProcessCommunicator.domain}' -passout pass:${password}`
-                , { cwd: FileManager._opensslKeyDir }
-                , err => err ? reject(err) : fs.writeFile(FileManager._opensslPasswordPath, password, err => err ? reject(err) : resolve()));
+                , { cwd: FilePath._opensslKeyDir }
+                , err => err ? reject(err) : fs.writeFile(FilePath._opensslPasswordPath, password, err => err ? reject(err) : resolve()));
         });
     }
 }

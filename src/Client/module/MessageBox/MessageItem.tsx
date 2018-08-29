@@ -15,7 +15,7 @@ export class MessageItem extends ObservableComponent<{ arg: MessageBoxOptions, o
     private readonly _button_ok?: () => void;
     private readonly _button_cancel?: () => void;
     private readonly _progress_update?: (v: number) => void;
-    private _timer: number;
+    private _timer: any;
 
     constructor(props: any, context: any) {
         super(props, context);
@@ -33,7 +33,7 @@ export class MessageItem extends ObservableComponent<{ arg: MessageBoxOptions, o
                 this.forceUpdate();
                 if (value >= 100) {
                     progress.off('set', this._progress_update);
-                    if (autoClose > 0) this._timer = setTimeout(this.props.onClose, autoClose * 1000) as any;
+                    if (autoClose > 0) this._timer = setTimeout(this.props.onClose, autoClose * 1000);
                 }
             }
 
@@ -41,7 +41,7 @@ export class MessageItem extends ObservableComponent<{ arg: MessageBoxOptions, o
         }
 
         if (autoClose > 0 && buttons == null && progress == null)
-            this._timer = setTimeout(this.props.onClose, autoClose * 1000) as any;
+            this._timer = setTimeout(this.props.onClose, autoClose * 1000);
     }
 
     componentWillUnmount() {

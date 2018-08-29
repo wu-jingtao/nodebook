@@ -2,8 +2,9 @@ import * as moment from 'moment';
 import { BaseServiceModule } from "service-starter";
 import { ObservableVariable } from "observable-variable";
 
+import * as FilePath from '../../../FilePath';
+
 import { SystemSetting } from "../../SystemSetting/SystemSetting";
-import { FileManager } from "../../FileManager/FileManager";
 
 import { TaskLogger } from './TaskLogger';
 
@@ -26,8 +27,8 @@ export class LogManager extends BaseServiceModule {
      * 检查任务路径是否符合要求
      */
     static _checkPath(taskFilePath: string): void {
-        if (!taskFilePath.startsWith(FileManager._userCodeDir))
-            throw new Error(`不能为 '${FileManager._userCodeDir}' 目录以外的文件创建任务日志`);
+        if (!taskFilePath.startsWith(FilePath._userCodeDir))
+            throw new Error(`不能为 '${FilePath._userCodeDir}' 目录以外的文件创建任务日志`);
 
         if (!taskFilePath.endsWith('.js'))
             throw new Error('只能为 js 类型的文件创建任务日志');

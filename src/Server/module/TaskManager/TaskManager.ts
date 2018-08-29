@@ -6,8 +6,9 @@ import * as _ from 'lodash';
 import pidusage, { Stat } from 'pidusage';
 import { BaseServiceModule } from "service-starter";
 
+import * as FilePath from '../../FilePath';
+
 import { LogManager } from "./LogManager/LogManager";
-import { FileManager } from "../FileManager/FileManager";
 import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 const os_utils = require('os-utils');
@@ -41,7 +42,7 @@ export class TaskManager extends BaseServiceModule {
             LogManager._checkPath(taskFilePath);
 
             const child = child_process.fork(taskFilePath, [], {
-                cwd: FileManager._programDataDir,
+                cwd: FilePath._programDataDir,
                 uid: 6000,
                 gid: 6000
             });
@@ -106,8 +107,8 @@ export class TaskManager extends BaseServiceModule {
                         totalMemory: os.totalmem(),                                         //内存总量
                         freeMemory: os.freemem(),                                           //剩余内存大小
                         uptime: os.uptime(),                                                //系统运行了多久了
-                        userDataDir: await diskusage_check(FileManager._userDataDir),       //查看用户数据目录还有多少可用空间
-                        programDataDir: await diskusage_check(FileManager._programDataDir)  //查看程序数据目录还有多少可用空间。这两个目录如果位于同一个分区下则大小一样
+                        userDataDir: await diskusage_check(FilePath._userDataDir),       //查看用户数据目录还有多少可用空间
+                        programDataDir: await diskusage_check(FilePath._programDataDir)  //查看程序数据目录还有多少可用空间。这两个目录如果位于同一个分区下则大小一样
                     });
                 } catch (error) { reject(error); }
             });

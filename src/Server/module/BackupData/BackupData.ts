@@ -10,9 +10,9 @@ import { ObservableVariable } from "observable-variable";
 import log from 'log-formatter';
 import randomString = require('crypto-random-string');
 
+import * as FilePath from '../../FilePath';
 import { SystemSetting } from "../SystemSetting/SystemSetting";
 import { MailService } from "../MailService/MailService";
-import { FileManager } from '../FileManager/FileManager';
 import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 //设置系统变量默认值
@@ -61,7 +61,7 @@ export class BackupData extends BaseServiceModule {
                 throw new Error('backup.maxNumber 的值必须大于1');
         });
 
-        this._interval.on('set', (newValue, oldValue) => {
+        const timer = (newValue: number, oldValue: number) => {
             this.onStop();  //清除旧的计时器
             if (newValue != 0) {
                 if (oldValue == 0) this._lastBackupTime = moment();
@@ -70,11 +70,12 @@ export class BackupData extends BaseServiceModule {
                 const timeDiff = moment.duration(moment().add(newValue, 'days').diff(this._lastBackupTime)).valueOf();
                 this._timer = setTimeout(() => this._autoBackup(), timeDiff);
             }
-        });
+        }
 
+        this._interval.on('set', timer);
         this._maxNumber.on('set', () => this._cleanOldBackup());
 
-        this._interval.value = this._interval.value;    //初始化计时器
+        timer(this._interval.value, this._interval.value);    //初始化计时器
     }
 
     async onStop(): Promise<void> {
@@ -85,7 +86,7 @@ export class BackupData extends BaseServiceModule {
      * 读取某个备份文件。用于用户下载
      */
     readBackupFile(filename: string): fs.ReadStream {
-        const path = node_path.join(FileManager._userDataBackupDir, filename);
+        const path = node_path.join(FilePath._userDataBackupDir, filename);
         return fs.createReadStream(path);
     }
 
@@ -93,7 +94,7 @@ export class BackupData extends BaseServiceModule {
      * 将某个备份文件发送到用户邮箱
      */
     async sendBackupEmail(filename: string): Promise<void> {
-        const path = node_path.join(FileManager._userDataBackupDir, filename);
+        const path = node_path.join(FilePath._userDataBackupDir, filename);
         const text = `nodebook 用户数据备份 ${filename}`;
 
         if (this._encryptEmailFile.value) {
@@ -128,7 +129,7 @@ export class BackupData extends BaseServiceModule {
      * 列出所有备份文件的文件名
      */
     async listBackupFiles(): Promise<ReadonlyArray<string>> {
-        const files = await fs.promises.readdir(FileManager._userDataBackupDir);
+        const files = await fs.promises.readdir(FilePath._userDataBackupDir);
         return files.filter(item => /^\d{4}-\d{2}-\d{2}_\d{2}∶\d{2}∶\d{2}\.zip$/.test(item));   //确保正确性
     }
 
@@ -136,16 +137,16 @@ export class BackupData extends BaseServiceModule {
      * 删除某个备份文件
      */
     async deleteBackupFiles(filename: string): Promise<void> {
-        await fs.remove(node_path.join(FileManager._userDataBackupDir, filename));
+        await fs.remove(node_path.join(FilePath._userDataBackupDir, filename));
     }
 
     /**
-     * 创建备份。目前只会备份，_userCodeDir、_recycleDir、_databaseDir 和 package.json
+     * 创建备份。目前只会备份，_logoDir、_userCodeDir、_recycleDir、_databaseDir 和 package.json
      */
     createBackupFile(): Promise<string> {
         return new Promise((resolve, reject) => {
             const filename = moment().format('YYYY-MM-DD_HH∶mm∶ss') + '.zip';
-            const path = node_path.join(FileManager._userDataBackupDir, filename);
+            const path = node_path.join(FilePath._userDataBackupDir, filename);
             const output = fs.createWriteStream(path);
             const archive = archiver('zip', { zlib: { level: 9 } });
 
@@ -155,10 +156,11 @@ export class BackupData extends BaseServiceModule {
                 reject(err);
             });
 
-            archive.file(node_path.join(FileManager._userDataDir, 'package.json'), { name: 'package.json' });
-            archive.directory(FileManager._userCodeDir, node_path.basename(FileManager._userCodeDir));
-            archive.directory(FileManager._recycleDir, node_path.basename(FileManager._recycleDir));
-            archive.directory(FileManager._databaseDir, node_path.basename(FileManager._databaseDir));
+            archive.file(node_path.join(FilePath._userDataDir, 'package.json'), { name: 'package.json' });
+            archive.directory(FilePath._userCodeDir, node_path.basename(FilePath._userCodeDir));
+            archive.directory(FilePath._recycleDir, node_path.basename(FilePath._recycleDir));
+            archive.directory(FilePath._databaseDir, node_path.basename(FilePath._databaseDir));
+            archive.directory(FilePath._logoDir, node_path.basename(FilePath._logoDir));
 
             archive.finalize();
             archive.pipe(output);
@@ -170,7 +172,7 @@ export class BackupData extends BaseServiceModule {
      */
     resumeFromBackup(filename: string, userPassword: string): void {
         if (this._userPassword.value === userPassword)
-            this._mainProcessCommunicator.restartAndRun(`npm run resumeFromBackup ${filename}`, FileManager._userDataDir);
+            this._mainProcessCommunicator.restartAndRun(`npm run resumeFromBackup ${filename}`, FilePath._userDataDir);
         else
             throw new Error('用户密码错误');
     }
@@ -199,7 +201,7 @@ export class BackupData extends BaseServiceModule {
         try {
             const modifyTime = [];  //检索每个备份文件的创建时间
             for (const item of await this.listBackupFiles()) {
-                const path = node_path.join(FileManager._userDataBackupDir, item);
+                const path = node_path.join(FilePath._userDataBackupDir, item);
                 const stats = await fs.promises.stat(path);
                 modifyTime.push({ path, time: stats.mtime });
             }

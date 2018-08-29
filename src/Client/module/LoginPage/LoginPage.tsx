@@ -7,7 +7,7 @@ import { TextInput } from '../../global/Component/TextInput/TextInput';
 import { Button } from '../../global/Component/Button/Button';
 import { showMessageBox } from '../MessageBox/MessageBox';
 import { ServerApi } from '../../global/ServerApi';
-import { _loadSystemSetting } from '../../global/SystemSetting';
+import { loadSystemSetting } from '../../global/SystemSetting';
 
 const less = require('./LoginPage.less');
 
@@ -20,20 +20,21 @@ export class LoginPage extends ObservableComponent {
     private readonly _password = oVar('');      //密码
     private readonly _logging = oVar(true);     //是否正在登陆
     private readonly _logged = oVar(false);     //是否已经登陆
-    private _timer: number;                     //定时更新令牌计时器
+    private _timer: any;                        //定时更新令牌计时器
     private _settingLoaded: boolean = false;    //是否已经加载过系统设置了
 
     /**
      * 登陆系统
      */
     private async _login(): Promise<void> {
-        this._logging.value = true;
         try {
+            this._logging.value = true;
             await ServerApi.user.login(this._userName.value, this._password.value);
-            await _loadSystemSetting();
+            await loadSystemSetting();
             this._settingLoaded = true;
             this._logged.value = true;
         } catch (error) {
+            this._logged.value = false;
             showMessageBox({ icon: 'error', title: error.message });
         } finally {
             this._logging.value = false;
@@ -48,13 +49,13 @@ export class LoginPage extends ObservableComponent {
         try {
             await ServerApi.user.updateToken();
             if (this._settingLoaded === false) {
-                await _loadSystemSetting();
+                await loadSystemSetting();
                 this._settingLoaded = true;
             }
             this._logged.value = true;
         } catch (error) {
-            if (showErrorMessage) showMessageBox({ icon: "error", title: error.message });
             this._logged.value = false;
+            if (showErrorMessage) showMessageBox({ icon: "error", title: error.message });
         } finally {
             this._logging.value = false;
         }
@@ -65,7 +66,7 @@ export class LoginPage extends ObservableComponent {
 
         this._logged.on('set', (value) => {
             if (value)
-                this._timer = setInterval(() => this._updateToken(), 5 * 60 * 1000) as any;
+                this._timer = setInterval(() => this._updateToken(), 5 * 60 * 1000);
             else
                 clearInterval(this._timer);
         });
@@ -109,7 +110,7 @@ export class LoginPage extends ObservableComponent {
 
             return (
                 <form id="LoginPage" onSubmit={e => { e.preventDefault(); this._login(); }}>
-                    <img className={less.logo} src="./res/img/logo/brand.png" alt="nodebook" />
+                    <img className={less.logo} src="./logo/brand.png" alt="nodebook" />
                     {content}
                 </form>
             );

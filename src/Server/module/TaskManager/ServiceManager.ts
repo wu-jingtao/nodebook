@@ -2,10 +2,11 @@ import log from 'log-formatter';
 import * as moment from 'moment';
 import { BaseServiceModule } from "service-starter";
 
+import * as FilePath from '../../FilePath';
+
 import { TaskManager } from "./TaskManager";
 import { ServicesTable, ServiceConfig } from "../Database/ServicesTable";
 import { LogManager } from "./LogManager/LogManager";
-import { FileManager } from "../FileManager/FileManager";
 import { MailService } from '../MailService/MailService';
 import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
@@ -38,7 +39,7 @@ export class ServiceManager extends BaseServiceModule {
                     this._taskManager.createTask(item.path);
                 } catch (err) {
                     log.error.location.text.content.content(this.name, '启动用户服务失败',
-                        `服务名：${item.name}  服务文件：${item.path.replace(FileManager._userCodeDir, '/')}`, err);
+                        `服务名：${item.name}  服务文件：${item.path.replace(FilePath._userCodeDir, '/')}`, err);
                 }
             }
         }
@@ -57,7 +58,7 @@ export class ServiceManager extends BaseServiceModule {
                         NodeBook <${this._mainProcessCommunicator.domain}>
                         崩溃时间：${moment().format('YYYY-MM-DD HH:mm:ss')}
                         服务名称：${serviceConfig.name}
-                        程序文件路径：${serviceConfig.path.replace(FileManager._userCodeDir, '/')}
+                        程序文件路径：${serviceConfig.path.replace(FilePath._userCodeDir, '/')}
 
                         下面是一些日志的错误摘要：
                         ${logger.getLogsFromEnd(100).map(item => `[${moment(item.date).format('YYYY-MM-DD HH:mm:ss')}]  ${item.text}`).join('\n')}

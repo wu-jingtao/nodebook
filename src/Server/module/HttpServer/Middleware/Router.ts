@@ -1,10 +1,13 @@
 import * as node_path from 'path';
+import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as koa from 'koa';
 import * as koa_compose from 'koa-compose';
 import * as koa_router from 'koa-router';
 import * as moment from 'moment';
 import { ObservableVariable } from 'observable-variable';
+
+import * as FilePath from '../../../FilePath';
 
 import { HttpServer } from '../HttpServer';
 import { UserManager } from '../../UserManager/UserManager';
@@ -22,7 +25,7 @@ import { SystemSettingTable } from '../../Database/SystemSettingTable';
 
 import { FormParser } from './FormParser';
 import { LoginCheck } from './LoginCheck';
-import { ClientStaticFileSender } from './ClientStaticFileSender';
+import { StaticFileSender } from './StaticFileSender';
 
 /**
  * 路由控制
@@ -34,17 +37,19 @@ export function Router(httpServer: HttpServer): koa.Middleware {
 
     router_login.use(LoginCheck(httpServer.services.UserManager));
 
-    router_no_login.get('static', '/static/:path(.+?\\..+)', ClientStaticFileSender());
-    router_no_login.redirect('/', '/static/index.html');
-    router_no_login.redirect('/favicon.ico', '/static/img/logo/favicon.ico');
+    router_no_login.get('/static/:path(.+?\\..+)', StaticFileSender(FilePath._appClientFileDir));
 
     Others(router_login, httpServer);
+    Logo(router_login, router_no_login);
     File(router_login, httpServer);
     User(router_login, router_no_login, httpServer);
     Setting(router_login, httpServer);
     Backup(router_login, httpServer);
     Library(router_login, httpServer);
     Task(router_login, httpServer);
+
+    router_no_login.redirect('/', '/static/index.html');
+    router_no_login.redirect('/favicon.ico', '/logo/favicon.ico');
 
     return koa_compose([
         FormParser(httpServer.services.SystemSetting),
@@ -107,6 +112,42 @@ function Others(router: koa_router, httpServer: HttpServer) {
 }
 
 /**
+ * 修改程序Logo
+ */
+function Logo(router_login: koa_router, router_no_login: koa_router) {
+    const _prefix = '/logo';
+
+    router_no_login.get(_prefix + '/:path(.+?\\..+)', StaticFileSender(FilePath._logoDir));
+
+    /**
+     * 修改程序登录页图片
+     * @param files
+     */
+    router_login.post(_prefix + '/changeBrand', async (ctx) => {
+        await fs.move(ctx.request.body.files[0].path, FilePath._logoBrandPath);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 修改程序图标
+     * @param files
+     */
+    router_login.post(_prefix + '/changeIcon', async (ctx) => {
+        await fs.move(ctx.request.body.files[0].path, FilePath._logoIconPath);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 修改程序登录页图片
+     * @param files
+     */
+    router_login.post(_prefix + '/changeFavicon', async (ctx) => {
+        await fs.move(ctx.request.body.files[0].path, FilePath._logoFaviconPath);
+        ctx.body = 'ok';
+    });
+}
+
+/**
  * 文件相关操作
  */
 function File(router: koa_router, httpServer: HttpServer) {
@@ -122,7 +163,7 @@ function File(router: koa_router, httpServer: HttpServer) {
      * @param path 相对于用户代码目录
      */
     router.get(_prefix_data + '/code/:path(.+?\\..+)', async (ctx) => {
-        ctx.body = await _fileManager.readFile(node_path.join(FileManager._userCodeDir, ctx.params.path));
+        ctx.body = await _fileManager.readFile(node_path.join(FilePath._userCodeDir, ctx.params.path));
     });
 
     /**
@@ -130,7 +171,7 @@ function File(router: koa_router, httpServer: HttpServer) {
      * @param path
      */
     router.get(_prefix_data + '/programData/:path(.+?\\..+)', async (ctx) => {
-        ctx.body = await _fileManager.readFile(node_path.join(FileManager._programDataDir, ctx.params.path));
+        ctx.body = await _fileManager.readFile(node_path.join(FilePath._programDataDir, ctx.params.path));
     });
 
     /**
@@ -138,7 +179,7 @@ function File(router: koa_router, httpServer: HttpServer) {
      * @param path 
      */
     router.get(_prefix_data + '/recycle/:path(.+?\\..+)', async (ctx) => {
-        ctx.body = await _fileManager.readFile(node_path.join(FileManager._recycleDir, ctx.params.path));
+        ctx.body = await _fileManager.readFile(node_path.join(FilePath._recycleDir, ctx.params.path));
     });
 
     /**
@@ -146,7 +187,7 @@ function File(router: koa_router, httpServer: HttpServer) {
      * @param path
      */
     router.get(_prefix_data + '/library/:path(.+?\\..+)', async (ctx) => {
-        ctx.body = await _fileManager.readFile(node_path.join(FileManager._libraryDir, ctx.params.path));
+        ctx.body = await _fileManager.readFile(node_path.join(FilePath._libraryDir, ctx.params.path));
     });
 
     /**

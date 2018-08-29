@@ -1,7 +1,7 @@
 import sqlDB = require('simple-sqlite-promise');
 import { BaseServiceModule } from 'service-starter';
 
-import { FileManager } from '../FileManager/FileManager';
+import * as FilePath from '../../FilePath';
 
 /**
  * 初始化数据库和数据库连接
@@ -14,7 +14,7 @@ export class InitializeDatabase extends BaseServiceModule {
     public dbCon: sqlDB;
 
     async onStart(): Promise<void> {
-        this.dbCon = await sqlDB.connectDB(FileManager._databasePath);
+        this.dbCon = await sqlDB.connectDB(FilePath._databasePath);
     }
 
     async onStop(): Promise<void> {
