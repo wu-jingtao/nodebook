@@ -45,6 +45,7 @@ export class MessageItem extends ObservableComponent<{ arg: MessageBoxOptions, o
     }
 
     componentWillUnmount() {
+        super.componentWillUnmount();
         clearTimeout(this._timer);
         if (this.props.arg.progress) this.props.arg.progress.off('set', this._progress_update);
     }

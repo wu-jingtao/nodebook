@@ -1,0 +1,90 @@
+@import "../../../../global/ThemeColor.less";
+
+#SideBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 100%;
+}
+
+:local(.top) {
+    height: 70%;
+    overflow: hidden;
+}
+
+:local(.bottom) {
+    height: 30%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+:local(.logo) {
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin: 20px 10px 30px;
+}
+
+:local(.icon) {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    padding-bottom: 10px;
+    text-align: center;
+    color: @darkFontColor;
+    cursor: pointer;
+
+    &:hover {
+        color: lighten(@darkFontColor, 35%, relative);
+    }
+
+    &.selected {
+        color: lighten(@fontColor, 5%, relative);
+    }
+
+    & > i {
+        font-size: 2em;
+
+        //调整个别图标大小
+        &.icon-paper-plane {
+            font-size: 1.85em;
+        }
+
+        &.icon-tasks {
+            font-size: 1.85em;
+        }
+
+        &.icon-ic_networkservices {
+            font-size: 2.3em;
+        }
+
+        &.icon-bxs-terminal {
+            font-size: 2.3em;
+        }
+    }
+}
+
+:local(.iconNumber) {
+    position: absolute;
+    font-size: 13px;
+    color: #F8F8F2;
+    width: 29px;
+    height: 20px;
+    text-align: center;
+    border-radius: 10px;
+    line-height: 22px;
+    bottom: 18px;
+    right: 1px;
+    transform: scale(0.85);
+
+    &.blue {
+        background-color: #007ACC;
+    }
+
+    &.red {
+        background-color: #d90000;
+    }
+}

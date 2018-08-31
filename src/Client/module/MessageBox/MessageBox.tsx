@@ -59,6 +59,7 @@ export class MessageBox extends ObservableComponent {
     }
 
     componentWillUnmount() {
+        super.componentWillUnmount();
         _messageList.clear();
     }
 

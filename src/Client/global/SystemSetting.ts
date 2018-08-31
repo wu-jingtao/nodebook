@@ -14,39 +14,31 @@ export const secretSettings: ReadonlyMap<string, ObservableVariable<any>> = new 
  * 加载系统设置
  */
 export async function loadSystemSetting(): Promise<void> {
+    const _normalSettings = normalSettings as Map<string, ObservableVariable<any>>;
+    const _secretSettings = secretSettings as Map<string, ObservableVariable<any>>;
+
+    //清楚旧的设置
+    _normalSettings.clear();
+    _secretSettings.clear();
+
     const [normal, secret] = await Promise.all([ServerApi.settings.getAllNormalKey(), ServerApi.settings.getAllSecretKey()]);
 
     //普通设置可以直接修改
     normal.forEach(item => {
-        const obj = normalSettings.get(item.key);
-
-        if (obj) {  //如果有了就只更新值
-            obj.value = item.value;
-        } else {
-            const _value = oVar(item.value);
-            _value.on('set', _.debounce(async (newValue, oldValue) => {
-                try {
-                    await ServerApi.settings.changeNormalSetting(item.key, newValue);
-                } catch (error) {
-                    showMessageBox({ icon: 'error', title: `修改普通设置'${item.key}'失败`, content: error.message });
-                    _value.value = oldValue;
-                }
-            }, 5 * 1000));
-            (normalSettings as any).set(item.key, _value);
-        }
+        const _value = oVar(item.value);
+        _value.on('set', _.debounce(async (newValue, oldValue) => {
+            try {
+                await ServerApi.settings.changeNormalSetting(item.key, newValue);
+            } catch (error) {
+                showMessageBox({ icon: 'error', title: `修改普通设置'${item.key}'失败`, content: error.message });
+                _value.value = oldValue;
+            }
+        }, 5 * 1000));
+        _normalSettings.set(item.key, _value);
     });
 
     secret.forEach(item => {
-        const obj = secretSettings.get(item.key);
-
-        if (obj) {  //如果有了就只更新值
-            obj.readonly = false;
-            obj.value = item.value;
-            obj.readonly = true;
-        } else {
-            const _value = oVar(item.value, { readonly: true });
-            (secretSettings as any).set(item.key, _value);
-        }
+        _secretSettings.set(item.key, oVar(item.value, { readonly: true }));
     });
 }
 

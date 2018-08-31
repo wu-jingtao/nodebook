@@ -42,7 +42,11 @@ export class FileManager extends BaseServiceModule {
         await fs.ensureDir(FilePath._userDataBackupDir);
         await fs.ensureDir(FilePath._recycleDir);
         await fs.ensureDir(FilePath._databaseDir);
-        await fs.ensureDir(FilePath._logoDir);
+
+        //复制程序图标
+        await fs.copy(node_path.join(FilePath._appClientFileDir, './res/img/logo', 'brand.png'), node_path.join(FilePath._logoDir, 'brand.png'), { overwrite: false });
+        await fs.copy(node_path.join(FilePath._appClientFileDir, './res/img/logo', 'icon.png'), node_path.join(FilePath._logoDir, 'icon.png'), { overwrite: false });
+        await fs.copy(node_path.join(FilePath._appClientFileDir, './res/img/logo', 'favicon.ico'), node_path.join(FilePath._logoDir, 'favicon.ico'), { overwrite: false });
     }
 
     /**
@@ -195,7 +199,7 @@ export class FileManager extends BaseServiceModule {
                 FileManager._pathStartWith(path, [FilePath._userCodeDir, FilePath._programDataDir]);
                 FileManager._pathStartWith(to, [FilePath._userCodeDir, FilePath._programDataDir]);
                 await FileManager._isFile(path);
-                
+
                 fs.createReadStream(path).pipe(unzip.Extract({ path: to })).on('error', reject).on('close', resolve);
             } catch (error) { reject(error); }
         });

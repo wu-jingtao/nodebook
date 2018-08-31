@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { oVar } from 'observable-variable';
+import { oVar, ObservableVariable } from 'observable-variable';
 
 import { ObservableComponent } from '../../global/Tools/ObservableComponent';
 import { Container } from '../../global/Component/Container/Container';
@@ -14,14 +14,13 @@ const less = require('./LoginPage.less');
 /**
  * 登陆页面
  */
-export class LoginPage extends ObservableComponent {
+export class LoginPage extends ObservableComponent<{ logged: ObservableVariable<boolean> }> {
 
-    private readonly _userName = oVar('');      //用户名
-    private readonly _password = oVar('');      //密码
-    private readonly _logging = oVar(true);     //是否正在登陆
-    private readonly _logged = oVar(false);     //是否已经登陆
-    private _timer: any;                        //定时更新令牌计时器
-    private _settingLoaded: boolean = false;    //是否已经加载过系统设置了
+    private readonly _userName = oVar('');          //用户名
+    private readonly _password = oVar('');          //密码
+    private readonly _logging = oVar(true);         //是否正在登陆
+    private readonly _logged = this.props.logged;   //是否已经登陆
+    private _timer: any;                            //定时更新令牌计时器
 
     /**
      * 登陆系统
@@ -31,7 +30,6 @@ export class LoginPage extends ObservableComponent {
             this._logging.value = true;
             await ServerApi.user.login(this._userName.value, this._password.value);
             await loadSystemSetting();
-            this._settingLoaded = true;
             this._logged.value = true;
         } catch (error) {
             this._logged.value = false;
@@ -41,40 +39,35 @@ export class LoginPage extends ObservableComponent {
         }
     }
 
-    /**
-     * 更新用户令牌
-     * @param showErrorMessage 是否显示错误消息
-     */
-    private async _updateToken(showErrorMessage: boolean = true): Promise<void> {
-        try {
-            await ServerApi.user.updateToken();
-            if (this._settingLoaded === false) {
-                await loadSystemSetting();
-                this._settingLoaded = true;
-            }
-            this._logged.value = true;
-        } catch (error) {
-            this._logged.value = false;
-            if (showErrorMessage) showMessageBox({ icon: "error", title: error.message });
-        } finally {
-            this._logging.value = false;
-        }
-    }
-
     componentDidMount() {
         this.watch(this._userName, this._password, this._logging, this._logged);
 
-        this._logged.on('set', (value) => {
-            if (value)
-                this._timer = setInterval(() => this._updateToken(), 5 * 60 * 1000);
-            else
+        this._logged.on('set', value => {
+            if (value) {    //登录成功后每隔7分钟更新一次令牌
+                this._timer = setInterval(async () => { 
+                    try {
+                        await ServerApi.user.updateToken();
+                    } catch (error) {
+                        this._logged.value = false;
+                        showMessageBox({ icon: "error", title: error.message });
+                    }
+                }, 7 * 60 * 1000);
+            } else
                 clearInterval(this._timer);
         });
 
-        this._updateToken(false);
+        //第一次打开后检查是否已经登录
+        ServerApi.user.updateToken().then(async () => {
+            await loadSystemSetting();
+            this._logged.value = true;
+            this._logging.value = false;
+        }).catch(() => {
+            this._logging.value = false;
+        });
     }
 
     componentWillUnmount() {
+        super.componentWillUnmount();
         clearInterval(this._timer);
     }
 

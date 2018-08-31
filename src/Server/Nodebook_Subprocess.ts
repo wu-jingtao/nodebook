@@ -16,6 +16,9 @@ import { HttpServer } from './module/HttpServer/HttpServer';
 import { BackupData } from './module/BackupData/BackupData';
 import { MainProcessCommunicator } from './module/MainProcess/MainProcessCommunicator';
 
+//加载客户端设置
+require('./module/SystemSetting/ClientSettings');  
+
 /**
  * 将程序模块按照注册的顺序依次启动
  */

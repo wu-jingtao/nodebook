@@ -135,14 +135,10 @@ function Logo(router_login: koa_router, router_no_login: koa_router) {
     router_no_login.get(_prefix + '/:path(.+?\\..+)',
         koa_conditional(),
         koa_etag(),
-        async function StaticFileSender(ctx) {
-            try {
-                const path = node_path.join(FilePath._logoDir, ctx.params.path);
-                await FileManager._isFile(path);
-                ctx.body = fs.createReadStream(path).on('error', () => { });
-            } catch {
-                ctx.redirect(node_path.join('/static/res/img/logo', ctx.params.path));
-            }
+        async function LogoFileSender(ctx) {
+            const path = node_path.join(FilePath._logoDir, ctx.params.path);
+            await FileManager._isFile(path);
+            ctx.body = fs.createReadStream(path);
         }
     );
 
@@ -164,7 +160,7 @@ function Logo(router_login: koa_router, router_no_login: koa_router) {
      * 重置
      */
     router_login.get(_prefix + '/reset', async (ctx) => {
-        await fs.emptyDir(FilePath._logoDir);
+        await fs.copy(node_path.join(FilePath._appClientFileDir, './res/img/logo'), FilePath._logoDir);
         ctx.body = 'ok';
     });
 }
@@ -434,7 +430,7 @@ function Backup(router: koa_router, httpServer: HttpServer) {
      * 下载某个备份文件。
      * @param filename
      */
-    router.post(_prefix + '/readBackupFile',async (ctx: any) => {
+    router.post(_prefix + '/readBackupFile', async (ctx: any) => {
         ctx.compress = false;   //确保不会被 koa-compress 压缩
         ctx.body = await _backupData.readBackupFile(ctx.request.body.filename);
     });
