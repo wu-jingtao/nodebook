@@ -1,0 +1,24 @@
+@import "../../../../global/ThemeColor.less";
+
+#FunctionArea {
+    min-width: 100px;
+    height: 100%;
+    flex-grow: 0;
+    flex-shrink: 0;
+    background-color: @darkBackColor;
+    position: relative;
+}
+
+:local(.content) {
+    width: 100%;
+    height: 100%;
+}
+
+//分割条
+:local(.splitter) {
+    width: 5px;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+}

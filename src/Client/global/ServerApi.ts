@@ -1,7 +1,7 @@
 import md5 = require('blueimp-md5');
 
 import { Get, Post } from './Tools/Ajax';
-import { expect } from './Tools/Assert';
+import { expect } from './Tools/Tools';
 
 /**
  * 服务器端接口

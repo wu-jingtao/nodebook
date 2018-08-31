@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import * as $ from 'jquery';
-import * as _ from 'lodash';
 import { oVar } from 'observable-variable';
 
 import { ObservableComponent } from '../../global/Tools/ObservableComponent';
@@ -9,9 +8,6 @@ import { LoginPage } from '../LoginPage/LoginPage';
 import { MessageBox } from '../MessageBox/MessageBox';
 import { MainWindow } from '../MainWindow/MainWindow';
 
-(window as any)._ = _;
-(window as any).React = React;
-(window as any).ReactDom = ReactDom;
 (window as any).jQuery = (window as any).$ = $;
 
 require('./index.less');

@@ -1,16 +1,19 @@
 @import "../../../../global/ThemeColor.less";
 
 #SideBar {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 60px;
     height: 100%;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 :local(.top) {
     height: 70%;
     overflow: hidden;
+
+    > :local(.icon):first-of-type {
+        margin-top: 15px;
+    }
 }
 
 :local(.bottom) {
@@ -24,7 +27,7 @@
     display: block;
     width: 40px;
     height: 40px;
-    margin: 20px 10px 30px;
+    margin: 20px 10px 0;
 }
 
 :local(.icon) {

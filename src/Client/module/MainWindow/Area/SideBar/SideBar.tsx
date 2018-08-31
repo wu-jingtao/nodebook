@@ -58,7 +58,7 @@ export class SideBar extends ObservableComponent<SideBarPropsType> {
                         onClick={() => this._changeFunctionArea('file')} title="资源管理器" >
                         <i className="iconfont icon-file" />
                         {this.props.fileManagerNumber.value > 0 &&
-                            <span className={classnames(less.iconNumber, 'blue')}>{this.props.fileManagerNumber.value}</span>}
+                            <span className={classnames(less.iconNumber, 'blue')}>{Math.min(this.props.fileManagerNumber.value, 99)}</span>}
                     </div>
                     <div className={classnames(less.icon, { selected: this.props.functionAreaDisplayType.value === 'task' })}
                         onClick={() => this._changeFunctionArea('task')} title="任务管理器" >
@@ -68,7 +68,7 @@ export class SideBar extends ObservableComponent<SideBarPropsType> {
                         onClick={() => this._changeFunctionArea('service')} title="服务列表" >
                         <i className="iconfont icon-ic_networkservices" />
                         {this.props.serviceManagerErrorNumber.value > 0 &&
-                            <span className={classnames(less.iconNumber, 'red')}>{this.props.serviceManagerErrorNumber.value}</span>}
+                            <span className={classnames(less.iconNumber, 'red')}>{Math.min(this.props.serviceManagerErrorNumber.value, 99)}</span>}
                     </div>
                 </div>
                 <div className={less.bottom}>
