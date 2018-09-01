@@ -8,7 +8,6 @@ import { MainProcessCommunicator } from '../../MainProcess/MainProcessCommunicat
  * 错误处理方法
  */
 export function ErrorHandling(httpServer: HttpServer): koa.Middleware {
-    //是否开启了debug模式。如果开启了,则会将错误的堆栈信息也输出给用户
     const _mainProcessCommunicator = httpServer.services.MainProcessCommunicator as MainProcessCommunicator;
 
     return async function ErrorHandling(ctx, next) {
@@ -18,7 +17,8 @@ export function ErrorHandling(httpServer: HttpServer): koa.Middleware {
             ctx.status = err.statusCode || err.status || 400;
             ctx.body = err.message;
 
-            if (_mainProcessCommunicator.isDebug)   //打印错误消息
+            //是否开启了debug模式。如果开启了,则会将错误的堆栈信息打印到控制台
+            if (_mainProcessCommunicator.isDebug)
                 log.error.location.content(ctx.request.path, err);
         }
     }

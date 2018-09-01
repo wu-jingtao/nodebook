@@ -23,9 +23,12 @@ export class SideBar extends ObservableComponent<SideBarPropsType> {
      * 打开设置窗口
      */
     private readonly _openSettingWindow = () => {
-        const setting_window = this.props.openedWindows.find(item => item._tag === 'setting_window');
+        const focusedWindow = this.props.contentWindows.focusedWindow.value === 'left' ?
+            this.props.contentWindows.leftWindow : this.props.contentWindows.rightWindow;
+
+        const setting_window = focusedWindow.find(item => item._tag === 'setting_window');
         if (setting_window) {
-            setting_window.z_index.value = topWindowIndex(this.props.openedWindows);
+            setting_window.z_index.value = topWindowIndex(focusedWindow);
         } else {
             //todo 
         }
@@ -35,7 +38,7 @@ export class SideBar extends ObservableComponent<SideBarPropsType> {
      * 改变要显示的功能区
      */
     private readonly _changeFunctionArea = (changeTo: 'file' | 'task' | 'shortcut' | 'service') => {
-        this.props.functionAreaDisplayType.value = this.props.functionAreaDisplayType.value === changeTo ? undefined : changeTo;
+        this.props.functionAreaDisplayType.value = this.props.functionAreaDisplayType.value === changeTo ? null : changeTo;
     }
 
     constructor(props: any, context: any) {
@@ -52,17 +55,17 @@ export class SideBar extends ObservableComponent<SideBarPropsType> {
                     {this._showLogo.value && <img src="/logo/icon.png" className={less.logo} />}
                     <div className={classnames(less.icon, { selected: this.props.functionAreaDisplayType.value === 'shortcut' })}
                         onClick={() => this._changeFunctionArea('shortcut')} title="快捷方式" >
-                        <i className="iconfont icon-paper-plane" />
+                        <i className="iconfont icon-xingzhuang" />
                     </div>
                     <div className={classnames(less.icon, { selected: this.props.functionAreaDisplayType.value === 'file' })}
                         onClick={() => this._changeFunctionArea('file')} title="资源管理器" >
-                        <i className="iconfont icon-file" />
+                        <i className="iconfont icon-folder" />
                         {this.props.fileManagerNumber.value > 0 &&
                             <span className={classnames(less.iconNumber, 'blue')}>{Math.min(this.props.fileManagerNumber.value, 99)}</span>}
                     </div>
                     <div className={classnames(less.icon, { selected: this.props.functionAreaDisplayType.value === 'task' })}
                         onClick={() => this._changeFunctionArea('task')} title="任务管理器" >
-                        <i className="iconfont icon-tasks" />
+                        <i className="iconfont icon-page1" />
                     </div>
                     <div className={classnames(less.icon, { selected: this.props.functionAreaDisplayType.value === 'service' })}
                         onClick={() => this._changeFunctionArea('service')} title="服务列表" >
@@ -74,7 +77,7 @@ export class SideBar extends ObservableComponent<SideBarPropsType> {
                 <div className={less.bottom}>
                     <div className={less.icon}
                         onClick={this._openSettingWindow} title="系统设置" >
-                        <i className="iconfont icon-setting" />
+                        <i className="iconfont icon-setting1" />
                     </div>
                     <div className={classnames(less.icon, { selected: this.props.showLogWindow.value })}
                         onClick={() => this.props.showLogWindow.value = !this.props.showLogWindow.value} title="日志窗口" >

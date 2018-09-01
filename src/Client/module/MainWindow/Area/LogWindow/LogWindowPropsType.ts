@@ -6,6 +6,27 @@ import { ObservableVariable, ObservableArray } from "observable-variable";
 export type showLogWindow = ObservableVariable<boolean>;
 
 /**
- * 要显示哪些任务的日志，传入任务的完整文件路径
+ * 要显示哪些任务的日志。
  */
-export type taskFilePathList = ObservableArray<string>;
+export type logWindows = ObservableArray<{
+    /**
+     * 任务的完整文件路径
+     */
+    path: string,
+    /**
+     * 显示的优先级
+     */
+    z_index: ObservableVariable<number>
+}>;
+
+/**
+ * 找出最大的z_index，并+1
+ */
+export function topLogWindowIndex(windowArray: logWindows): number {
+    return windowArray.reduce((pre, cur) => pre > cur.z_index.value ? pre : cur.z_index.value, 0) + 1;
+}
+
+export type LogWindowPropsType = {
+    showLogWindow: showLogWindow,
+    openedLogWindows: logWindows
+};

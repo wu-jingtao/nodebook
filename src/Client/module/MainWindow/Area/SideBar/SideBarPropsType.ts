@@ -1,8 +1,8 @@
 import { ObservableVariable } from "observable-variable";
 
-import { DisplayType } from "../FunctionArea/FunctionAreaPropsType";
+import { functionAreaDisplayType } from "../FunctionArea/FunctionAreaPropsType";
 import { showLogWindow } from "../LogWindow/LogWindowPropsType";
-import { openedWindows } from "../ContentWindow/ContentWindowPropsType";
+import { contentWindows } from "../ContentWindow/ContentWindowPropsType";
 
 /**
  * 侧边栏，资源管理器图标上要显示的数字，蓝色
@@ -18,9 +18,9 @@ export type serviceManagerErrorNumber = ObservableVariable<number>;
  * 侧边栏需要的属性
  */
 export type SideBarPropsType = {
-    functionAreaDisplayType: DisplayType,
+    functionAreaDisplayType: functionAreaDisplayType,
     showLogWindow: showLogWindow,
-    openedWindows: openedWindows,
+    contentWindows: contentWindows,
     fileManagerNumber: fileManagerNumber,
     serviceManagerErrorNumber: serviceManagerErrorNumber
 };

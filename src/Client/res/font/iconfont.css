@@ -11,14 +11,6 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-tasks:before {
-    content: "\ec35";
-}
-
-.icon-setting:before {
-    content: "\e66f";
-}
-
 .icon-iconcloseall:before {
     content: "\e886";
 }
@@ -47,28 +39,24 @@
     content: "\e61e";
 }
 
-.icon-user:before {
-    content: "\e629";
+.icon-page1:before {
+    content: "\e6e7";
 }
 
-.icon-paper-plane:before {
-    content: "\e6d5";
+.icon-user:before {
+    content: "\e629";
 }
 
 .icon-password:before {
     content: "\e61b";
 }
 
-.icon-file:before {
-    content: "\e6ef";
+.icon-close2:before {
+    content: "\e610";
 }
 
 .icon-ic_networkservices:before {
     content: "\e638";
-}
-
-.icon-close:before {
-    content: "\e601";
 }
 
 .icon-fresh:before {
@@ -95,6 +83,10 @@
     content: "\e806";
 }
 
+.icon-file2:before {
+    content: "\e69a";
+}
+
 .icon-splitscreen:before {
     content: "\e615";
 }
@@ -111,6 +103,10 @@
     content: "\e603";
 }
 
+.icon-guidang:before {
+    content: "\e62c";
+}
+
 .icon-error:before {
     content: "\e609";
 }
@@ -119,8 +115,20 @@
     content: "\e9f2";
 }
 
-.icon-spinner:before {
-    content: "\e600";
+.icon-folder:before {
+    content: "\e61f";
+}
+
+.icon-spinner1:before {
+    content: "\e7f8";
+}
+
+.icon-file-add-fill:before {
+    content: "\e7e4";
+}
+
+.icon-setting1:before {
+    content: "\e62d";
 }
 
 .icon-arrow-right:before {
@@ -133,4 +141,8 @@
 
 .icon-bxs-terminal:before {
     content: "\ec98";
+}
+
+.icon-xingzhuang:before {
+    content: "\e601";
 }

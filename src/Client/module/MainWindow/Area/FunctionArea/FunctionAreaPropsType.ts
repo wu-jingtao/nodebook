@@ -1,6 +1,7 @@
 import { ObservableVariable } from "observable-variable";
 
 import { fileManagerNumber, serviceManagerErrorNumber } from "../SideBar/SideBarPropsType";
+import { contentWindows } from "../ContentWindow/ContentWindowPropsType";
 
 /**
  * 确定显示哪一种功能区
@@ -10,13 +11,14 @@ import { fileManagerNumber, serviceManagerErrorNumber } from "../SideBar/SideBar
  * 'shortcut'： 快捷方式
  *  undefined： 不显示功能区
  */
-export type DisplayType = ObservableVariable<'file' | 'task' | 'shortcut' | 'service' | undefined>;
+export type functionAreaDisplayType = ObservableVariable<'file' | 'task' | 'shortcut' | 'service' | null>;
 
 /**
  * 功能区需要的属性
  */
 export type FunctionAreaPropsType = {
-    functionAreaDisplayType: DisplayType,
+    functionAreaDisplayType: functionAreaDisplayType,
     fileManagerNumber: fileManagerNumber,
-    serviceManagerErrorNumber: serviceManagerErrorNumber
+    serviceManagerErrorNumber: serviceManagerErrorNumber,
+    contentWindows: contentWindows
 };
