@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { oVar } from 'observable-variable';
 
 import { ObservableComponent } from "../../../../global/Tools/ObservableComponent";
 import { Splitter } from '../../../../global/Component/Splitter/Splitter';
-import { FunctionAreaPropsType } from "./FunctionAreaPropsType";
+import { permanent_oVar } from '../../../../global/Tools/PermanentVariable';
 import { FileManager } from './FunctionPanel/FileManager/FileManager';
 import { ShortcutManager } from './FunctionPanel/ShortcutManager/ShortcutManager';
 import { TaskManager } from './FunctionPanel/TaskManager/TaskManager';
 import { ServiceManager } from './FunctionPanel/ServiceManager/ServiceManager';
+import { FunctionAreaPropsType } from "./FunctionAreaPropsType";
 
 const less = require('./FunctionArea.less');
 
@@ -16,7 +16,7 @@ const less = require('./FunctionArea.less');
  */
 export class FunctionArea extends ObservableComponent<FunctionAreaPropsType> {
 
-    private readonly _width = oVar(300);    //功能区的宽度
+    private readonly _width = permanent_oVar('ui._functionAreaWidth', '300');    //功能区的宽度
 
     componentDidMount() {
         this.watch(this._width, this.props.functionAreaDisplayType);

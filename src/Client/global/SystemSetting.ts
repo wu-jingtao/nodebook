@@ -2,7 +2,7 @@ import { ObservableVariable, oVar } from "observable-variable";
 
 import { ServerApi } from './ServerApi';
 import { showMessageBox } from "../module/MessageBox/MessageBox";
-import { debounce } from './Tools/Tools';
+import { throttle } from './Tools/Tools';
 
 /**
  * 系统设置
@@ -26,7 +26,7 @@ export async function loadSystemSetting(): Promise<void> {
     //普通设置可以直接修改
     normal.forEach(item => {
         const _value = oVar(item.value);
-        _value.on('set', debounce(async (newValue, oldValue) => {
+        _value.on('set', throttle(async (newValue, oldValue) => {
             try {
                 await ServerApi.settings.changeNormalSetting(item.key, newValue);
             } catch (error) {

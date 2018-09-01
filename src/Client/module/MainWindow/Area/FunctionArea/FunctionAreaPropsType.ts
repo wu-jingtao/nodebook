@@ -9,7 +9,7 @@ import { contentWindows } from "../ContentWindow/ContentWindowPropsType";
  * 'task'：     任务管理器
  * 'service'：  服务列表
  * 'shortcut'： 快捷方式
- *  undefined： 不显示功能区
+ *  null： 不显示功能区
  */
 export type functionAreaDisplayType = ObservableVariable<'file' | 'task' | 'shortcut' | 'service' | null>;
 

@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { ObservableComponent } from '../../Tools/ObservableComponent';
 import { ObservableVariable } from 'observable-variable';
-import { debounce } from '../../Tools/Tools';
+import { throttle } from '../../Tools/Tools';
 
 interface SplitterPropsType {
     /**
@@ -43,7 +43,7 @@ export class Splitter extends ObservableComponent<SplitterPropsType> {
 
         $(this._splitter).on('mousedown', () => {
             $(document.body).css('cursor', vertical ? 's-resize' : 'w-resize');
-            $(document).on(this._on_mousemove, debounce((e: JQuery.Event) => {
+            $(document).on(this._on_mousemove, throttle((e: JQuery.Event) => {
                 if (vertical) {
                     const { clientY: point = 0 } = e;
                     position.value = (referenceFlip ? document.body.clientHeight - point : point) - deviation;

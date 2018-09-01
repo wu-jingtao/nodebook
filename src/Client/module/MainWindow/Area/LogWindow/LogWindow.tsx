@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { oVar } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { Splitter } from '../../../../global/Component/Splitter/Splitter';
+import { permanent_oVar } from '../../../../global/Tools/PermanentVariable';
 import { LogWindowPropsType } from './LogWindowPropsType';
 
 const less = require('./LogWindow.less');
@@ -12,7 +12,7 @@ const less = require('./LogWindow.less');
  */
 export class LogWindow extends ObservableComponent<LogWindowPropsType> {
 
-    private readonly _height = oVar(200);   //日志窗口的高度
+    private readonly _height = permanent_oVar('ui._logWindowHeight', '200');   //日志窗口的高度
 
     componentDidMount() {
         this.watch(this._height, this.props.showLogWindow);
