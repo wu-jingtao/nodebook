@@ -27,9 +27,8 @@ export class Splitter extends ObservableComponent<SplitterPropsType> {
     private _document = $(document);
     private _body = $(document.body);
 
-    private _id = Math.trunc(Math.random() * 10000).toString();
-    private _on_mousemove = `mousemove._${this._id}`;
-    private _off_mousemove = `mouseenter._${this._id} mouseleave._${this._id} mouseup._${this._id}`;
+    private _on_mousemove = `mousemove._${Math.trunc(Math.random() * 10000).toString()}`;
+    private _off_mousemove = `mouseenter mouseleave mouseup`;
 
     componentDidMount() {
         this._splitter.on('mousedown', () => {

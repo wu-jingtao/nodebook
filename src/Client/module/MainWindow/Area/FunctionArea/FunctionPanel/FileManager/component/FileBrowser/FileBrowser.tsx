@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { FoldableContainer } from '../FoldableContainer/FoldableContainer';
+import { FoldableContainer } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainer';
 import { FileBrowserPropsType } from './FileBrowserPropsType';
 
 const less = require('./FileBrowser.less');
@@ -11,7 +11,7 @@ const less = require('./FileBrowser.less');
 export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
 
     protected _titleBarClassName = less.titleBar;
-    protected _contentClassName = this.props.scrollable ? less.contentBox : less.noScrollContentBox;
+    protected _contentClassName = less.contentBox;
 
     componentDidMount() {
         super.componentDidMount();

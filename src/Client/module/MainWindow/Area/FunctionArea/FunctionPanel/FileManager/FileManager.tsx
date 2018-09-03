@@ -1,8 +1,8 @@
 import * as React from 'react';
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
+import { FileBrowser } from './component/FileBrowser/FileBrowser';
 import { FileManagerPropsType } from './FileManagerPropsType';
-import { FileBrowser } from './FileBrowser/FileBrowser';
 
 const less = require('./FileManager.less');
 
@@ -20,9 +20,9 @@ export class FileManager extends ObservableComponent<FileManagerPropsType> {
         return (
             <div id="FileManager" style={{ display: this.props.functionAreaDisplayType.value === 'file' ? 'flex' : 'none' }}>
                 <div className={less.header}>资源管理器</div>
-                <FileBrowser title="用户代码2" uniqueID="userCode2" scrollable />
-                <FileBrowser title="用户代码3" uniqueID="userCode3" scrollable />
-                <FileBrowser title="用户代码4" uniqueID="userCode4" scrollable />
+                <FileBrowser title="用户代码2" uniqueID="userCode2" />
+                <FileBrowser title="用户代码3" uniqueID="userCode3" />
+                <FileBrowser title="用户代码4" uniqueID="userCode4" />
             </div>
         );
     }

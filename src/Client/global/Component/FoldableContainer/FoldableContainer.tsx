@@ -2,16 +2,18 @@ import * as React from 'react';
 import * as classnames from 'classnames';
 import { oVar } from 'observable-variable';
 
-import { ObservableComponent } from '../../../../../../../global/Tools/ObservableComponent';
-import { permanent_oVar } from '../../../../../../../global/Tools/PermanentVariable';
-import { ScrollBar } from '../../../../../../../global/Component/ScrollBar/ScrollBar';
+import { permanent_oVar } from '../../Tools/PermanentVariable';
+import { ObservableComponent } from '../../Tools/ObservableComponent';
+import { ScrollBar } from '../ScrollBar/ScrollBar';
 import { FoldableContainerPropsType } from './FoldableContainerPropsType';
 
 const less = require('./FoldableContainer.less');
 
 export abstract class FoldableContainer<T extends FoldableContainerPropsType> extends ObservableComponent<T> {
 
-    protected readonly _folded = permanent_oVar(`ui.FoldableContainer.${this.props.uniqueID}`, this.props.folded ? 'true' : 'false');
+    protected readonly _folded = permanent_oVar(`ui.FoldableContainer.${this.props.uniqueID}`,
+        this.props.noFold ? 'false' : this.props.folded ? 'true' : 'false');
+
     protected readonly _hover = oVar(false);  //鼠标是否处于悬浮状态
 
     protected _titleBar_div: JQuery<HTMLDivElement>;
@@ -25,6 +27,8 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
 
     componentDidMount() {
         this.watch(this._folded, this._hover);
+        if (this.props.noFold) this._folded.on('beforeSet', () => false);
+
         this._titleBar_div.mouseenter(() => this._hover.value = true).mouseleave(() => this._hover.value = false);
         this._content_div.mouseenter(() => this._hover.value = true).mouseleave(() => this._hover.value = false);
     }
@@ -36,13 +40,13 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
     }
 
     render() {
-        console.log(this._folded.value, this._hover.value, !this._folded.value && this._hover.value ? 'block' : 'none');
         return (
             <>
                 <div className={classnames(less.titleBar, this._titleBarClassName)}
                     ref={(e: any) => this._titleBar_div = e && $(e)}
                     onClick={() => this._folded.value = !this._folded.value}>
-                    <i className={classnames(less.icon, 'iconfont', this._folded.value ? "icon-arrow_right" : "icon-arrowdroprightdown")} />
+                    <i style={{ visibility: this.props.noFold ? 'hidden' : 'visible' }}
+                        className={classnames(less.icon, 'iconfont', this._folded.value ? "icon-arrow_right" : "icon-arrowdroprightdown")} />
                     <span className={less.title}>{this.props.title}</span>
                     <div className={less.titleBox} style={{ display: !this._folded.value && this._hover.value ? 'block' : 'none' }}>
                         {this.renderTitleBar()}
