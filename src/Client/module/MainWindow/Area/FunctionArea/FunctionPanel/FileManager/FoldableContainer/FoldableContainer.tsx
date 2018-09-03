@@ -17,10 +17,8 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
     protected _titleBar_div: JQuery<HTMLDivElement>;
     protected _content_div: JQuery<HTMLDivElement>;
 
-    protected _titleBarClassName: string = '';
-    protected _contentClassName: string = '';
-    protected _titleBarStyle: { [key: string]: string } = {};
-    protected _contentStyle: { [key: string]: string } = {};
+    protected _titleBarClassName: string;
+    protected _contentClassName: string;
 
     protected abstract renderTitleBar(): JSX.Element;
     protected abstract renderContent(): JSX.Element;
@@ -42,7 +40,7 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
         return (
             <>
                 <div className={classnames(less.titleBar, this._titleBarClassName)}
-                    style={this._titleBarStyle} ref={(e: any) => this._titleBar_div = e && $(e)}
+                    ref={(e: any) => this._titleBar_div = e && $(e)}
                     onClick={() => this._folded.value = !this._folded.value}>
                     <i className={classnames(less.icon, 'iconfont', this._folded.value ? "icon-arrow_right" : "icon-arrowdroprightdown")} />
                     <span className={less.title}>{this.props.title}</span>
@@ -51,7 +49,7 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
                     </div>
                 </div>
                 <ScrollBar className={classnames(less.content, this._contentClassName)}
-                    style={{ ...this._contentStyle, display: this._folded.value ? 'none' : 'block' }}
+                    style={{ display: this._folded.value ? 'none' : 'block' }}
                     ref={(e: any) => this._content_div = e && $(e)}>
                     {this.renderContent()}
                 </ScrollBar>

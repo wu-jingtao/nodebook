@@ -1,4 +1,5 @@
 import { FoldableContainerPropsType } from "../FoldableContainer/FoldableContainerPropsType";
+import { ObservableVariable } from "observable-variable";
 
 export interface FileBrowserPropsType extends FoldableContainerPropsType {
     /**

@@ -10,17 +10,15 @@ const less = require('./FileBrowser.less');
  */
 export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
 
-    _titleBarClassName = less.titleBar;
-    _contentClassName = this.props.scrollable ? less.contentBox : less.noScrollContentBox;
+    protected _titleBarClassName = less.titleBar;
+    protected _contentClassName = this.props.scrollable ? less.contentBox : less.noScrollContentBox;
 
     componentDidMount() {
         super.componentDidMount();
-
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
-
     }
 
     protected renderTitleBar(): JSX.Element {
