@@ -12,7 +12,7 @@ const less = require('./LogWindow.less');
  */
 export class LogWindow extends ObservableComponent<LogWindowPropsType> {
 
-    private readonly _height = permanent_oVar('ui._logWindowHeight', '200');   //日志窗口的高度
+    private readonly _height = permanent_oVar('ui.LogWindow._height', '200');   //日志窗口的高度
 
     componentDidMount() {
         this.watch(this._height, this.props.showLogWindow);

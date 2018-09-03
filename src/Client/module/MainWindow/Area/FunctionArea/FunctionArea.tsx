@@ -16,7 +16,7 @@ const less = require('./FunctionArea.less');
  */
 export class FunctionArea extends ObservableComponent<FunctionAreaPropsType> {
 
-    private readonly _width = permanent_oVar('ui._functionAreaWidth', '300');    //功能区的宽度
+    private readonly _width = permanent_oVar('ui.FunctionArea._width', '300');    //功能区的宽度
 
     componentDidMount() {
         this.watch(this._width, this.props.functionAreaDisplayType);

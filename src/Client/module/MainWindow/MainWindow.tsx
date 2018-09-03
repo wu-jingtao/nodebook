@@ -18,12 +18,12 @@ const less = require('./MainWindow.less');
  */
 export class MainWindow extends ObservableComponent<{ logged: ObservableVariable<boolean> }> {
 
-    private readonly _functionAreaDisplayType: functionAreaDisplayType = permanent_oVar('ui._functionAreaDisplayType', '"file"');
-    private readonly _showLogWindow: showLogWindow = permanent_oVar('ui._showLogWindow', 'false');
-    private readonly _logWindows: logWindows = permanent_oArr('ui._logWindows', undefined, [{ key: 'z_index', type: ObservableVariable }]);
+    private readonly _functionAreaDisplayType: functionAreaDisplayType = permanent_oVar('ui.MainWindow._functionAreaDisplayType', '"file"');
+    private readonly _showLogWindow: showLogWindow = permanent_oVar('ui.MainWindow._showLogWindow', 'false');
+    private readonly _logWindows: logWindows = permanent_oArr('ui.MainWindow._logWindows', undefined, [{ key: 'z_index', type: ObservableVariable }]);
     private readonly _contentWindows: contentWindows = {
-        leftWindow: permanent_oArr('ui._leftContentWindows', undefined, [{ key: 'z_index', type: ObservableVariable }]),
-        rightWindow: permanent_oArr('ui._rightContentWindows', undefined, [{ key: 'z_index', type: ObservableVariable }]),
+        leftWindow: permanent_oArr('ui.MainWindow._leftContentWindows', undefined, [{ key: 'z_index', type: ObservableVariable }]),
+        rightWindow: permanent_oArr('ui.MainWindow._rightContentWindows', undefined, [{ key: 'z_index', type: ObservableVariable }]),
         focusedWindow: oVar<'left' | 'right'>('left')
     };
 

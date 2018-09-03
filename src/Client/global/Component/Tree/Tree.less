@@ -1,0 +1,34 @@
+@import "../../ThemeColor.less";
+
+:local(.Tree) {
+    margin-left: 1em;
+    width: ~"calc(100% - 1em)";
+}
+
+:local(.TreeTitle) {
+    height: 20px;
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+:local(.titleIcon) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    height: 20px;
+    width: 20px;
+}
+
+:local(.treeTitleContent) {
+    flex-grow: 1;
+    flex-shrink: 1;
+    height: 20px;
+    overflow: hidden;
+}
+
+:local(.TreeItem) {
+    margin-left: 1em;
+    width: ~"calc(100% - 1em)";
+    height: 20px;
+    overflow: hidden;
+}

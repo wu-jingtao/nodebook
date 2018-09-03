@@ -6,17 +6,17 @@ import { ObservableVariable, watch } from 'observable-variable';
  */
 export class ObservableComponent<p = {}> extends React.Component<p> {
 
-    private _unobserve: Function;
+    private _unobserve: Function[] = [];
 
     /**
      * 观察哪些 ObservableVariable 变量的变化，当其中某个的值发生改变后，重新渲染
      */
     watch(...args: ObservableVariable<any>[]) {
-        this._unobserve = watch(args, this.forceUpdate.bind(this));
+        this._unobserve.push(watch(args, this.forceUpdate.bind(this)));
     }
 
     componentWillUnmount() {
-        this._unobserve && this._unobserve();
+        this._unobserve.forEach(item => item());
     }
 
     shouldComponentUpdate() {
