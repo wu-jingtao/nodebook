@@ -1,29 +1,19 @@
 import * as React from 'react';
 
 import { ObservableComponent } from '../../Tools/ObservableComponent';
-import { ObservableVariable } from 'observable-variable';
 import { throttle } from '../../Tools/Tools';
 
 interface SplitterPropsType {
-    /**
-     * 当前分隔条相对于页面所处的位置
-     */
-    position: ObservableVariable<number>;
 
     /**
-     * 相对于鼠标位置的偏差大小，默认0
+     * 分隔条位置改变了多少
      */
-    deviation?: number;
+    onChange: (variation: number) => void;
 
     /**
      * 设置为垂直方向分隔条，默认水平
      */
     vertical?: boolean;
-
-    /**
-     * 参考系翻转。水平方向默认是相对于页面左边，垂直方向默认是相对于页面上边
-     */
-    referenceFlip?: boolean;
 
     className?: string;
 }
@@ -33,42 +23,40 @@ interface SplitterPropsType {
  */
 export class Splitter extends ObservableComponent<SplitterPropsType> {
 
-    private _splitter: HTMLDivElement;
+    private _splitter: JQuery<HTMLDivElement>;
+    private _document = $(document);
+    private _body = $(document.body);
+
     private _id = Math.trunc(Math.random() * 10000).toString();
     private _on_mousemove = `mousemove._${this._id}`;
     private _off_mousemove = `mouseenter._${this._id} mouseleave._${this._id} mouseup._${this._id}`;
 
     componentDidMount() {
-        const { position, deviation = 0, vertical, referenceFlip } = this.props;
+        this._splitter.on('mousedown', () => {
+            const offset = this._splitter.offset() as any;  //获取分隔条相对于屏幕的位置
+            const position = this.props.vertical ? offset.top : offset.left;
+            this.props.onChange(position);
 
-        $(this._splitter).on('mousedown', () => {
-            $(document.body).css('cursor', vertical ? 's-resize' : 'w-resize');
-            $(document).on(this._on_mousemove, throttle((e: JQuery.Event) => {
-                if (vertical) {
-                    const { clientY: point = 0 } = e;
-                    position.value = (referenceFlip ? document.body.clientHeight - point : point) - deviation;
-                } else {
-                    const { clientX: point = 0 } = e;
-                    position.value = (referenceFlip ? document.body.clientWidth - point : point) - deviation;
-                }
+            this._body.css('cursor', this.props.vertical ? 's-resize' : 'w-resize');
+
+            this._document.on(this._on_mousemove, throttle((e: JQuery.Event) => {
+                const position = (this.props.vertical ? e.clientY : e.clientX) as any;
+                this.props.onChange(position);
             }, 5));
-        });
 
-        $(document).on(this._off_mousemove, () => {
-            $(document.body).css('cursor', '');
-            $(document).off(this._on_mousemove);
-        });
-    }
+            this._document.one(this._off_mousemove, () => {
+                this._document.off(this._on_mousemove);
+                this._body.css('cursor', '');
 
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        $(this._splitter).off('mousedown');
-        $(document.body).css('cursor', '');
-        $(document).off(this._off_mousemove);
+                const offset = this._splitter.offset() as any;
+                const position = this.props.vertical ? offset.top : offset.left;
+                this.props.onChange(position);
+            });
+        });
     }
 
     render() {
-        return <div className={this.props.className} ref={e => this._splitter = e as any}
+        return <div className={this.props.className} ref={e => (this._splitter as any) = e && $(e)}
             style={{ cursor: this.props.vertical ? 's-resize' : 'w-resize' }} />;
     }
 }

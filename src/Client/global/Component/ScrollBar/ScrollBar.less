@@ -4,4 +4,15 @@
     width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+        background: transparent;
+    }
+
+    &:hover::-webkit-scrollbar-thumb {
+        background: fade(@darkFontColor, 50%);
+        border-radius: 2px;
+    }
 }

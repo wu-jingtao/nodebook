@@ -21,7 +21,7 @@ export class LogWindow extends ObservableComponent<LogWindowPropsType> {
     render() {
         return (
             <div id="LogWindow" style={{ height: this._height.value, display: this.props.showLogWindow.value ? 'block' : 'none' }}>
-                <Splitter className={less.splitter} position={this._height} referenceFlip vertical />
+                <Splitter className={less.splitter} onChange={position => this._height.value = window.innerHeight - position} vertical />
             </div>
         );
     }

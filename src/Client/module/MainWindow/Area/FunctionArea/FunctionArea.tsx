@@ -25,7 +25,7 @@ export class FunctionArea extends ObservableComponent<FunctionAreaPropsType> {
     render() {
         return (
             <div id="FunctionArea" style={{ width: this._width.value, display: this.props.functionAreaDisplayType.value === null ? 'none' : 'block' }}>
-                <Splitter className={less.splitter} position={this._width} deviation={60} />
+                <Splitter className={less.splitter} onChange={position => this._width.value = position - 55 /* 不是60是因为分隔条还有5像素宽 */} />
                 <div className={less.content}>
                     <ShortcutManager
                         functionAreaDisplayType={this.props.functionAreaDisplayType}

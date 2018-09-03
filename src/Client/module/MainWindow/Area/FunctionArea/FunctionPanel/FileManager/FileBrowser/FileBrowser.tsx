@@ -1,18 +1,17 @@
 import * as React from 'react';
 
-import { FoldableContainer } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainer';
+import { FoldableContainer } from '../FoldableContainer/FoldableContainer';
+import { FileBrowserPropsType } from './FileBrowserPropsType';
 
 const less = require('./FileBrowser.less');
 
 /**
  * 文件资源浏览器
  */
-export class FileBrowser extends FoldableContainer {
+export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
 
-    constructor(props: any, context: any) {
-        super(props, context);
-        this._classNames.push(less.FileBrowser);
-    }
+    _titleBarClassName = less.titleBar;
+    _contentClassName = this.props.scrollable ? less.contentBox : less.noScrollContentBox;
 
     componentDidMount() {
         super.componentDidMount();
@@ -37,7 +36,7 @@ export class FileBrowser extends FoldableContainer {
 
     protected renderContent(): JSX.Element {
         return (
-            <pre style={{color:'white'}}>
+            <pre style={{ color: 'white' }}>
                 {'content\n'.repeat(100)}
             </pre>
         );
