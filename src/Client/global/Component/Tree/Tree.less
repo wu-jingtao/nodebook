@@ -1,34 +1,57 @@
 @import "../../ThemeColor.less";
+@import "../Button/LoadingAnimation.less";
 
 :local(.Tree) {
-    margin-left: 1em;
-    width: ~"calc(100% - 1em)";
+    width: 100%;
+    overflow: hidden;
+}
+
+:local(.treeFocus) {
+    background-color: lighten(@lightBackColor, 20%, relative);
+}
+
+:local(.treeHover) {
+    background-color: @lightBackColor;
 }
 
 :local(.TreeTitle) {
     height: 20px;
-    width: 100%;
-    display: flex;
-    flex-wrap: nowrap;
+    overflow: hidden;
+    position: relative;
 }
 
-:local(.titleIcon) {
-    flex-grow: 0;
-    flex-shrink: 0;
-    height: 20px;
+:local(.titleArrow) {
     width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    color: lighten(@darkFontColor, 10%, relative);
+
+    &.icon-arrow_right {
+        font-size: .9em;
+        position: relative;
+        left: 1px;
+        top: 1px;
+    }
+
+    &.icon-arrowdroprightdown {
+        font-size: 1.75em;
+        position: relative;
+        left: 4px;
+        top: -2px;
+    }
 }
 
-:local(.treeTitleContent) {
-    flex-grow: 1;
-    flex-shrink: 1;
+:local(.titleLoading) {
+    width: 20px;
     height: 20px;
-    overflow: hidden;
+    .LoadingAnimation();
 }
 
-:local(.TreeItem) {
-    margin-left: 1em;
-    width: ~"calc(100% - 1em)";
-    height: 20px;
-    overflow: hidden;
+:local(.titleItemBox) {
+    position: absolute;
+    left: 20px;
+    right: 0;
+    top: 0;
+    bottom: 0;
 }
