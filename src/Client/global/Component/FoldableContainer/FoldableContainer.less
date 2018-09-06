@@ -1,8 +1,9 @@
 @import "../../ThemeColor.less";
+@height: 25px;
 
 :local(.titleBar) {
     background-color: @backColor;
-    height: 20px;
+    height: @height;
     width: 100%;
     cursor: pointer;
     display: flex;
@@ -12,43 +13,43 @@
 :local(.icon) {
     flex-grow: 0;
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
+    width: @height;
+    height: @height;
+    line-height: @height;
     text-align: center;
     color: lighten(@darkFontColor, 10%, relative);
 
     &.icon-arrow_right {
         font-size: .9em;
         position: relative;
-        left: 1px;
+        left: 2px;
         top: 1px;
     }
 
     &.icon-arrowdroprightdown {
         font-size: 1.75em;
         position: relative;
-        left: 4px;
-        top: -2px;
+        left: 6px;
+        top: -1px;
     }
 }
 
 :local(.title) {
     flex-grow: 0;
     flex-shrink: 0;
-    height: 20px;
+    height: @height;
     font-weight: 700;
     font-size: .9em;
     margin: 0 2px;
-    line-height: 23px;
-    color: lighten(@darkFontColor, 10%, relative);;
+    line-height: @height + 3px;
+    color: lighten(@darkFontColor, 10%, relative);
 }
 
 :local(.titleBox) {
     flex-grow: 1;
     flex-shrink: 1;
     overflow: hidden;
-    height: 20px;
+    height: @height;
     position: relative;
 }
 

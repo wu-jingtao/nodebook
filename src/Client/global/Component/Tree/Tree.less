@@ -1,58 +1,61 @@
 @import "../../ThemeColor.less";
 @import "../Button/LoadingAnimation.less";
+@height: 25px;
 
 :local(.Tree) {
     width: 100%;
     overflow: hidden;
+    cursor: pointer;
 }
 
 :local(.treeFocus) {
-    background-color: darken(@lightBackColor, 10%, relative) !important;
+    background-color: darken(@lightBackColor, 5%, relative) !important;
 }
 
 :local(.treeHover) {
-    background-color: lighten(@darkBackColor, 40%, relative);
+    background-color: darken(@lightBackColor, 25%, relative);
 }
 
 :local(.TreeTitle) {
-    height: 20px;
-    overflow: hidden;
+    height: @height;
     position: relative;
 }
 
 :local(.titleArrow) {
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
+    width: @height;
+    height: @height;
+    line-height: @height;
     text-align: center;
     color: lighten(@darkFontColor, 10%, relative);
 
     &.icon-arrow_right {
         font-size: .9em;
         position: relative;
-        left: 1px;
+        left: -2px;
         top: 1px;
     }
 
     &.icon-arrowdroprightdown {
         font-size: 1.75em;
         position: relative;
-        left: 4px;
-        top: -2px;
+        left: -3px;
+        top: -1px;
     }
 }
 
 :local(.titleLoading) {
-    width: 20px;
-    height: 20px;
+    width: @height;
+    height: @height;
     display: block;
     position: relative;
-    .LoadingAnimation(0.65em, 0.12em, @fontColor, fade(lighten(@darkFontColor, 10%, relative), 600%));
+    left: -10px;
+    top: -1px;
+    .LoadingAnimation(0.55em, 0.12em, @fontColor, fade(lighten(@darkFontColor, 10%, relative), 600%));
 }
 
 :local(.titleItemBox) {
     position: absolute;
-    left: 20px;
+    left: @height;
     right: 0;
     top: 0;
     bottom: 0;

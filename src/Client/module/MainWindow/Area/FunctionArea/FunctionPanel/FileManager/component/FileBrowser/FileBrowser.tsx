@@ -83,7 +83,7 @@ class FileTree extends Tree {
 
     protected _renderItem(): JSX.Element {
         return (
-            <div style={{ color: 'white' }}>{this._name}</div>
+            <div style={{ color: 'white', lineHeight: '25px' }}>{this._name}</div>
         );
     }
 }

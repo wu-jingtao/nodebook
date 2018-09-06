@@ -66,6 +66,11 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
      */
     protected readonly _loading = oSet<any>([]);
 
+    /**
+     * 当前元素的引用
+     */
+    protected _ref: JQuery<HTMLDivElement>;
+
     //#endregion
 
     constructor(props: any, context: any) {
@@ -187,7 +192,8 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
             })}
                 onClick={this._onClick}
                 onMouseOver={this._onMouseOver}
-                onMouseOut={this.props.root && this._onMouseLeave}>
+                onMouseOut={this.props.root && this._onMouseLeave}
+                ref={(e: any) => this._ref = e && $(e)}>
                 <TreeTitle
                     loading={this._loading}
                     openedBranch={this._openedBranch}

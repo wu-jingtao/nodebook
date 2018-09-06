@@ -11,8 +11,7 @@ const less = require('./FoldableContainer.less');
 
 export abstract class FoldableContainer<T extends FoldableContainerPropsType> extends ObservableComponent<T> {
 
-    protected readonly _folded = permanent_oVar(`ui.FoldableContainer.${this.props.uniqueID}`,
-        this.props.noFold ? 'false' : this.props.folded ? 'true' : 'false');
+    protected readonly _folded = permanent_oVar(`ui.FoldableContainer.${this.props.uniqueID}`, this.props.folded ? 'true' : 'false');
 
     protected readonly _hover = oVar(false);  //鼠标是否处于悬浮状态
 
@@ -25,9 +24,17 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
     protected abstract renderTitleBar(): JSX.Element;
     protected abstract renderContent(): JSX.Element;
 
+    constructor(props: any, context: any) {
+        super(props, context);
+
+        if (this.props.noFold) {
+            this._folded.value = false;
+            this._folded.on('beforeSet', () => false);
+        }
+    }
+
     componentDidMount() {
         this.watch(this._folded, this._hover);
-        if (this.props.noFold) this._folded.on('beforeSet', () => false);
 
         this._titleBar_div.mouseenter(() => this._hover.value = true).mouseleave(() => this._hover.value = false);
         this._content_div.mouseenter(() => this._hover.value = true).mouseleave(() => this._hover.value = false);
@@ -35,6 +42,7 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
 
     componentWillUnmount() {
         super.componentWillUnmount();
+        
         this._titleBar_div.off('mouseenter mouseleave');
         this._content_div.off('mouseenter mouseleave');
     }
