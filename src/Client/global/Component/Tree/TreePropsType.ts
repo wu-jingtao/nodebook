@@ -1,4 +1,4 @@
-import { ObservableMap } from "observable-variable";
+import { ObservableMap, ObservableSet } from "observable-variable";
 import { Tree } from "./Tree";
 
 export interface DataTree {
@@ -38,4 +38,68 @@ export interface TreePropsType {
      * 从根到当前节点的完整名称。在兄弟节点当中应当是唯一的
      */
     fullName: string[];
+}
+
+export interface TreeTitlePropsType {
+    /**
+     * 加载动画
+     */
+    loading: ObservableSet<string>;
+
+    /**
+     * 打开的节点名称
+     */
+    openedBranch: ObservableSet<string>;
+
+    /**
+     * 现在位于第几级（名称数组的长度）
+     */
+    level: number;
+
+    /**
+     * 是否是一个分支
+     */
+    isBranch: boolean;
+
+    /**
+     * 全名称
+     */
+    fullName: string;
+
+    /**
+     * 渲染当前级别的内容
+     */
+    renderItem: Function;
+}
+
+export interface TreeSubItemPropsType {
+    /**
+     * 当前级别的数据
+     */
+    data: DataTree;
+
+    /**
+     * 加载动画
+     */
+    loading: ObservableSet<string>;
+
+    /**
+     * 打开的节点名称
+     */
+    openedBranch: ObservableSet<string>;
+
+    /**
+     * 全名称
+     */
+    fullName: string[];
+
+    /**
+     * 元素类
+     */
+    element: Function;
+
+    /**
+     * 根
+     */
+    root: Tree;
 }

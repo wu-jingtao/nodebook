@@ -1,7 +1,8 @@
 @import "./Spinner.css";
 
 /* 加载动画 */
-.LoadingAnimation(@size:1.28571429em) {
+.LoadingAnimation(@size:1.28571429em, @thick:.2em, @color:white, @backColor:rgba(0,0,0,.15)) {
+    
     &::before {
         position: absolute;
         content: '';
@@ -11,7 +12,7 @@
         width: @size;
         height: @size;
         border-radius: 500rem;
-        border: .2em solid rgba(0,0,0,.15);
+        border: @thick solid @backColor;
     }
 
     &::after {
@@ -25,9 +26,9 @@
         animation: spinner .6s linear;
         animation-iteration-count: infinite;
         border-radius: 500rem;
-        border-color: #fff transparent transparent;
+        border-color: @color transparent transparent;
         border-style: solid;
-        border-width: .2em;
+        border-width: @thick;
         box-shadow: 0 0 0 1px transparent;
     }
 }

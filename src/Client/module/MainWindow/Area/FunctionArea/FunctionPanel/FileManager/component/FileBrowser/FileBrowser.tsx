@@ -16,12 +16,26 @@ export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
     protected _titleBarClassName = less.titleBar;
     protected _contentClassName = less.contentBox;
 
+    protected _fileTree: FileTree;
+
     componentDidMount() {
         super.componentDidMount();
+
+        //点击容器空白区域，清除所有选中选项
+        this._content_div.click(e => {
+            if (e.target === e.currentTarget)
+                this._fileTree.unfocus();
+        });
+
+        //清除hover。因为使用了flex布局，Tree在边界的地方无法触发mouseleave事件
+        this._content_div.mouseleave(() => {
+            this._fileTree.unhover();
+        });
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
+        this._content_div.off('click mouseleave');
     }
 
     protected renderTitleBar(): JSX.Element {
@@ -50,23 +64,26 @@ export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
     };
 
     protected renderContent(): JSX.Element {
-        return <FileTree fullName={["root"]} uniqueID="test_tree" dataTree={this.datatree} />;
+        return <FileTree fullName={["root"]} uniqueID="test_tree" dataTree={this.datatree} ref={e => this._fileTree = e as any} />;
     }
 }
 
 class FileTree extends Tree {
 
-    _onOpenBranch(): Promise<false | void> {
+    protected _onOpenBranch(isOpen: boolean): Promise<false | void> {
         return new Promise<false | void>((resolve, reject) => {
-            setTimeout(() => {
+            if (isOpen)
+                setTimeout(() => {
+                    resolve();
+                }, 2000);
+            else
                 resolve();
-            }, 2000);
         });
     }
 
-    _renderItem(): JSX.Element {
+    protected _renderItem(): JSX.Element {
         return (
-            <div>{this._name}</div>
+            <div style={{ color: 'white' }}>{this._name}</div>
         );
     }
 }
