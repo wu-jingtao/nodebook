@@ -6,6 +6,8 @@ import { Tree } from '../../../../../../../../global/Component/Tree/Tree';
 import { FileBrowserPropsType } from './FileBrowserPropsType';
 import { oMap } from 'observable-variable';
 
+import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
+
 const less = require('./FileBrowser.less');
 
 /**
@@ -83,7 +85,30 @@ class FileTree extends Tree {
 
     protected _renderItem(): JSX.Element {
         return (
-            <div style={{ color: 'white', lineHeight: '25px' }}>{this._name}</div>
+            <div style={{ color: 'white', lineHeight: '25px' }}
+                onClick={(e) => {
+                    showContextMenu({
+                        position: { x: e.clientX, y: e.clientY },
+                        items: [
+                            [
+                                { name: 'asd', callback: (e) => { console.log('asd'); } },
+                                { name: 'asd2', callback: (e) => { console.log('asd2'); } },
+                                { name: 'asd3', callback: (e) => { console.log('asd3'); } },
+                            ],
+                            [
+                                { name: 'qwe', callback: (e) => { console.log('qwe'); } },
+                                { name: 'qwe2', callback: (e) => { console.log('qwe2'); } },
+                                { name: 'qwe3', callback: (e) => { console.log('qwe3'); } },
+                            ],
+                            [
+                                { name: 'asd', callback: (e) => { console.log('asd'); } },
+                                { name: 'asd2', callback: (e) => { console.log('asd2'); } },
+                                { name: 'asd3', callback: (e) => { console.log('asd3'); } },
+                            ],
+                        ]
+                    });
+                }}
+            >{this._name}</div>
         );
     }
 }

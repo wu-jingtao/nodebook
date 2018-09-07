@@ -7,6 +7,7 @@ import { ObservableComponent } from '../../global/Tools/ObservableComponent';
 import { LoginPage } from '../LoginPage/LoginPage';
 import { MessageBox } from '../MessageBox/MessageBox';
 import { MainWindow } from '../MainWindow/MainWindow';
+import { ContextMenu } from '../ContextMenu/ContextMenu';
 
 (window as any).jQuery = (window as any).$ = $;
 
@@ -22,6 +23,7 @@ class Index extends ObservableComponent {
                 <LoginPage logged={this._logged} />
                 <MainWindow logged={this._logged} />
                 <MessageBox />
+                <ContextMenu />
             </>
         );
     }

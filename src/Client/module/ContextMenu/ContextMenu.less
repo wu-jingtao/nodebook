@@ -1,0 +1,28 @@
+@import "../../global/ThemeColor.less";
+
+#ContextMenu {
+    position: absolute;
+    z-index: 1000;
+    background-color: @backColor;
+    border: 1px solid @borderColor;
+}
+
+:local(.menuGroup) {
+    padding: 5px 0;
+    border-bottom: 1px solid lighten(@lightBackColor, 30%, relative);
+
+    &:last-child {
+        border: none;
+    }
+}
+
+:local(.menuItem) {
+    padding: 0 20px;
+    height: 25px;
+    line-height: 25px;
+    color: @fontColor;
+
+    &:hover {
+        background-color: @lightBackColor;
+    }
+}
