@@ -1,12 +1,10 @@
 import * as React from 'react';
+import { oMap } from 'observable-variable';
 
 import { FoldableContainer } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainer';
 import { DataTree } from '../../../../../../../../global/Component/Tree/TreePropsType';
 import { Tree } from '../../../../../../../../global/Component/Tree/Tree';
 import { FileBrowserPropsType } from './FileBrowserPropsType';
-import { oMap } from 'observable-variable';
-
-import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
 
 const less = require('./FileBrowser.less');
 
@@ -72,43 +70,72 @@ export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
 
 class FileTree extends Tree {
 
+    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
+        return parentProps;
+    }
+
+    protected _onOpenItem(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            setTimeout(() => {
+                resolve();
+            }, 2000);
+        });
+    }
+
     protected _onOpenBranch(isOpen: boolean): Promise<false | void> {
         return new Promise<false | void>((resolve, reject) => {
-            if (isOpen)
-                setTimeout(() => {
-                    resolve();
-                }, 2000);
-            else
+            setTimeout(() => {
                 resolve();
+            }, 2000);
         });
     }
 
     protected _renderItem(): JSX.Element {
         return (
-            <div style={{ color: 'white', lineHeight: '25px' }}
-                onClick={(e) => {
-                    showContextMenu({
-                        position: { x: e.clientX, y: e.clientY },
-                        items: [
-                            [
-                                { name: 'asd', callback: (e) => { console.log('asd'); } },
-                                { name: 'asd2', callback: (e) => { console.log('asd2'); } },
-                                { name: 'asd3', callback: (e) => { console.log('asd3'); } },
-                            ],
-                            [
-                                { name: 'qwe', callback: (e) => { console.log('qwe'); } },
-                                { name: 'qwe2', callback: (e) => { console.log('qwe2'); } },
-                                { name: 'qwe3', callback: (e) => { console.log('qwe3'); } },
-                            ],
-                            [
-                                { name: 'asd', callback: (e) => { console.log('asd'); } },
-                                { name: 'asd2', callback: (e) => { console.log('asd2'); } },
-                                { name: 'asd3', callback: (e) => { console.log('asd3'); } },
-                            ],
-                        ]
-                    });
-                }}
-            >{this._name}</div>
+            <div style={{ color: 'white', lineHeight: '25px' }} >{this._name}</div>
         );
     }
 }
+
+
+/**
+ * 
+
+    private readonly _onDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        e.dataTransfer.effectAllowed = 'copeMove';
+
+        if (this._focusedItem.size > 0) {
+            if (!this._focusedItem.has(this._fullName)) {
+                this._focusedItem.clear();
+                this._focusedItem.add(this._fullName);
+            }
+        } else
+            this._focusedItem.add(this._fullName);
+
+        let prompt: JQuery;
+        if (this._focusedItem.size > 0)
+            prompt = $(`<p>${this._focusedItem.size} item</p>`);
+        else
+            prompt = $(`<p>${this._name}</p>`);
+
+        e.dataTransfer.setData('jsonPathArray', JSON.stringify(this._focusedItem));
+        e.dataTransfer.setDragImage(prompt[0], 0, 0);
+    };
+
+    private readonly _onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        if (this._data.subItem) {
+            e.preventDefault();
+            e.stopPropagation();
+            this._hoveredItem.value = this._fullName;
+        }
+    };
+
+    private readonly _onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        if (this._data.subItem) {
+            e.stopPropagation();
+            console.log(this._fullName, e.dataTransfer.getData('jsonPathArray'));
+        }
+    };
+
+ */

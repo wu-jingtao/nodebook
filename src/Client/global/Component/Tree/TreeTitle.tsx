@@ -20,7 +20,7 @@ export class TreeTitle extends ObservableComponent<TreeTitlePropsType> {
             <div className={less.TreeTitle} style={{ marginLeft: 10 * this.props.level, width: `calc(100% - ${10 * this.props.level}px)` }}>
                 {this.props.isBranch && this.props.loading.size === 0 &&
                     <i className={classnames(less.titleArrow, 'iconfont',
-                        this.props.openedBranch.has(this.props.fullName) ? "icon-arrowdroprightdown" : "icon-arrow_right")} />}
+                        this.props.openedBranch.has(this.props.fullNameString) ? "icon-arrowdroprightdown" : "icon-arrow_right")} />}
                 {this.props.loading.size > 0 && <i className={less.titleLoading} />}
                 <div className={less.titleItemBox}>{this.props.renderItem()}</div>
             </div>

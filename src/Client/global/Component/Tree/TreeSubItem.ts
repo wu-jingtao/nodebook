@@ -8,15 +8,13 @@ import { TreeSubItemPropsType } from './TreePropsType';
  */
 export class TreeSubItem extends ObservableComponent<TreeSubItemPropsType> {
 
-    private readonly _fullName = this.props.fullName.join('');
-
     componentDidMount() {
         if (this.props.data.subItem)
             this.watch(this.props.data.subItem, this.props.openedBranch, this.props.loading);
     }
 
     render() {
-        if (this.props.data.subItem && !this.props.loading.has('_onOpenBranch') && this.props.openedBranch.has(this._fullName)) {
+        if (this.props.data.subItem && !this.props.loading.has('_onOpenBranch') && this.props.openedBranch.has(this.props.fullNameString)) {
             const subItem: JSX.Element[] = [];
             const data = [...this.props.data.subItem.values()];
 

@@ -64,7 +64,7 @@ export interface TreeTitlePropsType {
     /**
      * 全名称
      */
-    fullName: string;
+    fullNameString: string;
 
     /**
      * 渲染当前级别的内容
@@ -92,6 +92,11 @@ export interface TreeSubItemPropsType {
      * 全名称
      */
     fullName: string[];
+
+    /**
+     * 全名称
+     */
+    fullNameString: string;
 
     /**
      * 元素类

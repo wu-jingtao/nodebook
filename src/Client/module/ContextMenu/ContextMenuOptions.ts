@@ -9,5 +9,7 @@ export interface ContextMenuOptions {
     /**
      * 菜单项，通过数组分割菜单组
      */
-    items: { name: string, callback: React.MouseEventHandler<HTMLDivElement> }[][];
+    items: ContextMenuItemOptions;
 }
+
+export type ContextMenuItemOptions = { name: string, callback: React.MouseEventHandler<HTMLDivElement> }[][];

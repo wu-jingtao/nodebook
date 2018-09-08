@@ -20,6 +20,11 @@ export class SideBar extends ObservableComponent<SideBarPropsType> {
     private readonly _showLogo = normalSettings.get('client.sidebar.showLogo') as ObservableVariable<boolean>;
 
     /**
+     * 为程序图标添加一些内边距
+     */
+    private readonly _logoPadding = normalSettings.get('client.sidebar.logoPadding') as ObservableVariable<boolean>;
+
+    /**
      * 打开设置窗口
      */
     private readonly _openSettingWindow = () => {
@@ -52,7 +57,8 @@ export class SideBar extends ObservableComponent<SideBarPropsType> {
         return (
             <div id="SideBar">
                 <div className={less.top}>
-                    {this._showLogo.value && <img src="/logo/icon.png" className={less.logo} />}
+                    {this._showLogo.value &&
+                        <img src="/logo/icon.png" className={classnames(less.logo, { [less.logoPadding]: this._logoPadding.value })} />}
                     <div className={classnames(less.icon, { selected: this.props.functionAreaDisplayType.value === 'shortcut' })}
                         onClick={() => this._changeFunctionArea('shortcut')} title="快捷方式" >
                         <i className="iconfont icon-xingzhuang" />
