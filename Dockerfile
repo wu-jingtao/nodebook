@@ -1,3 +1,4 @@
+# 镜像地址：https://github.com/mx601595686/my-docker-image/tree/master/nodejs
 FROM registry.cn-hangzhou.aliyuncs.com/wujingtao/node:latest
 
 ENV NODEBOOK_VERSION="0.0.1"
