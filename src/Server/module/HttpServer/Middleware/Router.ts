@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import * as koa from 'koa';
 import * as koa_compose from 'koa-compose';
 import * as koa_router from 'koa-router';
+import * as koa_cache from 'koa-cache-control';
 import * as moment from 'moment';
 import { ObservableVariable } from 'observable-variable';
 import koa_conditional = require('koa-conditional-get');
@@ -118,6 +119,7 @@ function Static(router_no_login: koa_router) {
     router_no_login.get('/static/:path(.+?\\..+)',
         koa_conditional(),
         koa_etag(),
+        koa_cache({ maxAge: 31536000 }),
         async function StaticFileSender(ctx) {
             const path = node_path.join(FilePath._appClientFileDir, ctx.params.path);
             await FileManager._isFile(path);
