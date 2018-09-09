@@ -12,11 +12,7 @@ interface FileExtensionsType {
     /**
      * 可匹配的扩展名
      */
-    extensions: string[],
-    /**
-     * 是否匹配整个文件名
-     */
-    fileName: boolean
+    extensions: string[]
 }
 
 interface FolderExtensionsType {
@@ -30,31 +26,29 @@ interface FolderExtensionsType {
     extensions: string[]
 }
 
-const fileExtensions: FileExtensionsType[] = supportedExtensions.extensions.supported
+const fileExtensions: { ext: FileExtensionsType[] /* 通过扩展名匹配的 */, filename: FileExtensionsType[] /* 通过完整文件名匹配的 */ } = { ext: [], filename: [] };
+supportedExtensions.extensions.supported
     //排除vscode-icons禁用的，继承的，重载的
     .filter(item => item.disabled != true && item.extends == null && item.overrides == null)
-    .map(item => {
-        const result: FileExtensionsType = {
-            icon: `file_type_${item.icon}.${typeof item.format === 'string' ? item.format : FileFormat[item.format]}`,
-            extensions: [],
-            fileName: item.filename == true
-        };
+    .forEach(item => {
+        const icon = `file_type_${item.icon}.${typeof item.format === 'string' ? item.format : FileFormat[item.format]}`;
+        const extensions = item.extensions;
 
-        if (item.extensions.length > 0)
-            result.extensions = item.extensions;
+        if (item.languages)
+            item.languages.forEach(item => extensions.push(item.defaultExtension));
 
         if (item.extensionsGlob && item.filenamesGlob) {
             item.filenamesGlob.forEach(name => {
                 (item.extensionsGlob as any[]).forEach(ext => {
-                    result.extensions.push(`${name}.${ext}`);
+                    extensions.push(`${name}.${ext}`);
                 });
             });
         }
 
-        if (item.languages)
-            result.extensions = item.languages.map(item => item.defaultExtension);
-
-        return result;
+        if (item.filename)
+            fileExtensions.filename.push({ icon, extensions });
+        else
+            fileExtensions.ext.push({ icon, extensions });
     });
 
 const defaultFileExtensions: FileExtensionsType = {
@@ -62,8 +56,7 @@ const defaultFileExtensions: FileExtensionsType = {
         }.${typeof (supportedExtensions.extensions.default.file as any).format === 'string' ?
             (supportedExtensions.extensions.default.file as any).format :
             FileFormat[(supportedExtensions.extensions.default.file as any).format]}`,
-    extensions: [],
-    fileName: false
+    extensions: []
 };
 
 const folderExtensions: FolderExtensionsType[] = supportedFolders.extensions.supported
@@ -104,7 +97,7 @@ const defaultFolderExtensions: { folder: FolderExtensionsType, root_folder: Fold
  * @param isOpened 文件夹是否被打开了
  * @param isRootFolder 是否是根文件夹
  */
-export function getIconPath(filename: string, isFolder: boolean, isOpened?: boolean, isRootFolder?: boolean): string {
+export function getIconPath(filename: string, isFolder?: boolean, isOpened?: boolean, isRootFolder?: boolean): string {
     filename = filename.trim().toLowerCase();
 
     if (isFolder) {
@@ -117,12 +110,10 @@ export function getIconPath(filename: string, isFolder: boolean, isOpened?: bool
 
         return folder_ext.icon(isOpened);
     } else {
-        const file_ext: FileExtensionsType = fileExtensions.find(item => {
-            if (item.fileName)
-                return item.extensions.includes(filename);
-            else
-                return item.extensions.some(item => filename.endsWith(item));
-        }) || defaultFileExtensions;
+        const file_ext: FileExtensionsType =
+            fileExtensions.filename.find(item => item.extensions.includes(filename)) ||
+            fileExtensions.ext.find(item => item.extensions.some(item => filename.endsWith(`.${item}`))) ||
+            defaultFileExtensions;
 
         return file_ext.icon;
     }

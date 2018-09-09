@@ -30,9 +30,9 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
     protected readonly _dataTree: DataTree = this.props.dataTree || this._root._dataTree;
 
     /**
-     * 打开的分支。值是全路径字符串
+     * 打开的分支。值是全路径字符串。不要直接修改该属性
      */
-    private readonly _openedBranch: ObservableSet<string> = this._root._openedBranch || permanent_oSet(`ui.Tree.${this.props.uniqueID}`);
+    protected readonly _openedBranch: ObservableSet<string> = this._root._openedBranch || permanent_oSet(`ui.Tree.${this.props.uniqueID}`);
 
     /**
      * 聚焦到特定的子项上，该子项高亮显示。值是子项的对象
