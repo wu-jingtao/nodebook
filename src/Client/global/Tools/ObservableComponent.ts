@@ -27,7 +27,7 @@ export class ObservableComponent<p = {}> extends React.Component<p> {
 /**
  * 包装一段JSX，使之根据观察ObservableVariabled的改变而渲染
  */
-export class ObservableComponentWrapper extends ObservableComponent<{ watch: ObservableVariable<any>[], render: (children?: JSX.Element) => JSX.Element }>{
+export class ObservableComponentWrapper extends ObservableComponent<{ watch: ObservableVariable<any>[], render: (children?: React.ReactNode) => React.ReactNode }>{
     componentDidMount() {
         this.watch(...this.props.watch);
     }

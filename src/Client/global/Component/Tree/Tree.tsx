@@ -2,76 +2,71 @@ import * as React from 'react';
 import * as classnames from 'classnames';
 import { ObservableSet, ObservableVariable, ObservableMap, oSet, oVar, oMap } from 'observable-variable';
 
-import { ObservableComponent } from '../../Tools/ObservableComponent';
-import { permanent_oSet } from '../../Tools/PermanentVariable';
+import { ObservableComponent, ObservableComponentWrapper } from '../../Tools/ObservableComponent';
 import { TreePropsType, DataTree } from './TreePropsType';
-import { TreeTitle } from './TreeTitle';
-import { TreeSubItem } from './TreeSubItem';
 import { ContextMenuItemOptions } from '../../../module/ContextMenu/ContextMenuOptions';
 import { showContextMenu } from '../../../module/ContextMenu/ContextMenu';
 
 const less = require('./Tree.less');
 
-/**
- * 树状列表
- */
-export abstract class Tree extends ObservableComponent<TreePropsType> {
+export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreePropsType<D> & P> {
 
-    //#region 根上面的属性
+    //#region 属性
+
+    /**
+     * 判断是不是根节点
+     */
+    protected readonly _isRoot: boolean = this.props._root === undefined;
 
     /**
      * 根
      */
-    protected readonly _root = this.props.root || this;
+    protected readonly _root: this = this.props._root as any || this;
 
     /**
-     * 数据树
+     * 父级，根的父级为空
      */
-    protected readonly _dataTree: DataTree = this.props.dataTree || this._root._dataTree;
-
-    /**
-     * 打开的分支。值是全路径字符串。不要直接修改该属性
-     */
-    protected readonly _openedBranch: ObservableSet<string> = this._root._openedBranch || permanent_oSet(`ui.Tree.${this.props.uniqueID}`);
-
-    /**
-     * 聚焦到特定的子项上，该子项高亮显示。值是子项的对象
-     */
-    protected readonly _focusedItem: ObservableSet<Tree> = this._root._focusedItem || oSet([]);
-
-    /**
-     * 鼠标是否位于哪个节点之上
-     */
-    protected readonly _hoveredItem: ObservableVariable<Tree | undefined> = this._root._hoveredItem || oVar(undefined);
-
-    /**
-     * 项目的对象列表
-     */
-    protected readonly _treeObject: ObservableMap<string, Tree> = this._root._treeObject || oMap([]);
-
-    //#endregion
-
-    //#region 当前节点上面的属性
+    protected readonly _parent?: this = this.props._parent as any;
 
     /**
      * 当前项的名称
      */
-    protected readonly _name = this.props.fullName[this.props.fullName.length - 1];
+    protected readonly _name = this.props.name;
 
     /**
      * 当前项的完整名称
      */
-    protected readonly _fullName = this.props.fullName;
+    protected readonly _fullName: ReadonlyArray<string> = this._parent ? [...this._parent._fullName, this._name] : [this._name];
 
     /**
      * 当前项的完整名称字符串
      */
-    protected readonly _fullNameString = this.props.fullName.join('/');
+    protected readonly _fullNameString = this._fullName.join('/');
 
     /**
-     * 当前项在数据树中对应的数据
+     * 当前节点所对应的数据
      */
-    protected readonly _data: DataTree = this._dataTree;
+    protected readonly _dataTree: DataTree<D> = this.props._dataTree as any || { name: this._name, data: {}, subItem: oMap([]) };
+
+    /**
+     * 打开的分支。值是全路径字符串。不要直接修改该属性，要打开某个分支请使用openOrCloseBranch()
+     */
+    protected readonly _openedBranch: ObservableSet<string> = this._root._openedBranch || oSet([]);
+
+    /**
+     * 聚焦到特定的子项上，该子项高亮显示。
+     */
+    protected readonly _focusedItem: ObservableSet<this> = this._root._focusedItem || oSet([]);
+
+    /**
+     * 鼠标是否位于哪个节点之上
+     */
+    protected readonly _hoveredItem: ObservableVariable<this | undefined> = this._root._hoveredItem || oVar(undefined);
+
+    /**
+     * 树每个节点的对象列表，key是每个节点的_fullNameString
+     */
+    protected readonly _treeList: ObservableMap<string, this> = this._root._treeList || oMap([]);
 
     /**
      * 是否显示加载动画。如果数组长度大于1则显示
@@ -79,22 +74,35 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
     protected readonly _loading = oSet<any>([]);
 
     /**
-     * 右键菜单
+     * 右键菜单。只有当_contextMenu数组长度大于0才会显示右键菜单
      */
     protected readonly _contextMenu: ContextMenuItemOptions = [];
+
+    UNSAFE_componentWillMount() {
+        this._treeList.set(this._fullNameString, this);
+
+        //打开上次打开过的分支
+        this.openOrCloseBranch(this._openedBranch.has(this._fullNameString));
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        this._treeList.delete(this._fullNameString);
+    }
 
     //#endregion
 
     //#region 私有方法
 
     /**
-     * 点击后选中当前项
+     * 当前项的点击事件
      */
     private readonly _onClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
         e.preventDefault();
 
         if (e.button === 0) { //鼠标左键
+            //配置焦点
             if (e.ctrlKey) { //是否按下了Ctrl键
                 if (this._focusedItem.has(this))
                     this._focusedItem.delete(this);
@@ -104,9 +112,11 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
                 this._focusedItem.clear();
                 this._focusedItem.add(this);
 
+                //打开分支
                 this.openOrCloseBranch();
 
-                if (this._data.subItem === undefined) { //确保不是分支
+                //触发打开事件
+                if (this._dataTree.subItem === undefined) {  //确保不是分支
                     if (!this._loading.has('_onOpenItem')) { //确保不重复打开
                         this._loading.add('_onOpenItem');
                         this._onOpenItem().then(() => {
@@ -116,6 +126,7 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
                 }
             }
         } else if (e.button === 2) //鼠标右键
+            //右键菜单
             if (this._contextMenu.length > 0)
                 showContextMenu({ position: { x: e.clientX, y: e.clientY }, items: this._contextMenu });
     }
@@ -136,12 +147,53 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
         this._hoveredItem.value = undefined;
     };
 
+    /**
+     * 渲染每一级树的标题。
+     * 需要观察 _loading, _openedBranch
+     */
+    private readonly _renderTreeTitle = () => {
+        return (
+            <div className={less.TreeTitle} style={{ marginLeft: 20 * this._fullName.length, width: `calc(100% - ${20 * this._fullName.length}px)` }}>
+                {this._dataTree.subItem && this._loading.size === 0 &&
+                    <i className={classnames(less.titleArrow, 'iconfont',
+                        this._openedBranch.has(this._fullNameString) ? "icon-arrowdroprightdown" : "icon-arrow_right")} />}
+                {this._loading.size > 0 && <i className={less.titleLoading} />}
+                <div className={less.titleItemBox}>
+                    {this._renderItem()}
+                </div>
+            </div>
+        );
+    };
+
+    /**
+     * 渲染当前节点的子分支
+     * 需要观察 _dataTree.subItem, _loading, _openedBranch
+     */
+    private readonly _renderTreeBranch = () => {
+        if (!this._loading.has('_onOpenBranch') && this._openedBranch.has(this._fullNameString)) {
+            const subItem: JSX.Element[] = [];
+            const data: DataTree<D>[] = [...(this._dataTree.subItem as any).values()];
+
+            const branch = data.filter(item => item.subItem !== undefined).sort((a, b) => a.name.localeCompare(b.name));
+            const items = data.filter(item => item.subItem === undefined).sort((a, b) => a.name.localeCompare(b.name));
+
+            branch.forEach(item => subItem.push(React.createElement(this.constructor as any,
+                { _root: this._root, _parent: this._parent, _dataTree: item, name: item.name, key: item.name })));
+
+            items.forEach(item => subItem.push(React.createElement(this.constructor as any,
+                { _root: this._root, _parent: this._parent, _dataTree: item, name: item.name, key: item.name })));
+
+            return subItem;
+        } else
+            return false;
+    }
+
     //#endregion
 
     //#region 继承方法
 
     /**
-     * 可向当前树附加额外的属性
+     * 可向当前节点加额外的属性
      */
     protected abstract _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>): React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
 
@@ -168,7 +220,7 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
      * 展开或关闭分支。isOpen，是打开还是关闭。如果不传递isOpen，那么现在如果是打开则关闭，如果是关闭则打开
      */
     async openOrCloseBranch(isOpen?: boolean): Promise<void> {
-        if (this._data.subItem) {   //确保是目录
+        if (this._dataTree.subItem) {   //确保是目录
             if (!this._loading.has('_onOpenBranch')) {  //确保并未处于正在打开或关闭的状态
                 this._loading.add('_onOpenBranch'); //表示正在打开
 
@@ -215,7 +267,7 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
         const paths = [...this._openedBranch.values()].sort((a, b) => b.length - a.length);
 
         for (const item of paths) {
-            const obj = this._treeObject.get(item);
+            const obj = this._treeList.get(item);
             if (obj)
                 await obj.openOrCloseBranch(false);
         }
@@ -225,27 +277,6 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
 
     //#endregion
 
-    constructor(props: any, context: any) {
-        super(props, context);
-
-        this._treeObject.set(this._fullNameString, this);
-
-        for (let index = 1; index < this.props.fullName.length; index++) {  //找出当前节点在数据树中对应的数据
-            this._data = (this._data.subItem as any).get(this.props.fullName[index]);
-        }
-
-        this.openOrCloseBranch(this._openedBranch.has(this._fullNameString)); //检查上次是否打开过该节点
-    }
-
-    componentDidMount() {
-        this.watch(this._focusedItem, this._hoveredItem);
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        this._treeObject.delete(this._fullNameString);
-    }
-
     render() {
         const props = this._props({
             className: classnames(less.Tree, {
@@ -254,27 +285,15 @@ export abstract class Tree extends ObservableComponent<TreePropsType> {
             }),
             onClick: this._onClick,
             onMouseOver: this._onMouseOver,
-            onMouseLeave: this.props.root === undefined ? this._onMouseLeave : undefined
+            onMouseLeave: this._isRoot ? this._onMouseLeave : undefined
         });
 
         return (
             <div {...props}>
-                <TreeTitle
-                    loading={this._loading}
-                    openedBranch={this._openedBranch}
-                    level={this._fullName.length}
-                    isBranch={this._data.subItem !== undefined}
-                    fullNameString={this._fullNameString}
-                    renderItem={this._renderItem.bind(this)} />
-                <TreeSubItem
-                    loading={this._loading}
-                    openedBranch={this._openedBranch}
-                    data={this._data}
-                    fullName={this._fullName}
-                    fullNameString={this._fullNameString}
-                    element={this.constructor}
-                    root={this._root} />
-            </div >
+                <ObservableComponentWrapper watch={[this._loading, this._openedBranch]} render={this._renderTreeTitle} />
+                {this._dataTree.subItem &&
+                    <ObservableComponentWrapper watch={[this._dataTree.subItem, this._loading, this._openedBranch]} render={this._renderTreeBranch} />}
+            </div>
         );
     }
 }
