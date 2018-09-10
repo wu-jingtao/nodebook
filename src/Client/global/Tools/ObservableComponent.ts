@@ -23,3 +23,16 @@ export class ObservableComponent<p = {}> extends React.Component<p> {
         return false;
     }
 }
+
+/**
+ * 包装一段JSX，使之根据观察ObservableVariabled的改变而渲染
+ */
+export class ObservableComponentWrapper extends ObservableComponent<{ watch: ObservableVariable<any>[], render: (children?: JSX.Element) => JSX.Element }>{
+    componentDidMount() {
+        this.watch(...this.props.watch);
+    }
+
+    render() {
+        return this.props.render();
+    }
+}

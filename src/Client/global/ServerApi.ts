@@ -53,5 +53,17 @@ export const ServerApi = {
         async changeSecretSetting(key: string, value: any, password: string): Promise<void> {
             expect(await Post('/setting/changeSecretSetting', { key, value, password: md5(password) }), 'ok', '更改私密设置项失败');
         },
+    },
+    /**
+     * 文件操作
+     */
+    file: {
+        /**
+         * 列出某个目录中的子目录与文件
+         * @param path 传入的路径需对应服务器端全路径
+         */
+        async listDirectory(path: string): Promise<ReadonlyArray<{ name: string, isFile: boolean, modifyTime: number, size: number }>> {
+            return await Post('/file/api/listDirectory', { path });
+        }
     }
 };

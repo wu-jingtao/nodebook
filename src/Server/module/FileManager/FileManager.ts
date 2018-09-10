@@ -16,7 +16,7 @@ export class FileManager extends BaseServiceModule {
      * 判断某个路径是否以什么开头，如果都不匹配则抛出异常
      */
     private static _pathStartWith(path: string, startWith: string[]): void {
-        if (path.length > 4000 || !startWith.some(item => path.startsWith(item)))
+        if (path.length > 4000 || !startWith.some(item => !node_path.relative(item, path).startsWith('../')))
             throw new Error(`无权操作路径 '${path}'`);
     }
 

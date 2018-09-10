@@ -3,9 +3,8 @@ import { oMap } from 'observable-variable';
 
 import { FoldableContainer } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainer';
 import { DataTree } from '../../../../../../../../global/Component/Tree/TreePropsType';
+import { FileTree, FileTreeInner } from '../FileTree/FileTree';
 import { FileBrowserPropsType } from './FileBrowserPropsType';
-
-import { FileIconTree } from '../../../../../../../../global/Component/FileIconTree/FileIconTree';
 
 const less = require('./FileBrowser.less');
 
@@ -17,7 +16,7 @@ export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
     protected _titleBarClassName = less.titleBar;
     protected _contentClassName = less.contentBox;
 
-    protected _fileTree: FileTree;
+    protected _fileTree: FileTreeInner;
 
     componentDidMount() {
         super.componentDidMount();
@@ -51,55 +50,20 @@ export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
     }
 
     datatree: DataTree = {
-        name: '/root',
-        subItem: oMap([
-            ['index.js', { name: 'index.js' }],
-            ['index.html', { name: 'index.html' }],
-            ['index.css', { name: 'index.css' }],
-            ['index.jssscss', { name: 'index.jssscss' }],
-            ['index_asdasdasdasdasdasdddddddddddddddddddddddddddddddddddddddaaaaaaa__.html', { name: 'index_asdasdasdasdasdasdddddddddddddddddddddddddddddddddddddddaaaaaaa__.html' }],
-            ['tools', {
-                name: 'tools', subItem: oMap([
-                    ['dockerfile', { name: 'dockerfile' }],
-                    ['webpack.config.js', { name: 'webpack.config.js' }]
-                ])
-            }],
-            ['TaskManager', {
-                name: 'TaskManager', subItem: oMap([
-                    ['dockerfile', { name: 'dockerfile' }],
-                    ['webpack.config.js', { name: 'webpack.config.js' }]
-                ])
-            }],
-        ]) as any
+        name: '/user_data/code',
+        subItem: oMap([])
     };
 
     protected renderContent(): JSX.Element {
-        return <FileTree fullName={["/root"]} uniqueID="test_tree" dataTree={this.datatree} ref={e => this._fileTree = e as any} />;
+        return <FileTreeInner
+            fullName={["/user_data/code"]}
+            uniqueID="test_tree"
+            dataTree={this.datatree}
+            ref={e => this._fileTree = e as any} />;
     }
 }
 
-class FileTree extends FileIconTree {
 
-    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
-        return parentProps;
-    }
-
-    protected _onOpenItem(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            setTimeout(() => {
-                resolve();
-            }, 500);
-        });
-    }
-
-    protected _onOpenBranch(isOpen: boolean): Promise<false | void> {
-        return new Promise<false | void>((resolve, reject) => {
-            setTimeout(() => {
-                resolve();
-            }, 500);
-        });
-    }
-}
 
 
 /**
