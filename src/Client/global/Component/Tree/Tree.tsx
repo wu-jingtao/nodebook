@@ -46,12 +46,12 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
     /**
      * 当前节点所对应的数据
      */
-    protected readonly _dataTree: DataTree<D> = this.props._dataTree as any || { name: this._name, data: {}, subItem: oMap([]) };
+    protected _dataTree: DataTree<D> = this.props._dataTree as any || { name: this._name, data: {}, subItem: oMap([]) };
 
     /**
      * 打开的分支。值是全路径字符串。不要直接修改该属性，要打开某个分支请使用openOrCloseBranch()
      */
-    protected readonly _openedBranch: ObservableSet<string> = this._root._openedBranch || oSet([]);
+    protected _openedBranch: ObservableSet<string> = this._root._openedBranch || oSet([]);
 
     /**
      * 聚焦到特定的子项上，该子项高亮显示。

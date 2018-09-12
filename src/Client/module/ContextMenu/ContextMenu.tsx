@@ -41,7 +41,8 @@ export class ContextMenu extends ObservableComponent {
                         <div className={less.menuGroup} key={index}>
                             {group.map((item, index) => (
                                 <div className={less.menuItem} key={index} onClick={item.callback}>
-                                    {item.name}
+                                    <span>{item.name}</span>
+                                    <span className={less.itemTip}>{item.tip}</span>
                                 </div>
                             ))}
                         </div>

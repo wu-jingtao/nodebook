@@ -28,7 +28,7 @@ export async function Get(url: string, data?: { [key: string]: any }): Promise<a
     return await Ajax('GET', url, data);
 }
 
-export async function Post(url: string, data?: { [key: string]: any }, file?: File, progress?: ObservableVariable<number>): Promise<any> {
+export async function Post(url: string, data?: { [key: string]: any }, file?: Blob, progress?: ObservableVariable<number>): Promise<any> {
     if (file) {
         const formData = new FormData();
         jQuery.each(data, (key: string, value) => formData.append(key, value));

@@ -2,7 +2,7 @@ import * as os from 'os';
 import * as child_process from 'child_process';
 import * as diskusage from 'diskusage';
 import * as util from 'util';
-import * as _ from 'lodash';
+import log from 'log-formatter';
 import pidusage, { Stat } from 'pidusage';
 import { BaseServiceModule } from "service-starter";
 
@@ -60,13 +60,27 @@ export class TaskManager extends BaseServiceModule {
 
             const invokeCallback: Map<string, (jsonResult: string) => void> = new Map();
 
-            child.on('message', (msg: { requestID: string, jsonResult: string }) => {
-                if (_.isObject(msg)) {
-                    const callback = invokeCallback.get(msg.requestID);
-                    if (callback) {
-                        invokeCallback.delete(msg.requestID);
-                        callback(msg.jsonResult);
+            child.on('message', async (msg: MessageType) => {
+                try {
+                    if (msg.type === 'request') {
+                        const { taskFilePath, functionName, data } = msg.requestData;
+                        const result = await this.invokeTaskFunction(taskFilePath, functionName, data);
+                        if (child.connected)
+                            child.send({ type: 'response', id: msg.id, responseData: result });
+                    } else if (msg.type === 'response') {
+                        const callback = invokeCallback.get(msg.id);
+                        if (callback) {
+                            invokeCallback.delete(msg.id);
+                            callback(msg.responseData);
+                        }
                     }
+                } catch (error) {
+                    log.error
+                        .location
+                        .text
+                        .text.round
+                        .text
+                        .content(this.name, '任务', taskFilePath, "传递的'message'格式不正确", error);
                 }
             });
 
@@ -116,31 +130,67 @@ export class TaskManager extends BaseServiceModule {
     }
 
     /**
-     * 调用任务中暴露出的方法。执行后的结果以json格式返回。如果60秒没有返回结果这判定超时
+     * 调用任务中暴露出的方法。执行后的结果以json格式返回。如果100秒没有返回结果这判定超时
      * @param taskFilePath 任务文件路径
      * @param functionName 要调用的方法名称
      * @param jsonArgs json参数，到达任务进程中后会自动反序列化，然后传给要调用的方法
      */
     invokeTaskFunction(taskFilePath: string, functionName: string, jsonArgs: string): Promise<string> {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             const task = this._taskList.get(taskFilePath);
             if (task && task.process.connected) {
                 const requestID = Math.random().toString();
 
                 const timer = setTimeout(() => {
                     task.invokeCallback.delete(requestID);
-                    reject(new Error('调用超时'));
-                }, 1000 * 60);
+                    resolve('{"error":"调用超时"}');
+                }, 1000 * 100);
 
                 task.invokeCallback.set(requestID, jsonResult => {
-                    task.invokeCallback.delete(requestID);
                     clearTimeout(timer);
                     resolve(jsonResult);
                 });
 
-                task.process.send({ requestID, functionName, jsonArgs });
+                task.process.send({
+                    type: 'request', id: requestID, requestData: {
+                        functionName,
+                        data: jsonArgs
+                    }
+                });
             } else
-                reject(new Error('要调用的任务的方法无法访问'));
+                resolve('{"error":"要调用的任务的方法无法访问"}');
         });
+    }
+}
+
+/**
+ * 进程间通信的消息格式
+ */
+interface MessageType {
+    /**
+     * 请求的类型
+     */
+    type: 'request' | 'response';
+
+    /**
+     * 该条消息的唯一编号
+     */
+    id: string;
+
+    /**
+     * 响应的数据。格式{ data?: any, error?: string }
+     */
+    responseData: string;
+
+    /**
+     * 请求数据
+     */
+    requestData: {
+        /**
+         * 向任务中发送时为空
+         */
+        taskFilePath: string; 
+        functionName: string;
+        data: string;
     }
 }

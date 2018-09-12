@@ -119,7 +119,7 @@ function Static(router_no_login: koa_router) {
     router_no_login.get('/static/:path(.+?\\..+)',
         koa_conditional(),
         koa_etag(),
-        koa_cache({ maxAge: 31536000 }),
+        koa_cache({ maxAge: 60 * 60 }),
         async function StaticFileSender(ctx) {
             const path = node_path.join(FilePath._appClientFileDir, ctx.params.path);
             await FileManager._isFile(path);
@@ -289,19 +289,28 @@ function File(router: koa_router, httpServer: HttpServer) {
     });
 
     /**
-     * 清空回收站
-     */
-    router.post(_prefix_api + '/cleanRecycle', async (ctx) => {
-        await _fileManager.cleanRecycle();
-        ctx.body = 'ok';
-    });
-
-    /**
      * 永久删除 '_programDataDir' 下的文件或目录
      * @param path
      */
     router.post(_prefix_api + '/deleteProgramData', async (ctx) => {
         await _fileManager.deleteProgramData(ctx.request.body.path);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 永久删除 '_recycleDir' 下的文件或目录
+     * @param path
+     */
+    router.post(_prefix_api + '/deleteRecycleData', async (ctx) => {
+        await _fileManager.deleteRecycleData(ctx.request.body.path);
+        ctx.body = 'ok';
+    });
+
+    /**
+     * 清空回收站
+     */
+    router.post(_prefix_api + '/cleanRecycle', async (ctx) => {
+        await _fileManager.cleanRecycle();
         ctx.body = 'ok';
     });
 

@@ -3,7 +3,7 @@ import { Tree } from "./Tree";
 
 export interface DataTree<T> {
     /**
-     * 当前节点的名称。在兄弟节点当中应当是唯一的
+     * 当前节点的名称。在兄弟节点当中应当是唯一的。除了根，其他节点的名称不能使用'/'开头
      */
     name: string;
 

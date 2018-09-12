@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import { oVar, ObservableVariable } from 'observable-variable';
+import { ObservableVariable, ObservableArray, oArr } from 'observable-variable';
 
 import { ObservableComponentWrapper } from '../../../Tools/ObservableComponent';
 import { FileIcon } from '../../FileIcon/FileIcon';
@@ -11,12 +11,12 @@ const less = require('./FileIconTree.less');
 /**
  * MemoryTree 的基础上添加了文件图标，以及判断是否修改过
  */
-export abstract class FileIconTree<P extends { memorable: String }, D = any> extends MemoryTree<P, D> {
+export abstract class FileIconTree<P extends { memorable: string }, D = any> extends MemoryTree<P, D> {
 
     /**
-     * 该文件是否被修改过
+     * 该文件是否被修改过value是_fullNameString
      */
-    protected readonly _modified = oVar(false);
+    protected readonly _modified: ObservableArray<string> = this._root._modified || oArr([]);
 
     /**
      * 渲染FileIconTree的内容
@@ -30,7 +30,7 @@ export abstract class FileIconTree<P extends { memorable: String }, D = any> ext
                     isFolder={this._dataTree.subItem !== undefined}
                     opened={this._dataTree.subItem && this._openedBranch.has(this._fullNameString)}
                     rootFolder={this._isRoot} />
-                <div className={classnames(less.filename, { [less.modified]: this._modified.value })}>{this._name}</div>
+                <div className={classnames(less.filename, { [less.modified]: this._modified.some(item => item.startsWith(this._fullNameString)) })}>{this._name}</div>
             </>
         );
     };

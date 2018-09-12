@@ -1,0 +1,36 @@
+@import "../../global/ThemeColor.less";
+
+#PopupWindow {
+    position: absolute;
+    z-index: 200;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+:local(.PopupWindowItem) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    box-shadow: 0 2px 2px 1px @darkBackColor;
+    border: 1px solid @borderColor;
+    padding: 15px;
+    background-color: @backColor;
+}
+
+:local(.content) {
+    overflow: hidden;
+}
+
+:local(.bottom) {
+    border-top: 1px solid @borderColor;
+    height: 40px;
+    .clearFloat();
+}
+
+:local(.button) {
+    height: 30px;
+    margin: 5px;
+    float: right;
+}

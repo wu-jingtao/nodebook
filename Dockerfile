@@ -40,7 +40,7 @@ RUN npm install && \
 # 删除多余文件
     rm -r src gulpfile.js tsconfig.json webpack.config.js && \
 # 确保程序代码不会被破坏
-    chmod 700 /app && \
+    chmod 755 /app && \
 # 确保可执行
     dos2unix /app/node_modules/service-starter/src/Docker/health_check.sh && \
     chmod 755 /app/node_modules/service-starter/src/Docker/health_check.sh

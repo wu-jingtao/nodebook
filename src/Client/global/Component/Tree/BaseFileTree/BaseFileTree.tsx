@@ -8,7 +8,7 @@ import { throttle } from '../../../Tools/Tools';
 /**
  * 基础文件树。实现了服务器端路径读取，缓存。
  */
-export abstract class BaseFileTree<P extends { memorable: String }> extends FileIconTree<P, { size: number, modifyTime: number }> {
+export abstract class BaseFileTree<P extends { memorable: string }> extends FileIconTree<P, { size: number, modifyTime: number }> {
 
     /**
      * 是否在服务器端加载过了。value是_fullNameString
@@ -25,13 +25,13 @@ export abstract class BaseFileTree<P extends { memorable: String }> extends File
         super(props, context);
 
         //读取目录数据
-        if (this._isRoot && this._memorable) {
-            (this as any)._dataTree = JSON.parse(localStorage.getItem(`ui.BaseFileTree.memory.${this.props.memorable}`) ||
+        if (this._isRoot && this.props.memorable !== undefined) {
+            this._dataTree = JSON.parse(localStorage.getItem(`ui.BaseFileTree.memory.${this.props.memorable}`) ||
                 `{"name":"${this._name}","data":{"size":0,"modifyTime":0},"subItem":[]}`);
         }
 
         //添加保存数据监听器
-        if (this._memorable && this._dataTree.subItem) {
+        if (this._dataTree.subItem && this._root.props.memorable !== undefined) {
             oMap(this._dataTree, 'subItem');    //由于序列化的原因，确保subItem是ObservableMap
             this._dataTree.subItem.on('add', this._saveFolderData); //重复注册监听器不会有影响
             this._dataTree.subItem.on('remove', this._saveFolderData);
@@ -41,7 +41,7 @@ export abstract class BaseFileTree<P extends { memorable: String }> extends File
     /**
      * 从服务器端加载当前节点的目录数据
      */
-    async refreshFolder(): Promise<false | void> {
+    public async refreshFolder(): Promise<false | void> {
         if (this._dataTree.subItem && !this._loading.has('_refreshFolder')) {
             try {
                 this._loading.add('_refreshFolder');

@@ -1,4 +1,5 @@
 import md5 = require('blueimp-md5');
+import { ObservableVariable } from 'observable-variable';
 
 import { Get, Post } from './Tools/Ajax';
 import { expect } from './Tools/Tools';
@@ -64,6 +65,37 @@ export const ServerApi = {
          */
         async listDirectory(path: string): Promise<ReadonlyArray<{ name: string, isFile: boolean, modifyTime: number, size: number }>> {
             return await Post('/file/api/listDirectory', { path });
-        }
+        },
+        /**
+         * 创建目录
+         * @param path
+         */
+        async createDirectory(path: string): Promise<void> {
+            expect(await Post('/file/api/createDirectory', { path }), 'ok', '创建目录失败');
+        },
+        /**
+         * 复制文件或整个目录
+         * @param from
+         * @param to
+         */
+        async copy(from: string, to: string): Promise<void> {
+            expect(await Post('/file/api/copy', { from, to }), 'ok', '复制文件失败');
+        },
+        /**
+         * 移动文件或整个目录
+         * @param from
+         * @param to
+         */
+        async move(from: string, to: string): Promise<void> {
+            expect(await Post('/file/api/move', { from, to }), 'ok', '移动文件失败');
+        },
+        /**
+         * 上传文件。新建文件、修改文件也是用这个
+         * @param file
+         * @param to
+         */
+        async uploadFile(file: Blob, to: string, progress?: ObservableVariable<number>): Promise<void> {
+            expect(await Post('/file/api/uploadFile', { to }, file, progress), 'ok', '上传文件失败');
+        },
     }
 };

@@ -132,20 +132,29 @@ export class FileManager extends BaseServiceModule {
     }
 
     /**
-     * 清空回收站。永久删除 '_recycleDir' 下的所有文件或目录。
-     */
-    async cleanRecycle(): Promise<void> {
-        await fs.remove(FilePath._recycleDir);
-        await fs.ensureDir(FilePath._recycleDir);
-    }
-
-    /**
      * 永久删除 '_programDataDir' 下的文件或目录。
      */
     async deleteProgramData(path: string): Promise<void> {
         FileManager._pathStartWith(path, [FilePath._programDataDir]);
 
         await fs.remove(path);
+    }
+
+    /**
+     * 永久删除 '_recycleDir' 下的文件或目录。
+     */
+    async deleteRecycleData(path: string): Promise<void> {
+        FileManager._pathStartWith(path, [FilePath._recycleDir]);
+
+        await fs.remove(path);
+    }
+
+    /**
+     * 清空回收站。永久删除 '_recycleDir' 下的所有文件或目录。
+     */
+    async cleanRecycle(): Promise<void> {
+        await fs.remove(FilePath._recycleDir);
+        await fs.ensureDir(FilePath._recycleDir);
     }
 
     /**

@@ -12,4 +12,4 @@ export interface ContextMenuOptions {
     items: ContextMenuItemOptions;
 }
 
-export type ContextMenuItemOptions = { name: string, callback: React.MouseEventHandler<HTMLDivElement> }[][];
+export type ContextMenuItemOptions = { name: string, tip?: string, callback: React.MouseEventHandler<HTMLDivElement> }[][];
