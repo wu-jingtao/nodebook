@@ -218,6 +218,15 @@ function File(router: koa_router, httpServer: HttpServer) {
         ctx.body = await _fileManager.readFile(ctx.request.body.path);
     });
 
+    /**
+     * 压缩某个文件或目录，用于用户下载
+     * @param path 传入的路径需对应服务器端全路径
+     */
+    router.get(_prefix_api + '/zipDownloadData', async (ctx: any) => {
+        ctx.compress = false;   //确保不会被 koa-compress 压缩
+        ctx.body = await _fileManager.zipDownloadData(ctx.request.query.path);
+    });
+
     //#endregion
 
     /**
@@ -331,28 +340,6 @@ function File(router: koa_router, httpServer: HttpServer) {
      */
     router.post(_prefix_api + '/unzipData', async (ctx: any) => {
         await _fileManager.unzipData(ctx.request.body.path, ctx.request.body.to);
-        ctx.body = 'ok';
-    });
-
-    /**
-     * 压缩某个文件或目录，用于用户下载
-     * @param path
-     */
-    router.post(_prefix_api + '/zipDownloadData', async (ctx: any) => {
-        ctx.compress = false;   //确保不会被 koa-compress 压缩
-        ctx.body = await _fileManager.zipDownloadData(ctx.request.body.path);
-    });
-
-    /**
-     * 解压用户上传的zip文件到指定目录
-     * @param files
-     * @param to 
-     */
-    router.post(_prefix_api + '/unzipUploadData', async (ctx) => {
-        if (_.get(ctx.request.body, 'files.length') !== 1)
-            throw new Error('上传的文件数目不符合要求，每次必须且只能是一个文件');
-
-        await _fileManager.unzipUploadData(ctx.request.body.files[0].path, ctx.request.body.to);
         ctx.body = 'ok';
     });
 }

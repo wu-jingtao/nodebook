@@ -11,6 +11,6 @@ export abstract class MemoryTree<P extends { memorable: string }, D = any> exten
         super(props, context);
 
         if (this._isRoot && this.props.memorable !== undefined)
-            this._openedBranch = permanent_oSet(`ui.MemoryTree.memory.${this.props.memorable}`);
+            (this._openedBranch as any) = permanent_oSet(`ui.MemoryTree.memory.${this.props.memorable}`);
     }
 }

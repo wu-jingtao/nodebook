@@ -229,17 +229,4 @@ export class FileManager extends BaseServiceModule {
         archive.finalize();
         return archive;
     }
-
-    /**
-     * 解压用户上传的zip文件到指定目录。注意，只允许解压到 '_userCodeDir' 、'_programDataDir' 之下
-     */
-    unzipUploadData(zipFile: string, to: string): Promise<void> {
-        return new Promise((resolve, reject) => {
-            FileManager._pathStartWith(to, [FilePath._userCodeDir, FilePath._programDataDir]);
-
-            fs.createReadStream(zipFile).pipe(unzip.Extract({ path: to }))
-                .on('error', reject)
-                .on('close', () => fs.remove(zipFile, err => err ? reject(err) : resolve()));   //解压完成后删除压缩文件
-        });
-    }
 }

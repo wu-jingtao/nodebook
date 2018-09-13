@@ -26,7 +26,7 @@ export abstract class BaseFileTree<P extends { memorable: string }> extends File
 
         //读取目录数据
         if (this._isRoot && this.props.memorable !== undefined) {
-            this._dataTree = JSON.parse(localStorage.getItem(`ui.BaseFileTree.memory.${this.props.memorable}`) ||
+            (this._dataTree as any) = JSON.parse(localStorage.getItem(`ui.BaseFileTree.memory.${this.props.memorable}`) ||
                 `{"name":"${this._name}","data":{"size":0,"modifyTime":0},"subItem":[]}`);
         }
 

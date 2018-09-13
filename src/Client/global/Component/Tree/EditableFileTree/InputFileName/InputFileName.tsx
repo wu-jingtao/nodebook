@@ -32,7 +32,7 @@ export class InputFileName extends ObservableComponent<{ name: ObservableVariabl
         return (
             <div className={classnames(less.InputFileName, { [less.error]: errorTip !== undefined })}>
                 <FileIcon className={less.icon} isFolder={this.props.isDirectory} filename={this.props.name.value} />
-                <TextInput className={less.input} placeholder="请输入文件名称" maxLength={50} type="text" value={this.props.name} />
+                <TextInput className={less.input} placeholder="请输入文件名称" maxLength={100} type="text" value={this.props.name} />
                 {errorTip && <div className={less.errorTip}>{errorTip}</div>}
             </div>
         );

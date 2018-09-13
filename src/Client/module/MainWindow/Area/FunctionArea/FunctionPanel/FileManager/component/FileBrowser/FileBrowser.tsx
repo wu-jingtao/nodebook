@@ -69,41 +69,6 @@ export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
 /**
  * 
 
-    private readonly _onDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-        e.stopPropagation();
-        e.dataTransfer.effectAllowed = 'copeMove';
-
-        if (this._focusedItem.size > 0) {
-            if (!this._focusedItem.has(this._fullName)) {
-                this._focusedItem.clear();
-                this._focusedItem.add(this._fullName);
-            }
-        } else
-            this._focusedItem.add(this._fullName);
-
-        let prompt: JQuery;
-        if (this._focusedItem.size > 0)
-            prompt = $(`<p>${this._focusedItem.size} item</p>`);
-        else
-            prompt = $(`<p>${this._name}</p>`);
-
-        e.dataTransfer.setData('jsonPathArray', JSON.stringify(this._focusedItem));
-        e.dataTransfer.setDragImage(prompt[0], 0, 0);
-    };
-
-    private readonly _onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        if (this._data.subItem) {
-            e.preventDefault();
-            e.stopPropagation();
-            this._hoveredItem.value = this._fullName;
-        }
-    };
-
-    private readonly _onDrop = (e: React.DragEvent<HTMLDivElement>) => {
-        if (this._data.subItem) {
-            e.stopPropagation();
-            console.log(this._fullName, e.dataTransfer.getData('jsonPathArray'));
-        }
-    };
+    
 
  */

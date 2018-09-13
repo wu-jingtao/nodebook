@@ -97,5 +97,54 @@ export const ServerApi = {
         async uploadFile(file: Blob, to: string, progress?: ObservableVariable<number>): Promise<void> {
             expect(await Post('/file/api/uploadFile', { to }, file, progress), 'ok', '上传文件失败');
         },
+        /**
+         * 删除 '_userCodeDir' 下的文件或目录
+         * @param path
+         */
+        async deleteCodeData(path: string): Promise<void> {
+            expect(await Post('/file/api/deleteCodeData', { path }), 'ok', '删除失败');
+        },
+        /**
+         * 删除 '_programDataDir' 下的文件或目录
+         * @param path
+         */
+        async deleteProgramData(path: string): Promise<void> {
+            expect(await Post('/file/api/deleteProgramData', { path }), 'ok', '删除失败');
+        },
+        /**
+         * 删除 '_recycleDir' 下的文件或目录
+         * @param path
+         */
+        async deleteRecycleData(path: string): Promise<void> {
+            expect(await Post('/file/api/deleteRecycleData', { path }), 'ok', '删除失败');
+        },
+        /**
+         * 清空回收站
+         */
+        async cleanRecycle(): Promise<void> {
+            expect(await Post('/file/api/cleanRecycle'), 'ok', '清空回收站失败');
+        },
+        /**
+         * 压缩某个文件或目录
+         * @param file
+         * @param to
+         */
+        async zipData(from: string, to: string): Promise<void> {
+            if (!to.endsWith('.zip'))
+                throw new Error("压缩文件的后缀名必须以'zip'结尾");
+
+            expect(await Post('/file/api/zipData', { from, to }), 'ok', '压缩失败');
+        },
+        /**
+         * 解压压缩文件
+         * @param file
+         * @param to
+         */
+        async unzipData(from: string, to: string): Promise<void> {
+            if (!from.endsWith('.zip'))
+                throw new Error("压缩文件的后缀名必须以'zip'结尾");
+
+            expect(await Post('/file/api/unzipData', { from, to }), 'ok', '解压失败');
+        },
     }
 };

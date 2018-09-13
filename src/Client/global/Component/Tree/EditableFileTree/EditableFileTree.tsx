@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { oSet, oVar } from 'observable-variable';
+import { oSet, oVar, ObservableMap } from 'observable-variable';
 
 import { showMessageBox } from '../../../../module/MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../module/PopupWindow/PopupWindow';
@@ -8,6 +8,7 @@ import { codeTemplate } from '../../../CodeTemplate';
 import { BaseFileTree } from "../BaseFileTree/BaseFileTree";
 import { EditableFileTreePropsType } from './EditableFileTreePropsType';
 import { InputFileName } from './InputFileName/InputFileName';
+import { UploadFile } from './UploadFile/UploadFile';
 
 /**
  * 可编辑文件数
@@ -47,13 +48,36 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
 
     /**
      * 检查要操作的项目是否正在处理中。返回true表示并未在处理中
+     * @param checkDescendants 是否连后代也要检查，默认false
      */
-    private checkIsBusy(fullNameString: string = this._fullNameString): boolean {
-        if (EditableFileTree._processingItems.has(fullNameString)) {
-            showMessageBox({ icon: 'warning', title: '操作的文件正在处理中', content: fullNameString, autoClose: 3 });
-            return false;
-        } else
-            return true;
+    private checkIsBusy(item: EditableFileTree<any> = this, checkDescendants?: boolean): boolean {
+        if (checkDescendants && item._dataTree.subItem) {
+            return [...EditableFileTree._processingItems.values()].every(fullNameString => {
+                if (fullNameString.startsWith(this._fullNameString)) {
+                    showMessageBox({
+                        icon: 'warning',
+                        title: `操作的项目正在处理中，请稍后再试`,
+                        content: fullNameString,
+                        autoClose: 3
+                    });
+
+                    return false;
+                } else
+                    return true;
+            });
+        } else {
+            if (EditableFileTree._processingItems.has(item._fullNameString)) {
+                showMessageBox({
+                    icon: 'warning',
+                    title: `操作的项目正在处理中，请稍后再试`,
+                    content: item._fullNameString,
+                    autoClose: 3
+                });
+
+                return false;
+            } else
+                return true;
+        }
     }
 
     //#endregion
@@ -70,22 +94,22 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
         }
 
         const items = [...this._focusedItem.values()];
-        if (items.every(item => this.checkIsBusy(item._fullNameString))) {
+        if (items.every(item => this.checkIsBusy(item, true))) {
             EditableFileTree._copyItem = items;
             EditableFileTree._action = action;
         }
     };
 
     /**
-     * 右键菜单粘贴
+     * 右键菜单粘贴。只有目录才有
      */
     private readonly _menu_paste = async () => {
-        if (this._dataTree.subItem) {
+        if (this._dataTree.subItem && EditableFileTree._copyItem.length > 0) {
             const items = EditableFileTree._copyItem;
             const action = EditableFileTree._action;
 
             //确保没有正在操作中的项目
-            let checked = [this, ...items].every((item: EditableFileTree<any>) => this.checkIsBusy(item._fullNameString));
+            let checked = [this, ...items].every(item => this.checkIsBusy(item, true));
 
             //检查是否有文件夹，复制或剪切自己到自己内部
             checked = checked && items.every(item => {
@@ -109,18 +133,12 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                 EditableFileTree._action = undefined;
 
                 const tasks: { from: string, to: string }[] = [];
+
                 for (const item of items) {
-                    let name = item._name;
-
-                    if (this._dataTree.subItem.has(name)) {   //如果名称重复
-                        let index = 1;
-                        while (true) {
-                            if (!this._dataTree.subItem.has(name = item._name.replace(/(?![^\.]+)(\.?)/, `(${index++})$1`)))
-                                break;
-                        }
-                    }
-
-                    tasks.push({ from: item._fullNameString, to: `${this._fullNameString}/${name}` });
+                    tasks.push({
+                        from: item._fullNameString,
+                        to: `${this._fullNameString}/${this.deduplicateFilename(this._dataTree.subItem, item._name)}`
+                    });
                 }
 
                 try {
@@ -144,23 +162,40 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
         }
     };
 
+    /**
+     * 为重复的文件名后加上序号。没有重复就直接返回
+     */
+    private deduplicateFilename(subItem: ObservableMap<string, any>, filename: string): string {
+        let name = filename;
+
+        if (subItem.has(name)) {   //如果名称重复
+            let index = 1;
+            while (true) {
+                if (!subItem.has(name = filename.replace(/(?![^\.]+)(\.?)/, `(${index++})$1`)))
+                    break;
+            }
+        }
+
+        return name;
+    }
+
     //#endregion
 
     //#region 创建、删除、重命名
 
     /**
-     * 创建目录
+     * 创建目录。只有目录才有
      */
     private readonly _menu_createDirectory = () => {
-        if (this.checkIsBusy()) {
+        if (this._dataTree.subItem && this.checkIsBusy()) {
             const name = oVar('');
 
             showPopupWindow({
-                content: <InputFileName name={name} subItems={this._dataTree.subItem as any} isDirectory />,
+                content: <InputFileName name={name} subItems={this._dataTree.subItem} isDirectory />,
                 ok: async () => {
                     try {
                         EditableFileTree._processingItems.add(this._fullNameString);
-                        await ServerApi.file.createDirectory(name.value);
+                        await ServerApi.file.createDirectory(`${this._fullNameString}/${name.value}`);
                     } catch (error) {
                         showMessageBox({ icon: 'error', title: '创建文件夹失败', content: error.message });
                     } finally {
@@ -172,14 +207,14 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     };
 
     /**
-     * 创建文件
+     * 创建文件。只有目录才有
      */
     private readonly _menu_createFile = () => {
-        if (this.checkIsBusy()) {
+        if (this._dataTree.subItem && this.checkIsBusy()) {
             const name = oVar('');
 
             showPopupWindow({
-                content: <InputFileName name={name} subItems={this._dataTree.subItem as any} />,
+                content: <InputFileName name={name} subItems={this._dataTree.subItem} />,
                 ok: async () => {
                     try {
                         EditableFileTree._processingItems.add(this._fullNameString);
@@ -196,22 +231,24 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     };
 
     /**
-     * 删除文件或目录
+     * 删除文件或目录。不允许删除根
      */
     private readonly _menu_delete = () => {
-        if (this.checkIsBusy()) {
+        if (!this._isRoot) {
             showMessageBox({
                 icon: 'question', title: '删除确认',
                 content: `确认要删除'${this._fullNameString}'吗?`,
                 buttons: {
                     ok: async () => {
-                        try {
-                            EditableFileTree._processingItems.add(this._fullNameString);
-                            await this._onDelete();
-                        } catch (error) {
-                            showMessageBox({ icon: 'error', title: '创建文件失败', content: error.message });
-                        } finally {
-                            EditableFileTree._processingItems.delete(this._fullNameString);
+                        if (this.checkIsBusy(this, true)) {
+                            try {
+                                EditableFileTree._processingItems.add(this._fullNameString);
+                                await this._onDelete();
+                            } catch (error) {
+                                showMessageBox({ icon: 'error', title: '创建文件失败', content: error.message });
+                            } finally {
+                                EditableFileTree._processingItems.delete(this._fullNameString);
+                            }
                         }
                     },
                     cancel() { }
@@ -221,10 +258,10 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     }
 
     /**
-     * 重命名
+     * 重命名。根不允许重命名
      */
     private readonly _menu_rename = () => {
-        if (this.checkIsBusy()) {
+        if (!this._root && this.checkIsBusy(this, true)) {
             const name = oVar(this._name);
 
             showPopupWindow({
@@ -246,6 +283,144 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
 
     //#endregion
 
+    //#region 上传文件
+
+    /**
+     * 上传文件。只有目录才有
+     */
+    private readonly _menu_uploadFile = () => {
+        if (this._dataTree.subItem && this.checkIsBusy()) {
+            const file = oVar<File | undefined>(undefined);
+
+            showPopupWindow({
+                content: <UploadFile file={file} />,
+                ok: () => file.value && this.prepareUploadFile(file.value)
+            });
+        }
+    };
+
+    /**
+     * 准本上传文件的操作
+     */
+    private prepareUploadFile(file: File) {
+        if (this._dataTree.subItem && this.checkIsBusy()) {
+            const progress = oVar(0);
+            const filename = `${this._fullNameString}/${this.deduplicateFilename(this._dataTree.subItem, file.name)}`;
+            ServerApi.file.uploadFile(file, filename, progress);
+
+            showMessageBox({
+                icon: 'file',
+                title: '上传文件',
+                content: filename,
+                progress,
+                autoClose: 3
+            });
+        }
+    }
+
+    //#endregion
+
+    //#region 压缩、解压
+
+    /**
+     * 压缩文件或目录。不允许压缩根
+     */
+    private readonly _menu_zip = () => {
+        if (!this._isRoot && this.checkIsBusy(this, true)) {
+            const name = oVar('');
+
+            showPopupWindow({
+                content: <InputFileName name={name} subItems={(this._parent as any)._dataTree.subItem} />,
+                ok: async () => {
+                    try {
+                        EditableFileTree._processingItems.add(this._fullNameString);
+                        await ServerApi.file.zipData(this._fullNameString, `${(this._parent as any)._fullNameString}/${name.value}`);
+                    } catch (error) {
+                        showMessageBox({ icon: 'error', title: '压缩文件失败', content: error.message });
+                    } finally {
+                        EditableFileTree._processingItems.delete(this._fullNameString);
+                    }
+                }
+            });
+        }
+    };
+
+    /**
+     * 解压
+     */
+    private readonly _menu_unzip = async () => {
+        if (this._dataTree.subItem === undefined && this.checkIsBusy() && (this._parent as any).checkIsBusy()) {
+            try {
+                EditableFileTree._processingItems.add(this._fullNameString);
+                EditableFileTree._processingItems.add((this._parent as any)._fullNameString);
+
+                const unzipName = this.deduplicateFilename(
+                    (this._parent as any)._dataTree.subItem,
+                    (this._name.match(/[^\.]+/) || ['解压的文件'])[0]
+                );
+
+                await ServerApi.file.unzipData(
+                    this._fullNameString,
+                    `${(this._parent as any)._fullNameString}/${unzipName}`
+                );
+            } catch (error) {
+                showMessageBox({ icon: 'error', title: '解压文件失败', content: error.message });
+            } finally {
+                EditableFileTree._processingItems.delete(this._fullNameString);
+                EditableFileTree._processingItems.delete((this._parent as any)._fullNameString);
+            }
+        }
+    };
+
+    //#endregion
+
+    //#region 拖拽
+
+    private readonly _onDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        e.dataTransfer.effectAllowed = 'copyMove';
+
+        if (!this._focusedItem.has(this)) {
+            this._focusedItem.clear();
+            this._focusedItem.add(this);
+        }
+
+        const items = [...this._focusedItem.values()];
+        if (items.every(item => this.checkIsBusy(item, true))) {
+            EditableFileTree._copyItem = items;
+        }
+
+        e.dataTransfer.setDragImage(document.createElement('img'), 0, 0);
+    };
+
+    private readonly _onDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        EditableFileTree._copyItem = [];
+    };
+
+    private readonly _onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        if (this._dataTree.subItem) {
+            e.preventDefault();
+            e.stopPropagation();
+            this._hoveredItem.value = this;
+        }
+    };
+
+    private readonly _onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        if (this._dataTree.subItem) {
+            e.stopPropagation();
+
+            if (e.dataTransfer.files.length > 0) {
+                this.prepareUploadFile(e.dataTransfer.files[0]);
+            } else {
+                EditableFileTree._action = e.ctrlKey ? 'copy' : 'cut';
+                this._menu_paste();
+            }
+        }
+    };
+
+    //#endregion
+
     //#region 继承方法
 
     /**
@@ -256,7 +431,10 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     //#endregion
 
     protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
-        return parentProps;
+        return {
+            ...parentProps,
+
+        };
     }
 
     constructor(props: any, context: any) {

@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import { ObservableSet, ObservableVariable, ObservableMap, oSet, oVar, oMap } from 'observable-variable';
+import { ObservableSet, ObservableVariable, oSet, oVar, oMap } from 'observable-variable';
 
 import { ObservableComponent, ObservableComponentWrapper } from '../../Tools/ObservableComponent';
-import { TreePropsType, DataTree } from './TreePropsType';
-import { ContextMenuItemOptions } from '../../../module/ContextMenu/ContextMenuOptions';
+import { ContextMenuItemOptions, ContextMenuOptions } from '../../../module/ContextMenu/ContextMenuOptions';
 import { showContextMenu } from '../../../module/ContextMenu/ContextMenu';
+import { TreePropsType, DataTree } from './TreePropsType';
 
 const less = require('./Tree.less');
 
@@ -31,7 +31,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
     /**
      * 当前项的名称
      */
-    protected readonly _name = this.props.name;
+    protected readonly _name: string = this.props.name;
 
     /**
      * 当前项的完整名称
@@ -41,17 +41,17 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
     /**
      * 当前项的完整名称字符串
      */
-    protected readonly _fullNameString = this._fullName.join('/');
+    protected readonly _fullNameString: string = this._fullName.join('/');
 
     /**
      * 当前节点所对应的数据
      */
-    protected _dataTree: DataTree<D> = this.props._dataTree as any || { name: this._name, data: {}, subItem: oMap([]) };
+    protected readonly _dataTree: DataTree<D> = this.props._dataTree as any || { name: this._name, data: {}, subItem: oMap([]) };
 
     /**
      * 打开的分支。值是全路径字符串。不要直接修改该属性，要打开某个分支请使用openOrCloseBranch()
      */
-    protected _openedBranch: ObservableSet<string> = this._root._openedBranch || oSet([]);
+    protected readonly _openedBranch: ObservableSet<string> = this._root._openedBranch || oSet([]);
 
     /**
      * 聚焦到特定的子项上，该子项高亮显示。
@@ -66,17 +66,12 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
     /**
      * 树每个节点的对象列表，key是每个节点的_fullNameString
      */
-    protected readonly _treeList: ObservableMap<string, this> = this._root._treeList || oMap([]);
+    protected readonly _treeList: Map<string, this> = this._root._treeList || new Map;
 
     /**
      * 是否显示加载动画。如果数组长度大于1则显示
      */
     protected readonly _loading = oSet<any>([]);
-
-    /**
-     * 右键菜单。只有当_contextMenu数组长度大于0才会显示右键菜单
-     */
-    protected readonly _contextMenu: ContextMenuItemOptions = [];
 
     UNSAFE_componentWillMount() {
         this._treeList.set(this._fullNameString, this);
@@ -125,10 +120,19 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
                     }
                 }
             }
-        } else if (e.button === 2) //鼠标右键
-            //右键菜单
-            if (this._contextMenu.length > 0)
-                showContextMenu({ position: { x: e.clientX, y: e.clientY }, items: this._contextMenu });
+        } else if (e.button === 2) { //鼠标右键 右键菜单
+            let menuNumber = 0;
+
+            //过滤void和false
+            const items: any = this._onContextMenu().map(item => {
+                const result = item.filter(item => item);
+                menuNumber += result.length;
+                return result;
+            });
+
+            if (menuNumber > 0)
+                showContextMenu({ position: { x: e.clientX, y: e.clientY }, items });
+        }
     }
 
     /**
@@ -212,6 +216,11 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
      */
     protected abstract async _onOpenItem(): Promise<void>;
 
+    /**
+     * 显示右键菜单
+     */
+    protected abstract _onContextMenu(): (ContextMenuItemOptions | void | false)[][];
+
     //#endregion
 
     //#region 公开的方法
@@ -268,8 +277,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
 
         for (const item of paths) {
             const obj = this._treeList.get(item);
-            if (obj)
-                await obj.openOrCloseBranch(false);
+            if (obj) await obj.openOrCloseBranch(false);
         }
 
         this._openedBranch.clear();
