@@ -77,7 +77,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
         this._treeList.set(this._fullNameString, this);
 
         //打开上次打开过的分支
-        this.openOrCloseBranch(this._openedBranch.has(this._fullNameString));
+        this._openOrCloseBranch(this._openedBranch.has(this._fullNameString));
     }
 
     componentWillUnmount() {
@@ -108,7 +108,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
                 this._focusedItem.add(this);
 
                 //打开分支
-                this.openOrCloseBranch();
+                this._openOrCloseBranch();
 
                 //触发打开事件
                 if (this._dataTree.subItem === undefined) {  //确保不是分支
@@ -228,7 +228,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
     /**
      * 展开或关闭分支。isOpen，是打开还是关闭。如果不传递isOpen，那么现在如果是打开则关闭，如果是关闭则打开
      */
-    async openOrCloseBranch(isOpen?: boolean): Promise<void> {
+    protected async _openOrCloseBranch(isOpen?: boolean): Promise<void> {
         if (this._dataTree.subItem) {   //确保是目录
             if (!this._loading.has('_onOpenBranch')) {  //确保并未处于正在打开或关闭的状态
                 this._loading.add('_onOpenBranch'); //表示正在打开
@@ -277,7 +277,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
 
         for (const item of paths) {
             const obj = this._treeList.get(item);
-            if (obj) await obj.openOrCloseBranch(false);
+            if (obj) await obj._openOrCloseBranch(false);
         }
 
         this._openedBranch.clear();

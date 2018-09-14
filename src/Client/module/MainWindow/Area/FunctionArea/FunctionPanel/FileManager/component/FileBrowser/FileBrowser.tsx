@@ -1,22 +1,28 @@
 import * as React from 'react';
-import { oMap } from 'observable-variable';
 
 import { FoldableContainer } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainer';
-import { DataTree } from '../../../../../../../../global/Component/Tree/TreePropsType';
-import { FileTree, FileTreeInner } from '../FileTree/FileTree';
-import { FileBrowserPropsType } from './FileBrowserPropsType';
+import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
+import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
 
 const less = require('./FileBrowser.less');
 
 /**
  * 文件资源浏览器
  */
-export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
+export abstract class FileBrowser<T extends FoldableContainerPropsType> extends FoldableContainer<T> {
 
     protected _titleBarClassName = less.titleBar;
     protected _contentClassName = less.contentBox;
 
-    protected _fileTree: FileTreeInner;
+    /**
+     * 对于文件树的引用
+     */
+    protected abstract _tree: EditableFileTree<any>;
+
+    /**
+     * 标题栏上面的按钮
+     */
+    protected abstract _titleBarButtons: JSX.Element[];
 
     componentDidMount() {
         super.componentDidMount();
@@ -24,12 +30,12 @@ export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
         //点击容器空白区域，清除所有选中选项
         this._content_div.click(e => {
             if (e.target === e.currentTarget)
-                this._fileTree.unfocus();
+                this._tree.unfocus();
         });
 
         //清除hover。因为使用了flex布局，Tree在边界的地方无法触发mouseleave事件
         this._content_div.mouseleave(() => {
-            this._fileTree.unhover();
+            this._tree.unhover();
         });
     }
 
@@ -41,34 +47,8 @@ export class FileBrowser extends FoldableContainer<FileBrowserPropsType> {
     protected renderTitleBar(): JSX.Element {
         return (
             <div className={less.titleButtons}>
-                <i title="新建文件" className="iconfont icon-file-add-fill" onClick={e => e.stopPropagation()} />
-                <i title="新建文件夹" className="iconfont icon-file2" onClick={e => e.stopPropagation()} />
-                <i title="刷新" className="iconfont icon-fresh" onClick={e => e.stopPropagation()} />
-                <i title="全部折叠" className="iconfont icon-iconcloseall" onClick={e => e.stopPropagation()} />
+                {this._titleBarButtons}
             </div>
         );
     }
-
-    datatree: DataTree = {
-        name: '/user_data/code',
-        subItem: oMap([])
-    };
-
-    protected renderContent(): JSX.Element {
-        return <FileTreeInner
-            fullName={["/user_data/code"]}
-            uniqueID="test_tree"
-            dataTree={this.datatree}
-            ref={e => this._fileTree = e as any} />;
-    }
 }
-
-
-
-
-/**
- * 
-
-    
-
- */

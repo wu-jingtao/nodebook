@@ -11,7 +11,7 @@ const less = require('./FileIconTree.less');
 /**
  * MemoryTree 的基础上添加了文件图标，以及判断是否修改过
  */
-export abstract class FileIconTree<P extends { memorable: string }, D = any> extends MemoryTree<P, D> {
+export abstract class FileIconTree<P extends { memorable?: string }, D = any> extends MemoryTree<P, D> {
 
     /**
      * 该文件是否被修改过value是_fullNameString

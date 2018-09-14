@@ -214,8 +214,8 @@ function File(router: koa_router, httpServer: HttpServer) {
      * 这个相当于上面那4个的汇总，上面的主要是方便用户使用，这个主要是方便程序内部使用
      * @param path 传入的路径需对应服务器端全路径
      */
-    router.post(_prefix_api + '/readFile', async (ctx) => {
-        ctx.body = await _fileManager.readFile(ctx.request.body.path);
+    router.get(_prefix_api + '/readFile', async (ctx) => {
+        ctx.body = await _fileManager.readFile(ctx.request.query.path);
     });
 
     /**

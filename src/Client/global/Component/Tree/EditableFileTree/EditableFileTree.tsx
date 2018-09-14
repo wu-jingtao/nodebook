@@ -1,8 +1,11 @@
 import * as React from 'react';
+import * as downloadjs from 'downloadjs';
 import { oSet, oVar, ObservableMap } from 'observable-variable';
+import clipboard = require('copy-text-to-clipboard');
 
 import { showMessageBox } from '../../../../module/MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../module/PopupWindow/PopupWindow';
+import { ContextMenuItemOptions } from '../../../../module/ContextMenu/ContextMenuOptions';
 import { ServerApi } from '../../../ServerApi';
 import { codeTemplate } from '../../../CodeTemplate';
 import { BaseFileTree } from "../BaseFileTree/BaseFileTree";
@@ -87,14 +90,14 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     /**
      * 右键菜单复制或剪切
      */
-    private readonly _menu_copyCut = (action: 'copy' | 'cut') => {
+    protected readonly _menu_copyCut = (action: 'copy' | 'cut') => {
         if (!this._focusedItem.has(this)) {
             this._focusedItem.clear();
             this._focusedItem.add(this);
         }
 
         const items = [...this._focusedItem.values()];
-        if (items.every(item => this.checkIsBusy(item, true))) {
+        if (items.every(item => !item._isRoot && this.checkIsBusy(item, true))) {
             EditableFileTree._copyItem = items;
             EditableFileTree._action = action;
         }
@@ -103,7 +106,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     /**
      * 右键菜单粘贴。只有目录才有
      */
-    private readonly _menu_paste = async () => {
+    protected readonly _menu_paste = async () => {
         if (this._dataTree.subItem && EditableFileTree._copyItem.length > 0) {
             const items = EditableFileTree._copyItem;
             const action = EditableFileTree._action;
@@ -186,7 +189,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     /**
      * 创建目录。只有目录才有
      */
-    private readonly _menu_createDirectory = () => {
+    protected readonly _menu_createDirectory = () => {
         if (this._dataTree.subItem && this.checkIsBusy()) {
             const name = oVar('');
 
@@ -209,7 +212,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     /**
      * 创建文件。只有目录才有
      */
-    private readonly _menu_createFile = () => {
+    protected readonly _menu_createFile = () => {
         if (this._dataTree.subItem && this.checkIsBusy()) {
             const name = oVar('');
 
@@ -233,7 +236,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     /**
      * 删除文件或目录。不允许删除根
      */
-    private readonly _menu_delete = () => {
+    protected readonly _menu_delete = () => {
         if (!this._isRoot) {
             showMessageBox({
                 icon: 'question', title: '删除确认',
@@ -260,7 +263,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     /**
      * 重命名。根不允许重命名
      */
-    private readonly _menu_rename = () => {
+    protected readonly _menu_rename = () => {
         if (!this._root && this.checkIsBusy(this, true)) {
             const name = oVar(this._name);
 
@@ -288,7 +291,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     /**
      * 上传文件。只有目录才有
      */
-    private readonly _menu_uploadFile = () => {
+    protected readonly _menu_uploadFile = () => {
         if (this._dataTree.subItem && this.checkIsBusy()) {
             const file = oVar<File | undefined>(undefined);
 
@@ -325,7 +328,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     /**
      * 压缩文件或目录。不允许压缩根
      */
-    private readonly _menu_zip = () => {
+    protected readonly _menu_zip = () => {
         if (!this._isRoot && this.checkIsBusy(this, true)) {
             const name = oVar('');
 
@@ -348,7 +351,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     /**
      * 解压
      */
-    private readonly _menu_unzip = async () => {
+    protected readonly _menu_unzip = async () => {
         if (this._dataTree.subItem === undefined && this.checkIsBusy() && (this._parent as any).checkIsBusy()) {
             try {
                 EditableFileTree._processingItems.add(this._fullNameString);
@@ -370,6 +373,37 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                 EditableFileTree._processingItems.delete((this._parent as any)._fullNameString);
             }
         }
+    };
+
+    //#endregion
+
+    //#region 复制文件路径
+
+    /**
+     * 复制当前文件的绝对路径
+     */
+    protected readonly _menu_copyPath = () => {
+        if (!clipboard(this._fullNameString)) {
+            showMessageBox({ icon: 'message', title: '复制失败请手动复制', content: this._fullNameString, autoClose: 0 });
+        }
+    };
+
+    //#endregion
+
+    //#region 下载
+
+    /**
+     * 下载文件
+     */
+    protected readonly _menu_download = () => {
+        downloadjs(`/file/api/readFile?path=${this._fullNameString}`);
+    };
+
+    /**
+     * 下载文件并压缩
+     */
+    protected readonly _menu_zip_download = () => {
+        downloadjs(`/file/api/zipDownloadData?path=${this._fullNameString}`);
     };
 
     //#endregion
@@ -398,6 +432,9 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
         EditableFileTree._copyItem = [];
     };
 
+    /**
+     * 只有目录才需要
+     */
     private readonly _onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         if (this._dataTree.subItem) {
             e.preventDefault();
@@ -406,11 +443,14 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
         }
     };
 
+    /**
+     * 只有目录才需要
+     */
     private readonly _onDrop = (e: React.DragEvent<HTMLDivElement>) => {
         if (this._dataTree.subItem) {
             e.stopPropagation();
 
-            if (e.dataTransfer.files.length > 0) {
+            if (!this._root.props.noUpload && e.dataTransfer.files.length > 0) {
                 this.prepareUploadFile(e.dataTransfer.files[0]);
             } else {
                 EditableFileTree._action = e.ctrlKey ? 'copy' : 'cut';
@@ -430,10 +470,68 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
 
     //#endregion
 
-    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
+    //#region 公开的方法
+
+    /**
+     * 在选中的文件夹下创建文件
+     */
+    public createFile() {
+        const target = [...this._focusedItem.values()].pop() || this._root;
+        target._menu_createFile();
+    }
+
+    /**
+     * 在选中的文件夹下创建文件夹
+     */
+    public createDirectory() {
+        const target = [...this._focusedItem.values()].pop() || this._root;
+        target._menu_createDirectory();
+    }
+    
+    //#endregion
+
+    protected _onContextMenu(): (ContextMenuItemOptions | void | false)[][] {
+        return [
+            [   //复制、剪切、粘贴
+                this._root.props.noCopyCut || this._isRoot ? undefined : { name: '复制', callback: this._menu_copyCut.bind(undefined, 'copy') },
+                this._root.props.noCopyCut || this._isRoot ? undefined : { name: '剪切', callback: this._menu_copyCut.bind(undefined, 'cut') },
+                this._root.props.noPaste || this._dataTree.subItem === undefined ? undefined : { name: '粘贴', callback: this._menu_paste },
+            ],
+            [   //创建
+                this._root.props.noCreate || this._dataTree.subItem === undefined ? undefined : { name: '新建文件', callback: this._menu_createFile },
+                this._root.props.noCreate || this._dataTree.subItem === undefined ? undefined : { name: '新建文件夹', callback: this._menu_createDirectory },
+            ],
+            [   //删除
+                this._root.props.noDelete || this._isRoot ? undefined : { name: '删除', callback: this._menu_delete },
+            ],
+            [   //重命名
+                this._root.props.noRename || this._isRoot ? undefined : { name: '重命名', callback: this._menu_rename },
+            ],
+            [   //复制文件路径
+                { name: '复制绝对路径', callback: this._menu_copyPath },
+            ],
+            [   //上传文件
+                this._root.props.noUpload || this._dataTree.subItem === undefined ? undefined : { name: '上传文件', callback: this._menu_uploadFile }
+            ],
+            [   //压缩、解压
+                this._root.props.noZip || this._isRoot ? undefined : { name: '压缩成ZIP文件', callback: this._menu_zip },
+                this._root.props.noZip || !this._name.endsWith('.zip') ? undefined : { name: '解压ZIP文件', callback: this._menu_unzip },
+            ],
+            [   //下载
+                this._root.props.noDownload || this._dataTree.subItem !== undefined ? undefined : { name: '下载文件', callback: this._menu_download },
+                this._root.props.noDownload ? undefined : { name: '压缩成ZIP并下载', callback: this._menu_zip_download },
+            ],
+        ];
+    }
+
+    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>)
+        : React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
         return {
             ...parentProps,
-
+            onDragStart: this._root.props.noCopyCut || this._isRoot ? undefined : this._onDragStart,
+            onDragEnd: this._root.props.noCopyCut || this._isRoot ? undefined : this._onDragEnd,
+            onDragOver: this._root.props.noPaste || this._dataTree.subItem === undefined ? undefined : this._onDragOver,
+            onDrop: this._root.props.noPaste || this._dataTree.subItem === undefined ? undefined : this._onDrop,
         };
     }
 
