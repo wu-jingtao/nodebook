@@ -22,7 +22,7 @@ export abstract class FileBrowser<T extends FoldableContainerPropsType> extends 
     /**
      * 标题栏上面的按钮
      */
-    protected abstract _titleBarButtons: JSX.Element[];
+    protected abstract _titleBarButtons: JSX.Element;
 
     componentDidMount() {
         super.componentDidMount();

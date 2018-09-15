@@ -94,8 +94,11 @@ export const ServerApi = {
          * @param file
          * @param to
          */
-        async uploadFile(file: Blob, to: string, progress?: ObservableVariable<number>): Promise<void> {
-            expect(await Post('/file/api/uploadFile', { to }, file, progress), 'ok', '上传文件失败');
+        uploadFile(file: Blob, to: string, progress?: ObservableVariable<number>) {
+            const promise = Post('/file/api/uploadFile', { to }, file, progress);
+            const result: typeof promise = promise.then(e => expect(e, 'ok', '上传文件失败')) as any;
+            result.abort = promise.abort;
+            return result;
         },
         /**
          * 删除 '_userCodeDir' 下的文件或目录

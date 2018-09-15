@@ -23,7 +23,7 @@ export interface MessageBoxOptions {
     /**
      * 按钮
      */
-    buttons?: { ok?: () => void, cancel?: () => void };
+    buttons?: { ok?: { name?: string, callback: () => void }, cancel?: { name?: string, callback: () => void } };
 
     /**
      * 显示进度条，0 - 100 。当到达100后，如果 autoClose > 0 则自动关闭消息框

@@ -3,9 +3,11 @@ import { ObservableVariable } from "observable-variable";
 /**
  * 包装jquery的 Ajax 方法 
  */
-function Ajax(method: 'GET' | 'POST', url: string, data: any, setting: JQuery.AjaxSettings = {}): Promise<any> {
-    return new Promise((resolve, reject) => {
-        jQuery.ajax({
+function Ajax(method: 'GET' | 'POST', url: string, data: any, setting: JQuery.AjaxSettings = {}) {
+    let ajax: JQuery.jqXHR<any> = undefined as any;
+
+    const promise: { abort: () => void } & Promise<any> = new Promise((resolve, reject) => {
+        ajax = jQuery.ajax({
             url,
             type: method,
             data,
@@ -21,21 +23,24 @@ function Ajax(method: 'GET' | 'POST', url: string, data: any, setting: JQuery.Aj
             },
             ...setting
         });
-    });
+    }) as any;
+
+    promise.abort = ajax.abort;
+    return promise;
 }
 
-export async function Get(url: string, data?: { [key: string]: any }): Promise<any> {
-    return await Ajax('GET', url, data);
+export function Get(url: string, data?: { [key: string]: any }) {
+    return Ajax('GET', url, data);
 }
 
-export async function Post(url: string, data?: { [key: string]: any }, file?: Blob, progress?: ObservableVariable<number>): Promise<any> {
+export function Post(url: string, data?: { [key: string]: any }, file?: Blob, progress?: ObservableVariable<number>) {
     if (file) {
         const formData = new FormData();
         jQuery.each(data, (key: string, value) => formData.append(key, value));
         formData.append('file', file);
 
         if (progress) {
-            return await Ajax('POST', url, formData, {
+            return Ajax('POST', url, formData, {
                 processData: false,
                 contentType: false,
                 xhr: function () {
@@ -48,7 +53,7 @@ export async function Post(url: string, data?: { [key: string]: any }, file?: Bl
                 }
             });
         } else
-            return await Ajax('POST', url, formData, { processData: false, contentType: false });
+            return Ajax('POST', url, formData, { processData: false, contentType: false });
     } else
-        return await Ajax('POST', url, data);
+        return Ajax('POST', url, data);
 }

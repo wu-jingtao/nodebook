@@ -1,4 +1,10 @@
 export interface PopupWindowConfig {
+
+    /**
+     * 标题栏
+     */
+    title: string;
+
     /**
      * 要显示的内容
      */
@@ -7,10 +13,10 @@ export interface PopupWindowConfig {
     /**
      * 确认按钮，不设置则不显示
      */
-    ok?: () => void;
+    ok?: { name?: string, callback: () => void };
 
     /**
      * 取消按钮
      */
-    cancel?: () => void;
+    cancel?: { name?: string, callback: () => void };
 }

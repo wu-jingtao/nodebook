@@ -1,36 +1,75 @@
 @import "../../global/ThemeColor.less";
 
-#PopupWindow {
+:local(.popupWindowItemWrapper) {
     position: absolute;
-    z-index: 200;
+    z-index: 1000;
     left: 0;
+    right: 0;
     top: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+    bottom: 0;
+    background-color: transparent;
+    transition: background-color .3s ease;
+
+    &.moveIn {
+        background-color: rgba(0, 0, 0, 0.3);
+
+        :local(.PopupWindowItem) {
+            transform: translateY(0);
+        }
+    }
+
+    &.moveOut {
+        background-color: transparent;
+
+        :local(.PopupWindowItem) {
+            transform: translateY(-100%);
+        }
+    }
 }
 
 :local(.PopupWindowItem) {
-    flex-grow: 0;
-    flex-shrink: 0;
-    box-shadow: 0 2px 2px 1px @darkBackColor;
+    display: table;
+    min-width: 300px;
+    margin: 0 auto;
     border: 1px solid @borderColor;
-    padding: 15px;
     background-color: @backColor;
+    transform: translateY(-100%);
+    transition: transform .3s ease;
+}
+
+:local(.title) {
+    background-color: @darkBackColor;
+    font-size: .9em;
+    height: 35px;
+    line-height: 37px;
+    color: @darkFontColor;
+    text-align: center;
 }
 
 :local(.content) {
     overflow: hidden;
+    padding: 15px;
 }
 
 :local(.bottom) {
-    border-top: 1px solid @borderColor;
-    height: 40px;
     .clearFloat();
 }
 
 :local(.button) {
     height: 30px;
-    margin: 5px;
+    line-height: 10px;
+    font-size: .9em;
+    margin: 0 15px 10px -10px;
     float: right;
+    background-color: transparent;
+    border-radius: 3px;
+
+    &:hover {
+        background-color: transparent;
+        color: darken(@fontColor, 10%, relative);
+    }
+
+    &:active {
+        background-color: darken(@backColor, 30%, relative);
+    }
 }

@@ -35,18 +35,38 @@ export class ContextMenu extends ObservableComponent {
 
     render() {
         if (data.value) {
-            return (
-                <div id="ContextMenu" style={{ top: `${data.value.position.y}px`, left: `${data.value.position.x}px` }}>
-                    {data.value.items.map((group, index) => (
-                        <div className={less.menuGroup} key={index}>
-                            {group.map((item, index) => (
+            //计算高度
+            let height = 0;
+
+            //显示内容
+            const content = data.value.items.map((group, index) => {
+                height += 3 + 3 + 1;    //上下padding + 边框
+
+                return (
+                    <div className={less.menuGroup} key={index}>
+                        {group.map((item, index) => {
+                            height += 25;   //高度25
+
+                            return (
                                 <div className={less.menuItem} key={index} onClick={item.callback}>
                                     <span>{item.name}</span>
-                                    <span className={less.itemTip}>{item.tip}</span>
+                                    {item.tip && <span className={less.itemTip}>{item.tip}</span>}
                                 </div>
-                            ))}
-                        </div>
-                    ))}
+                            );
+                        })}
+                    </div>
+                )
+            });
+
+            let position;   //计算是显示在鼠标的下方还是上方
+            if (data.value.position.y + height < window.innerHeight)
+                position = { top: `${data.value.position.y + 2}px`, left: `${data.value.position.x + 2}px` };
+            else
+                position = { top: `${data.value.position.y - height - 2}px`, left: `${data.value.position.x + 2}px` };
+
+            return (
+                <div id="ContextMenu" style={position}>
+                    {content}
                 </div>
             );
         } else

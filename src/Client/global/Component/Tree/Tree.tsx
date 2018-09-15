@@ -3,7 +3,7 @@ import * as classnames from 'classnames';
 import { ObservableSet, ObservableVariable, oSet, oVar, oMap } from 'observable-variable';
 
 import { ObservableComponent, ObservableComponentWrapper } from '../../Tools/ObservableComponent';
-import { ContextMenuItemOptions, ContextMenuOptions } from '../../../module/ContextMenu/ContextMenuOptions';
+import { ContextMenuItemOptions } from '../../../module/ContextMenu/ContextMenuOptions';
 import { showContextMenu } from '../../../module/ContextMenu/ContextMenu';
 import { TreePropsType, DataTree } from './TreePropsType';
 
@@ -74,6 +74,8 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
     protected readonly _loading = oSet<any>([]);
 
     UNSAFE_componentWillMount() {
+        this.watch(this._focusedItem, this._hoveredItem);
+
         this._treeList.set(this._fullNameString, this);
 
         //打开上次打开过的分支
@@ -120,20 +122,35 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
                     }
                 }
             }
-        } else if (e.button === 2) { //鼠标右键 右键菜单
+        }
+    }
+
+    /**
+     * 右键菜单
+     */
+    private readonly _original_onContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (e.button === 2) { //鼠标右键 右键菜单
             let menuNumber = 0;
 
             //过滤void和false
-            const items: any = this._onContextMenu().map(item => {
+            const items: ContextMenuItemOptions[][] = [];
+
+            this._onContextMenu().forEach(item => {
                 const result = item.filter(item => item);
-                menuNumber += result.length;
-                return result;
+
+                if (result.length > 0) {
+                    menuNumber += result.length;
+                    items.push(result as any);
+                }
             });
 
             if (menuNumber > 0)
                 showContextMenu({ position: { x: e.clientX, y: e.clientY }, items });
         }
-    }
+    };
 
     /**
      * 当前元素获得焦点
@@ -182,10 +199,10 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
             const items = data.filter(item => item.subItem === undefined).sort((a, b) => a.name.localeCompare(b.name));
 
             branch.forEach(item => subItem.push(React.createElement(this.constructor as any,
-                { _root: this._root, _parent: this._parent, _dataTree: item, name: item.name, key: item.name })));
+                { _root: this._root, _parent: this, _dataTree: item, name: item.name, key: item.name })));
 
             items.forEach(item => subItem.push(React.createElement(this.constructor as any,
-                { _root: this._root, _parent: this._parent, _dataTree: item, name: item.name, key: item.name })));
+                { _root: this._root, _parent: this, _dataTree: item, name: item.name, key: item.name })));
 
             return subItem;
         } else
@@ -292,6 +309,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
                 [less.treeHover]: this._hoveredItem.value === this
             }),
             onClick: this._onClick,
+            onContextMenu: this._original_onContextMenu,
             onMouseOver: this._onMouseOver,
             onMouseLeave: this._isRoot ? this._onMouseLeave : undefined
         });

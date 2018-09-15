@@ -4,7 +4,7 @@ import { ObservableVariable } from 'observable-variable';
 import { ObservableComponent } from "../../../../Tools/ObservableComponent";
 import { FileIcon } from '../../../FileIcon/FileIcon';
 
-const less = require('./InputFileName.less');
+const less = require('./UploadFile.less');
 
 /**
  * 上传文件

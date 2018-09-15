@@ -2,13 +2,13 @@
 
 #ContextMenu {
     position: absolute;
-    z-index: 1000;
+    z-index: 900;
     background-color: @backColor;
     border: 1px solid @borderColor;
 }
 
 :local(.menuGroup) {
-    padding: 5px 0;
+    padding: 3px 0;
     border-bottom: 1px solid lighten(@lightBackColor, 30%, relative);
 
     &:last-child {
@@ -22,8 +22,9 @@
     justify-content: space-between;
     padding: 0 20px;
     height: 25px;
-    line-height: 25px;
+    line-height: 28px;
     color: @fontColor;
+    font-size: .9em;
 
     &:hover {
         background-color: @lightBackColor;
@@ -33,5 +34,5 @@
 :local(.itemTip) {
     color: @darkFontColor;
     text-align: right;
-    padding-left: 10px;
+    padding-left: 50px;
 }

@@ -61,7 +61,7 @@ export abstract class BaseFileTree<P extends { memorable?: string }> extends Fil
     /**
      * 刷新所有打开的文件夹
      */
-    public async refreshFolder() {
+    public async refreshAllFolder() {
         //从根开始刷新
         const items = [...this._openedBranch.values()].sort((a, b) => a.length - b.length);
 

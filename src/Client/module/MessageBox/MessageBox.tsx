@@ -34,36 +34,34 @@ export function closeMessageBox(id: string): void {
  */
 export class MessageBox extends ObservableComponent {
 
-    private _messageBox: JQuery | null;
+    private _messageBox: JQuery<HTMLDivElement>;
 
     componentDidMount() {
-        _messageList.on('add', (item, key) => {
-            if (this._messageBox) {
-                const node = $(`<div class="${less.messageItemAnimation}" data-tag="${key}"></div>`);
-                this._messageBox.prepend(node);
-                ReactDom.render(<MessageItem arg={item} onClose={() => _messageList.delete(key)} />, node[0]);
-                setTimeout(() => node.addClass('moveIn'), 5);
-            }
+        _messageList.on('add', (config, id) => {
+            const node = $(`<div class="${less.messageItemAnimation}" data-tag="${id}"></div>`);
+            this._messageBox.prepend(node);
+            ReactDom.render(<MessageItem config={config} messageId={id} />, node[0]);
+            setTimeout(() => node.addClass('moveIn'), 5);
         });
 
-        _messageList.on('remove', (item, key) => {
-            if (this._messageBox) {
-                const node = this._messageBox.children(`[data-tag="${key}"]`);
-                node.one('transitionend', () => {
-                    ReactDom.unmountComponentAtNode(node[0]);
-                    node.remove();
-                });
-                node.addClass('moveOut');
-            }
+        _messageList.on('remove', (config, id) => {
+            const node = this._messageBox.children(`[data-tag="${id}"]`);
+            node.one('transitionend', () => {
+                ReactDom.unmountComponentAtNode(node[0]);
+                node.remove();
+            });
+            node.addClass('moveOut');
         });
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
         _messageList.clear();
+        _messageList.off('add');
+        _messageList.off('remove');
     }
 
     render() {
-        return <div id="MessageBox" ref={e => this._messageBox = e && $(e)} />;
+        return <div id="MessageBox" ref={(e: any) => this._messageBox = e && $(e)} />;
     }
 }

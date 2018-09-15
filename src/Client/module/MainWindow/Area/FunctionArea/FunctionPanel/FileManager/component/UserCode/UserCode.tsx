@@ -11,15 +11,6 @@ import { UserCodePropsType, UserCodeTreePropsType } from './UserCodePropsType';
  */
 export class UserCode extends FileBrowser<UserCodePropsType> {
 
-    protected _tree: EditableFileTree<any>;
-
-    protected _titleBarButtons: JSX.Element[] = [
-        <i title="新建文件" className="iconfont icon-file-add-fill" onClick={this._createFile} />,
-        <i title="新建文件夹" className="iconfont icon-file2" onClick={this._createDirectory} />,
-        <i title="刷新" className="iconfont icon-fresh" onClick={this._refreshDirectory} />,
-        <i title="全部折叠" className="iconfont icon-iconcloseall" onClick={this._closeDirectory} />,
-    ];
-
     private readonly _createFile = (e: React.MouseEvent) => {
         e.stopPropagation();
         this._tree.createFile();
@@ -32,13 +23,22 @@ export class UserCode extends FileBrowser<UserCodePropsType> {
 
     private readonly _refreshDirectory = (e: React.MouseEvent) => {
         e.stopPropagation();
-        this._tree.refreshFolder();
+        this._tree.refreshAllFolder();
     };
 
     private readonly _closeDirectory = (e: React.MouseEvent) => {
         e.stopPropagation();
         this._tree.closeAllBranch();
     };
+
+    protected _tree: EditableFileTree<any>;
+
+    protected _titleBarButtons: JSX.Element = <>
+        <i title="新建文件" className="iconfont icon-file-add-fill" onClick={this._createFile} />
+        <i title="新建文件夹" className="iconfont icon-file2" onClick={this._createDirectory} />
+        <i title="刷新" className="iconfont icon-fresh" onClick={this._refreshDirectory} />
+        <i title="全部折叠" className="iconfont icon-iconcloseall" onClick={this._closeDirectory} />
+    </>;
 
     protected renderContent(): JSX.Element {
         return <UserCodeTree
@@ -52,6 +52,8 @@ export class UserCode extends FileBrowser<UserCodePropsType> {
 
 class UserCodeTree extends EditableFileTree<UserCodeTreePropsType> {
 
+    private readonly _watch_modified: Function;
+
     protected async _onDelete(): Promise<void> {
         await ServerApi.file.deleteCodeData(this._fullNameString);
     }
@@ -64,15 +66,18 @@ class UserCodeTree extends EditableFileTree<UserCodeTreePropsType> {
         });
     }
 
-    private readonly _watch_modified: Function;
-
     constructor(props: any, context: any) {
         super(props, context);
-        this._watch_modified = watch([this._modified], () => this.props.fileManagerNumber.value = this._modified.length);
+
+        if (this._isRoot) {
+            this.props.fileManagerNumber.value = this._modified.length
+            this._watch_modified = watch([this._modified], () => this.props.fileManagerNumber.value = this._modified.length);
+        }
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        this._watch_modified();
+
+        if (this._isRoot) this._watch_modified();
     }
 }
