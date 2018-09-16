@@ -21,9 +21,9 @@ export class UploadFile extends ObservableComponent<{ file: ObservableVariable<F
             <div className={less.UploadFile}>
                 <FileIcon className={less.icon} filename={filename} />
                 <div className={less.filename}>{filename}</div>
-                <label >
+                <label className={less.selectFile}>
                     <input type="file" style={{ display: 'none' }} onChange={(e: any) => this.props.file.value = e.target.files[0]} />
-                    <button className={less.selectFile}>选择文件</button>
+                    <span>选择文件</span>
                 </label>
             </div>
         );

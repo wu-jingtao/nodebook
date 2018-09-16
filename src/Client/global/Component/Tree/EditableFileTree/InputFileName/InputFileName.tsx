@@ -20,12 +20,12 @@ export class InputFileName extends ObservableComponent<{ name: ObservableVariabl
     render() {
         let errorTip;
 
-        if (!/^[^<>/\\\|:""\*\?]+$/.test(this.props.name.value))
-            errorTip = '文件命中不能包含特殊字符';
+        if (/[<>/\\\|:""\*\?]+/.test(this.props.name.value))
+            errorTip = '文件名中不能包含特殊字符';
         else if (this.props.name.value === '.')
-            errorTip = "文件名不能为'.'";
+            errorTip = "文件名不能为 '.'";
         else if (this.props.name.value === '..')
-            errorTip = "文件名不能为'..'";
+            errorTip = "文件名不能为 '..'";
         else if (!this.props.isRename && this.props.subItems.has(this.props.name.value))
             errorTip = '文件名重复';
 

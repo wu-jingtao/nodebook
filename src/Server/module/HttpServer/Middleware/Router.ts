@@ -151,7 +151,10 @@ function Logo(router_login: koa_router, router_no_login: koa_router) {
      */
     router_login.post(_prefix + '/change', async (ctx) => {
         if (['brand.png', 'icon.png', 'favicon.ico'].includes(ctx.request.body.filename)) {
-            await fs.move(ctx.request.body.files[0].path, node_path.join(FilePath._logoDir, ctx.request.body.filename));
+            if (_.get(ctx.request, 'files.length') !== 1)
+                throw new Error('上传的文件数目不符合要求，每次必须且只能是一个文件');
+
+            await fs.move((ctx.request as any).files[0].path, node_path.join(FilePath._logoDir, ctx.request.body.filename));
             ctx.body = 'ok';
         } else {
             throw new Error(`上传程序Logo文件名错误。[${ctx.request.body.filename}]`);
@@ -272,10 +275,10 @@ function File(router: koa_router, httpServer: HttpServer) {
      * @param to 
      */
     router.post(_prefix_api + '/uploadFile', async (ctx) => {
-        if (_.get(ctx.request.body, 'files.length') !== 1)
+        if (_.get(ctx.request, 'files.length') !== 1)
             throw new Error('上传的文件数目不符合要求，每次必须且只能是一个文件');
 
-        await _fileManager.moveFromOutside(ctx.request.body.files[0].path, ctx.request.body.to);
+        await _fileManager.moveFromOutside((ctx.request as any).files[0].path, ctx.request.body.to);
         ctx.body = 'ok';
     });
 

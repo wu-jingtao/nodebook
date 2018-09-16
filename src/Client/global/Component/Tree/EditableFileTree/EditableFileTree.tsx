@@ -12,6 +12,7 @@ import { BaseFileTree } from "../BaseFileTree/BaseFileTree";
 import { EditableFileTreePropsType } from './EditableFileTreePropsType';
 import { InputFileName } from './InputFileName/InputFileName';
 import { UploadFile } from './UploadFile/UploadFile';
+import { DeleteFiles } from './DeleteFiles/DeleteFiles';
 
 /**
  * 可编辑文件数
@@ -114,6 +115,9 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
             const items = EditableFileTree._copyItem;
             const action = EditableFileTree._action;
 
+            EditableFileTree._copyItem = [];
+            EditableFileTree._action = undefined;
+
             //确保没有正在操作中的项目
             let checked = [this, ...items].every(item => this.checkIsBusy(item, true));
 
@@ -135,9 +139,6 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
             });
 
             if (checked) {
-                EditableFileTree._copyItem = [];
-                EditableFileTree._action = undefined;
-
                 const tasks: { from: string, to: string }[] = [];
 
                 for (const item of items) {
@@ -207,14 +208,16 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                 content: <InputFileName name={name} subItems={this._dataTree.subItem} isDirectory />,
                 ok: {
                     callback: async () => {
-                        try {
-                            EditableFileTree._processingItems.add(this._fullNameString);
-                            await ServerApi.file.createDirectory(`${this._fullNameString}/${name.value}`);
-                        } catch (error) {
-                            showMessageBox({ icon: 'error', title: '创建文件夹失败', content: error.message });
-                        } finally {
-                            EditableFileTree._processingItems.delete(this._fullNameString);
-                            this._menu_refresh();
+                        if (name.value) {
+                            try {
+                                EditableFileTree._processingItems.add(this._fullNameString);
+                                await ServerApi.file.createDirectory(`${this._fullNameString}/${name.value}`);
+                            } catch (error) {
+                                showMessageBox({ icon: 'error', title: '创建文件夹失败', content: error.message });
+                            } finally {
+                                EditableFileTree._processingItems.delete(this._fullNameString);
+                                this._menu_refresh();
+                            }
                         }
                     }
                 }
@@ -234,15 +237,17 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                 content: <InputFileName name={name} subItems={this._dataTree.subItem} />,
                 ok: {
                     callback: async () => {
-                        try {
-                            EditableFileTree._processingItems.add(this._fullNameString);
-                            const data = new Blob([codeTemplate(name.value)], { type: 'text/plain' });
-                            await ServerApi.file.uploadFile(data, `${this._fullNameString}/${name.value}`);
-                        } catch (error) {
-                            showMessageBox({ icon: 'error', title: '创建文件失败', content: error.message });
-                        } finally {
-                            EditableFileTree._processingItems.delete(this._fullNameString);
-                            this._menu_refresh();
+                        if (name.value) {
+                            try {
+                                EditableFileTree._processingItems.add(this._fullNameString);
+                                const data = new Blob([codeTemplate(name.value)], { type: 'text/plain' });
+                                await ServerApi.file.uploadFile(data, `${this._fullNameString}/${name.value}`);
+                            } catch (error) {
+                                showMessageBox({ icon: 'error', title: '创建文件失败', content: error.message });
+                            } finally {
+                                EditableFileTree._processingItems.delete(this._fullNameString);
+                                this._menu_refresh();
+                            }
                         }
                     }
                 }
@@ -262,13 +267,12 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
         const items = [...this._focusedItem.values()];
         if (items.every(item => !item._isRoot && this.checkIsBusy(item, true))) {
             showPopupWindow({
-                title: `删除文件`,
-                content: (
-                    <dl>
-                        <dt>确认要删除吗?</dt>
-                        {items.map(item => <dd key={item._fullNameString}>{item._fullNameString}</dd>)}
-                    </dl>
-                ),
+                title: `确认要删除的文件`,
+                content: <DeleteFiles items={items.map(item => ({
+                    name: item._name,
+                    fullName: item._fullNameString,
+                    isDirectory: item._dataTree.subItem !== undefined
+                }))} />,
                 ok: {
                     callback: async () => {
                         try {
@@ -366,7 +370,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                 showMessageBox({
                     icon: 'error',
                     title: '上传文件失败',
-                    content: `文件：${filename}。\n${error.message}`
+                    content: `文件：${filename}。${error.message}`
                 });
             } finally {
                 this._menu_refresh();
@@ -488,6 +492,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
 
     private readonly _onDragStart = (e: React.DragEvent<HTMLDivElement>) => {
         e.stopPropagation();
+
         e.dataTransfer.effectAllowed = 'copyMove';
 
         if (!this._focusedItem.has(this)) {
@@ -496,15 +501,18 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
         }
 
         const items = [...this._focusedItem.values()];
-        if (items.every(item => this.checkIsBusy(item, true))) {
+        if (items.every(item => !item._isRoot && this.checkIsBusy(item, true)))
             EditableFileTree._copyItem = items;
-        }
+        else
+            EditableFileTree._copyItem = [];
 
         e.dataTransfer.setDragImage(document.createElement('img'), 0, 0);
     };
 
     private readonly _onDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
         e.stopPropagation();
+        e.preventDefault();
+
         EditableFileTree._copyItem = [];
     };
 
@@ -513,8 +521,9 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      */
     private readonly _onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         if (this._dataTree.subItem) {
-            e.preventDefault();
             e.stopPropagation();
+            e.preventDefault();
+
             this._hoveredItem.value = this;
         }
     };
@@ -525,6 +534,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     private readonly _onDrop = (e: React.DragEvent<HTMLDivElement>) => {
         if (this._dataTree.subItem) {
             e.stopPropagation();
+            e.preventDefault();
 
             if (!this._root.props.noUpload && e.dataTransfer.files.length > 0) {
                 this.prepareUploadFile(e.dataTransfer.files[0]);
@@ -549,18 +559,20 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     //#region 公开的方法
 
     /**
-     * 在选中的文件夹下创建文件
+     * 在焦点目录下创建文件
      */
     public createFile() {
-        const target = [...this._focusedItem.values()].pop() || this._root;
+        let target = [...this._focusedItem.values()].pop() || this._root;
+        target = target._dataTree.subItem ? target : target._parent as any;
         target._menu_createFile();
     }
 
     /**
-     * 在选中的文件夹下创建文件夹
+     * 在焦点目录下创建文件夹
      */
     public createDirectory() {
-        const target = [...this._focusedItem.values()].pop() || this._root;
+        let target = [...this._focusedItem.values()].pop() || this._root;
+        target = target._dataTree.subItem ? target : target._parent as any;
         target._menu_createDirectory();
     }
 
@@ -574,7 +586,11 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
             [   //复制、剪切、粘贴
                 this._root.props.noCopyCut || this._isRoot ? undefined : { name: '复制', callback: this._menu_copyCut.bind(undefined, 'copy') },
                 this._root.props.noCopyCut || this._isRoot ? undefined : { name: '剪切', callback: this._menu_copyCut.bind(undefined, 'cut') },
-                this._root.props.noPaste || this._dataTree.subItem === undefined ? undefined : { name: '粘贴', callback: this._menu_paste },
+                this._root.props.noPaste || this._dataTree.subItem === undefined || EditableFileTree._copyItem.length === 0
+                    ? undefined : { name: '粘贴', callback: this._menu_paste },
+            ],
+            [   //复制文件路径
+                { name: '复制绝对路径', callback: this._menu_copyPath },
             ],
             [   //创建
                 this._root.props.noCreate || this._dataTree.subItem === undefined ? undefined : { name: '新建文件', callback: this._menu_createFile },
@@ -586,19 +602,16 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
             [   //重命名
                 this._root.props.noRename || this._isRoot ? undefined : { name: '重命名', callback: this._menu_rename },
             ],
-            [   //复制文件路径
-                { name: '复制绝对路径', callback: this._menu_copyPath },
-            ],
             [   //上传文件
                 this._root.props.noUpload || this._dataTree.subItem === undefined ? undefined : { name: '上传文件', callback: this._menu_uploadFile }
-            ],
-            [   //压缩、解压
-                this._root.props.noZip || this._isRoot ? undefined : { name: '压缩成ZIP文件', callback: this._menu_zip },
-                this._root.props.noZip || !this._name.endsWith('.zip') ? undefined : { name: '解压ZIP文件', callback: this._menu_unzip },
             ],
             [   //下载
                 this._root.props.noDownload || this._dataTree.subItem !== undefined ? undefined : { name: '下载文件', callback: this._menu_download },
                 this._root.props.noDownload ? undefined : { name: '压缩下载', callback: this._menu_zip_download },
+            ],
+            [   //压缩、解压
+                this._root.props.noZip || this._isRoot ? undefined : { name: '压缩成ZIP文件', callback: this._menu_zip },
+                this._root.props.noZip || !this._name.endsWith('.zip') ? undefined : { name: '解压ZIP文件', callback: this._menu_unzip },
             ],
         ];
     }
@@ -607,6 +620,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
         : React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
         return {
             ...parentProps,
+            draggable: this._root.props.noCopyCut || this._isRoot ? false : true,
             onDragStart: this._root.props.noCopyCut || this._isRoot ? undefined : this._onDragStart,
             onDragEnd: this._root.props.noCopyCut || this._isRoot ? undefined : this._onDragEnd,
             onDragOver: this._root.props.noPaste || this._dataTree.subItem === undefined ? undefined : this._onDragOver,

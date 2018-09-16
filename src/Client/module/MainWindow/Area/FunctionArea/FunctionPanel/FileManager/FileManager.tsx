@@ -21,7 +21,7 @@ export class FileManager extends ObservableComponent<FileManagerPropsType> {
                 <div className={less.header}>资源管理器</div>
                 <UserCode
                     title="用户代码"
-                    uniqueID="ui.FileManager.usercode"
+                    uniqueID="_userCode"
                     fileManagerNumber={this.props.fileManagerNumber}
                     contentWindows={this.props.contentWindows} />
             </div>
