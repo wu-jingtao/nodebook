@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as downloadjs from 'downloadjs';
 import { oSet, oVar, ObservableMap } from 'observable-variable';
 import clipboard = require('copy-text-to-clipboard');
 
@@ -294,7 +293,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      * 重命名。根不允许重命名
      */
     protected readonly _menu_rename = () => {
-        if (!this._root && this.checkIsBusy(this, true)) {
+        if (!this._isRoot && this.checkIsBusy(this, true)) {
             const name = oVar(this._name);
 
             showPopupWindow({
@@ -303,14 +302,16 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                     isDirectory={this._dataTree.subItem !== undefined} isRename />,
                 ok: {
                     callback: async () => {
-                        try {
-                            EditableFileTree._processingItems.add(this._fullNameString);
-                            await ServerApi.file.move(this._fullNameString, `${(this._parent as any)._fullNameString}/${name.value}`);
-                        } catch (error) {
-                            showMessageBox({ icon: 'error', title: '重命名失败', content: error.message });
-                        } finally {
-                            EditableFileTree._processingItems.delete(this._fullNameString);
-                            (this._parent as any)._menu_refresh();
+                        if (name.value) {
+                            try {
+                                EditableFileTree._processingItems.add(this._fullNameString);
+                                await ServerApi.file.move(this._fullNameString, `${(this._parent as any)._fullNameString}/${name.value}`);
+                            } catch (error) {
+                                showMessageBox({ icon: 'error', title: '重命名失败', content: error.message });
+                            } finally {
+                                EditableFileTree._processingItems.delete(this._fullNameString);
+                                (this._parent as any)._menu_refresh();
+                            }
                         }
                     }
                 }
@@ -394,14 +395,19 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                 content: <InputFileName name={name} subItems={(this._parent as any)._dataTree.subItem} />,
                 ok: {
                     callback: async () => {
-                        try {
-                            EditableFileTree._processingItems.add(this._fullNameString);
-                            await ServerApi.file.zipData(this._fullNameString, `${(this._parent as any)._fullNameString}/${name.value}`);
-                        } catch (error) {
-                            showMessageBox({ icon: 'error', title: '压缩文件失败', content: error.message });
-                        } finally {
-                            EditableFileTree._processingItems.delete(this._fullNameString);
-                            (this._parent as any)._menu_refresh();
+                        if (name.value) {
+                            if (name.value.endsWith('.zip')) {
+                                try {
+                                    EditableFileTree._processingItems.add(this._fullNameString);
+                                    await ServerApi.file.zipData(this._fullNameString, `${(this._parent as any)._fullNameString}/${name.value}`);
+                                } catch (error) {
+                                    showMessageBox({ icon: 'error', title: '压缩文件失败', content: error.message });
+                                } finally {
+                                    EditableFileTree._processingItems.delete(this._fullNameString);
+                                    (this._parent as any)._menu_refresh();
+                                }
+                            } else
+                                showMessageBox({ icon: 'error', title: "压缩文件名必须以'.zip'结尾" });
                         }
                     }
                 }
@@ -459,7 +465,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      */
     protected readonly _menu_download = () => {
         if (this._dataTree.subItem === undefined && this.checkIsBusy())
-            downloadjs(`/file/api/readFile?path=${this._fullNameString}`);
+            window.open(`/file/api/readFile?path=${this._fullNameString}`);
     };
 
     /**
@@ -467,7 +473,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      */
     protected readonly _menu_zip_download = () => {
         if (this.checkIsBusy(this, true))
-            downloadjs(`/file/api/zipDownloadData?path=${this._fullNameString}`);
+            window.open(`/file/api/zipDownloadData?path=${this._fullNameString}`);
     };
 
     //#endregion

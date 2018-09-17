@@ -114,8 +114,8 @@ export class FileManager extends BaseServiceModule {
         const pathDetail = node_path.parse(path);
 
         const deletedPath = node_path.format({
-            dir: pathDetail.dir,
-            name: pathDetail.name + moment().format('_YYYY-MM-DD_HH∶mm∶ss'),
+            dir: FilePath._recycleDir,
+            name: pathDetail.name + moment().format('_YYYY-MM-DD_HH-mm-ss'),
             ext: pathDetail.ext
         });
 

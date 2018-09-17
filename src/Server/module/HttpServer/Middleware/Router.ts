@@ -1,6 +1,5 @@
 import * as node_path from 'path';
 import * as fs from 'fs-extra';
-import * as _ from 'lodash';
 import * as koa from 'koa';
 import * as koa_compose from 'koa-compose';
 import * as koa_router from 'koa-router';
@@ -151,11 +150,11 @@ function Logo(router_login: koa_router, router_no_login: koa_router) {
      */
     router_login.post(_prefix + '/change', async (ctx) => {
         if (['brand.png', 'icon.png', 'favicon.ico'].includes(ctx.request.body.filename)) {
-            if (_.get(ctx.request, 'files.length') !== 1)
-                throw new Error('上传的文件数目不符合要求，每次必须且只能是一个文件');
-
-            await fs.move((ctx.request as any).files[0].path, node_path.join(FilePath._logoDir, ctx.request.body.filename));
-            ctx.body = 'ok';
+            if (ctx.request.files && ctx.request.files.file) {
+                await fs.move(ctx.request.files.file.path, node_path.join(FilePath._logoDir, ctx.request.body.filename));
+                ctx.body = 'ok';
+            } else
+                throw new Error('没有接收到要上传的文件');
         } else {
             throw new Error(`上传程序Logo文件名错误。[${ctx.request.body.filename}]`);
         }
@@ -219,6 +218,8 @@ function File(router: koa_router, httpServer: HttpServer) {
      */
     router.get(_prefix_api + '/readFile', async (ctx) => {
         ctx.body = await _fileManager.readFile(ctx.request.query.path);
+        //确保浏览器会弹出下载框
+        ctx.set('Content-Disposition', `attachment;filename=${node_path.basename(ctx.body.path)}`);
     });
 
     /**
@@ -228,6 +229,7 @@ function File(router: koa_router, httpServer: HttpServer) {
     router.get(_prefix_api + '/zipDownloadData', async (ctx: any) => {
         ctx.compress = false;   //确保不会被 koa-compress 压缩
         ctx.body = await _fileManager.zipDownloadData(ctx.request.query.path);
+        ctx.set('Content-Disposition', `attachment;filename=${node_path.basename(ctx.request.query.path)}.zip`);
     });
 
     //#endregion
@@ -275,11 +277,11 @@ function File(router: koa_router, httpServer: HttpServer) {
      * @param to 
      */
     router.post(_prefix_api + '/uploadFile', async (ctx) => {
-        if (_.get(ctx.request, 'files.length') !== 1)
-            throw new Error('上传的文件数目不符合要求，每次必须且只能是一个文件');
-
-        await _fileManager.moveFromOutside((ctx.request as any).files[0].path, ctx.request.body.to);
-        ctx.body = 'ok';
+        if (ctx.request.files && ctx.request.files.file) {
+            await _fileManager.moveFromOutside(ctx.request.files.file.path, ctx.request.body.to);
+            ctx.body = 'ok';
+        } else
+            throw new Error('没有接收到要上传的文件');
     });
 
     /**

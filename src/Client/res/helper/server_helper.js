@@ -38,7 +38,7 @@ process.on('message', msg => {
             const callback = callbackList.get(msg.id);
             if (callback) {
                 callbackList.delete(msg.id);
-                callback(JSON.parse(responseData));
+                callback(JSON.parse(msg.responseData));
             }
         }
     } catch (error) {

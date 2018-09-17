@@ -30,6 +30,7 @@ export class LoginPage extends ObservableComponent<{ logged: ObservableVariable<
             this._logging.value = true;
             await ServerApi.user.login(this._userName.value, this._password.value);
             await loadSystemSetting();
+            this._password.value = '';
             this.props.logged.value = true;
         } catch (error) {
             this.props.logged.value = false;

@@ -147,7 +147,7 @@ export class BackupData extends BaseServiceModule {
      */
     createBackupFile(): Promise<string> {
         return new Promise((resolve, reject) => {
-            const filename = moment().format('YYYY-MM-DD_HH∶mm∶ss') + '.zip';
+            const filename = moment().format('YYYY-MM-DD_HH-mm-ss') + '.zip';
             const path = node_path.join(FilePath._userDataBackupDir, filename);
             const output = fs.createWriteStream(path);
             const archive = archiver('zip', { zlib: { level: 9 } });

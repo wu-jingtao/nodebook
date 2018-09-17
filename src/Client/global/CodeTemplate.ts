@@ -12,12 +12,18 @@ export function codeTemplate(filename: string) {
         return clientJs(filename);
     else if (filename.endsWith('server.js'))
         return ServerJs(filename);
+    else if (filename.endsWith('sh'))
+        return bash(filename);
     else
         return default_file(filename);
 }
 
 function default_file(filename: string) {
     return `/* ${moment().format('YYYY-MM-DD HH:mm:ss')} */`;
+}
+
+function bash(filename: string) {
+    return `# ${moment().format('YYYY-MM-DD HH:mm:ss')}`;
 }
 
 function html(filename: string) {
@@ -63,5 +69,10 @@ const nodebook = require('/app/bin/Client/res/helper/server_helper.js');
 nodebook.invokeTask('/user_data/code/test.js', 'exportedFunctionName', {data: 123})
     .then((jsonData) => {})
     .catch((err) => {})
+
+/* 暴露出一个方法供外界调用 */
+nodebook.export('functionName', async (data) => { 
+    
+});
 `;
 }
