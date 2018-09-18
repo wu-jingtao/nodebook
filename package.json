@@ -54,7 +54,7 @@
         "@types/react": "^16.4.11",
         "@types/react-dom": "^16.0.7",
         "@types/request-promise-native": "^1.0.15",
-        "@types/unzip": "^0.1.1",
+        "@types/unzipper": "^0.9.0",
         "blueimp-md5": "^2.10.0",
         "classnames": "^2.2.6",
         "copy-text-to-clipboard": "^1.0.4",
@@ -109,6 +109,6 @@
         "request-promise-native": "^1.0.5",
         "service-starter": "^1.1.0",
         "simple-sqlite-promise": "^0.1.5",
-        "unzip": "^0.1.11"
+        "unzipper": "^0.9.3"
     }
 }

@@ -17,12 +17,13 @@ interface Args {
     maxLength?: number;
     className?: any;
     disabled?: boolean;
+    autoFocus?: boolean;
 }
 
 /**
  * 文本输入框
  */
-export const TextInput: React.StatelessComponent<Args> = ({ value, type, placeholder, required, maxLength, className, disabled }) => {
+export const TextInput: React.StatelessComponent<Args> = ({ value, type, placeholder, required, maxLength, className, disabled, autoFocus }) => {
     return (
         <input type={type}
             maxLength={maxLength}
@@ -32,6 +33,7 @@ export const TextInput: React.StatelessComponent<Args> = ({ value, type, placeho
             placeholder={placeholder}
             required={required}
             disabled={disabled}
+            autoFocus={autoFocus}
         />
     );
 };

@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as node_path from 'path';
 import * as moment from 'moment';
 import * as archiver from 'archiver';
-import * as unzip from 'unzip';
+import * as unzipper from 'unzipper';
 import { BaseServiceModule } from "service-starter";
 
 import * as FilePath from '../../FilePath';
@@ -207,7 +207,7 @@ export class FileManager extends BaseServiceModule {
                 FileManager._pathStartWith(to, [FilePath._userCodeDir, FilePath._programDataDir]);
                 await FileManager._isFile(path);
 
-                fs.createReadStream(path).pipe(unzip.Extract({ path: to })).on('error', reject).on('close', resolve);
+                fs.createReadStream(path).pipe(unzipper.Extract({ path: to })).on('error', reject).on('close', resolve);
             } catch (error) { reject(error); }
         });
     }

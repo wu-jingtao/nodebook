@@ -201,13 +201,14 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     protected readonly _menu_createDirectory = () => {
         if (this._dataTree.subItem && this.checkIsBusy()) {
             const name = oVar('');
+            const errorTip = oVar('');
 
             showPopupWindow({
                 title: '新建文件夹',
-                content: <InputFileName name={name} subItems={this._dataTree.subItem} isDirectory />,
+                content: <InputFileName name={name} errorTip={errorTip} subItems={this._dataTree.subItem} isDirectory />,
                 ok: {
                     callback: async () => {
-                        if (name.value) {
+                        if (!errorTip.value) {
                             try {
                                 EditableFileTree._processingItems.add(this._fullNameString);
                                 await ServerApi.file.createDirectory(`${this._fullNameString}/${name.value}`);
@@ -230,13 +231,14 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     protected readonly _menu_createFile = () => {
         if (this._dataTree.subItem && this.checkIsBusy()) {
             const name = oVar('');
+            const errorTip = oVar('');
 
             showPopupWindow({
                 title: '新建文件',
-                content: <InputFileName name={name} subItems={this._dataTree.subItem} />,
+                content: <InputFileName name={name} errorTip={errorTip} subItems={this._dataTree.subItem} />,
                 ok: {
                     callback: async () => {
-                        if (name.value) {
+                        if (!errorTip.value) {
                             try {
                                 EditableFileTree._processingItems.add(this._fullNameString);
                                 const data = new Blob([codeTemplate(name.value)], { type: 'text/plain' });
@@ -295,14 +297,15 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
     protected readonly _menu_rename = () => {
         if (!this._isRoot && this.checkIsBusy(this, true)) {
             const name = oVar(this._name);
+            const errorTip = oVar('');
 
             showPopupWindow({
                 title: '重命名',
-                content: <InputFileName name={name} subItems={(this._parent as any)._dataTree.subItem}
+                content: <InputFileName name={name} errorTip={errorTip} subItems={(this._parent as any)._dataTree.subItem}
                     isDirectory={this._dataTree.subItem !== undefined} isRename />,
                 ok: {
                     callback: async () => {
-                        if (name.value) {
+                        if (!errorTip.value && this._name !== name.value) {
                             try {
                                 EditableFileTree._processingItems.add(this._fullNameString);
                                 await ServerApi.file.move(this._fullNameString, `${(this._parent as any)._fullNameString}/${name.value}`);
@@ -388,26 +391,26 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      */
     protected readonly _menu_zip = () => {
         if (!this._isRoot && this.checkIsBusy(this, true)) {
-            const name = oVar('');
+            const name = oVar(`${this._name}.zip`);
+            const errorTip = oVar('');
 
             showPopupWindow({
                 title: '新建压缩文件名',
-                content: <InputFileName name={name} subItems={(this._parent as any)._dataTree.subItem} />,
+                content: <InputFileName name={name} errorTip={errorTip}
+                    subItems={(this._parent as any)._dataTree.subItem}
+                    extraValidation={value => value.endsWith('.zip') ? '' : "压缩文件名必须以'.zip'结尾"} />,
                 ok: {
                     callback: async () => {
-                        if (name.value) {
-                            if (name.value.endsWith('.zip')) {
-                                try {
-                                    EditableFileTree._processingItems.add(this._fullNameString);
-                                    await ServerApi.file.zipData(this._fullNameString, `${(this._parent as any)._fullNameString}/${name.value}`);
-                                } catch (error) {
-                                    showMessageBox({ icon: 'error', title: '压缩文件失败', content: error.message });
-                                } finally {
-                                    EditableFileTree._processingItems.delete(this._fullNameString);
-                                    (this._parent as any)._menu_refresh();
-                                }
-                            } else
-                                showMessageBox({ icon: 'error', title: "压缩文件名必须以'.zip'结尾" });
+                        if (!errorTip.value) {
+                            try {
+                                EditableFileTree._processingItems.add(this._fullNameString);
+                                await ServerApi.file.zipData(this._fullNameString, `${(this._parent as any)._fullNameString}/${name.value}`);
+                            } catch (error) {
+                                showMessageBox({ icon: 'error', title: '压缩文件失败', content: error.message });
+                            } finally {
+                                EditableFileTree._processingItems.delete(this._fullNameString);
+                                (this._parent as any)._menu_refresh();
+                            }
                         }
                     }
                 }
@@ -419,7 +422,10 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      * 解压
      */
     protected readonly _menu_unzip = async () => {
-        if (this._dataTree.subItem === undefined && this.checkIsBusy() && (this._parent as any).checkIsBusy()) {
+        if (this._dataTree.subItem === undefined &&
+            this._name.endsWith('.zip') &&
+            this.checkIsBusy() &&
+            (this._parent as any).checkIsBusy()) {
             try {
                 EditableFileTree._processingItems.add(this._fullNameString);
                 EditableFileTree._processingItems.add((this._parent as any)._fullNameString);
@@ -582,6 +588,13 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
         target._menu_createDirectory();
     }
 
+    /**
+     * 上传文件到根
+     */
+    public uploadFile(file: File) {
+        this.prepareUploadFile(file);
+    }
+
     //#endregion
 
     protected _onContextMenu(): (ContextMenuItemOptions | void | false)[][] {
@@ -613,11 +626,11 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
             ],
             [   //下载
                 this._root.props.noDownload || this._dataTree.subItem !== undefined ? undefined : { name: '下载文件', callback: this._menu_download },
-                this._root.props.noDownload ? undefined : { name: '压缩下载', callback: this._menu_zip_download },
+                this._root.props.noDownload || this._name.endsWith('.zip') ? undefined : { name: '压缩下载', callback: this._menu_zip_download },
             ],
             [   //压缩、解压
-                this._root.props.noZip || this._isRoot ? undefined : { name: '压缩成ZIP文件', callback: this._menu_zip },
-                this._root.props.noZip || !this._name.endsWith('.zip') ? undefined : { name: '解压ZIP文件', callback: this._menu_unzip },
+                this._root.props.noZip || this._isRoot ? undefined : { name: '压缩成zip文件', callback: this._menu_zip },
+                this._root.props.noZip || !this._name.endsWith('.zip') ? undefined : { name: '解压zip文件', callback: this._menu_unzip },
             ],
         ];
     }

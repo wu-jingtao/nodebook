@@ -146,7 +146,7 @@ function Logo(router_login: koa_router, router_no_login: koa_router) {
     /**
      * 修改程序图标
      * @param filename
-     * @param files
+     * @param file
      */
     router_login.post(_prefix + '/change', async (ctx) => {
         if (['brand.png', 'icon.png', 'favicon.ico'].includes(ctx.request.body.filename)) {
@@ -273,7 +273,7 @@ function File(router: koa_router, httpServer: HttpServer) {
 
     /**
      * 上传文件，一次只允许上传一个文件
-     * @param files
+     * @param file
      * @param to 
      */
     router.post(_prefix_api + '/uploadFile', async (ctx) => {

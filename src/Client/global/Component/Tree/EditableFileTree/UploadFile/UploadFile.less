@@ -20,8 +20,10 @@
     line-height: 30px;
     width: ~"calc(100% - 115px)";
     background-color: @lightBackColor;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: @fontColor;
+    padding-right: 10px;
+    border: none;
+    box-sizing: border-box;
 }
 
 :local(.selectFile) {
@@ -35,6 +37,7 @@
 
     &:hover {
         background-color: darken(@lightBackColor, 20%, relative);
+        color: lighten(@darkFontColor, 10%, relative);
     }
 
     &:active {

@@ -129,25 +129,25 @@ export const ServerApi = {
         },
         /**
          * 压缩某个文件或目录
-         * @param file
+         * @param path
          * @param to
          */
-        async zipData(from: string, to: string): Promise<void> {
+        async zipData(path: string, to: string): Promise<void> {
             if (!to.endsWith('.zip'))
                 throw new Error("压缩文件的后缀名必须以'zip'结尾");
 
-            expect(await Post('/file/api/zipData', { from, to }), 'ok', '压缩失败');
+            expect(await Post('/file/api/zipData', { path, to }), 'ok', '压缩失败');
         },
         /**
          * 解压压缩文件
-         * @param file
+         * @param path
          * @param to
          */
-        async unzipData(from: string, to: string): Promise<void> {
-            if (!from.endsWith('.zip'))
+        async unzipData(path: string, to: string): Promise<void> {
+            if (!path.endsWith('.zip'))
                 throw new Error("压缩文件的后缀名必须以'zip'结尾");
 
-            expect(await Post('/file/api/unzipData', { from, to }), 'ok', '解压失败');
+            expect(await Post('/file/api/unzipData', { path, to }), 'ok', '解压失败');
         },
     }
 };

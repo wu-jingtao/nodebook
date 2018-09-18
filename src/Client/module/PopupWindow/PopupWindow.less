@@ -62,15 +62,15 @@
     font-size: .9em;
     margin: 0 15px 10px -10px;
     float: right;
-    background-color: transparent;
+    background-color: transparent !important;
     border-radius: 3px;
 
     &:hover {
-        background-color: transparent;
-        color: darken(@fontColor, 10%, relative);
+        background-color: transparent !important;
+        color: darken(@fontColor, 10%, relative) !important;
     }
 
     &:active {
-        background-color: darken(@backColor, 40%, relative);
+        background-color: darken(@backColor, 40%, relative) !important;
     }
 }
