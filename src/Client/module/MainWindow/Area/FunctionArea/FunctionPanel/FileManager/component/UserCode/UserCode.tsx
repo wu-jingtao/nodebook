@@ -34,10 +34,10 @@ export class UserCode extends FileBrowser<UserCodePropsType> {
     protected _tree: EditableFileTree<any>;
 
     protected _titleBarButtons: JSX.Element = <>
-        <i title="新建文件" className="iconfont icon-file-add-fill" onClick={this._createFile} />
-        <i title="新建文件夹" className="iconfont icon-file2" onClick={this._createDirectory} />
-        <i title="刷新" className="iconfont icon-fresh" onClick={this._refreshDirectory} />
-        <i title="全部折叠" className="iconfont icon-iconcloseall" onClick={this._closeDirectory} />
+        <img title="新建文件" src="/static/res/img/buttons_icon/AddFile_inverse.svg" onClick={this._createFile} />
+        <img title="新建文件夹" src="/static/res/img/buttons_icon/AddFolder_inverse.svg" onClick={this._createDirectory} />
+        <img title="刷新" src="/static/res/img/buttons_icon/Refresh_inverse.svg" onClick={this._refreshDirectory} />
+        <img title="全部折叠" src="/static/res/img/buttons_icon/CollapseAll_inverse.svg" onClick={this._closeDirectory} />
     </>;
 
     protected renderContent(): JSX.Element {

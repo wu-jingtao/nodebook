@@ -24,7 +24,7 @@ export class MessageItem extends ObservableComponent<{ config: MessageBoxOptions
         const { icon, buttons, progress, autoClose = 7 } = this.props.config;
 
         if (icon)
-            this._icon = <img className={less.icon} src={`./res/img/messageIcon/${icon}.png`} />;
+            this._icon = <img className={less.icon} src={`./res/img/message_icon/${icon}.png`} />;
 
         if (buttons) {
             this._button = (
@@ -53,7 +53,7 @@ export class MessageItem extends ObservableComponent<{ config: MessageBoxOptions
                     reached100 = true;
                     if (autoClose > 0) {
                         this._timer = setTimeout(() => closeMessageBox(this.props.messageId), autoClose * 1000);
-                        this._icon = <img className={less.icon} src={`./res/img/messageIcon/ok.png`} />;
+                        this._icon = <img className={less.icon} src={`./res/img/message_icon/ok.png`} />;
                         this.forceUpdate();
                     }
                 }
