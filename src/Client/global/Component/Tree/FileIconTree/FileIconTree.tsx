@@ -5,18 +5,19 @@ import { ObservableVariable, ObservableArray, oArr } from 'observable-variable';
 import { ObservableComponentWrapper } from '../../../Tools/ObservableComponent';
 import { FileIcon } from '../../FileIcon/FileIcon';
 import { MemoryTree } from '../MemoryTree/MemoryTree';
+import { FileIconTreePropsType } from './FileIconTreePropsType';
 
 const less = require('./FileIconTree.less');
 
 /**
  * MemoryTree 的基础上添加了文件图标，以及判断是否修改过
  */
-export abstract class FileIconTree<P extends { memorable?: string }, D = any> extends MemoryTree<P, D> {
+export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> extends MemoryTree<P, D> {
 
     /**
-     * 该文件是否被修改过value是_fullNameString
+     * 判断文件是否被修改过value是_fullNameString
      */
-    protected readonly _modified: ObservableArray<string> = this._root._modified || oArr([]);
+    protected readonly _modifiedFiles: ObservableArray<string> = this.props.modifiedFiles || this._root._modifiedFiles;
 
     /**
      * 渲染FileIconTree的内容
@@ -30,13 +31,13 @@ export abstract class FileIconTree<P extends { memorable?: string }, D = any> ex
                     isFolder={this._dataTree.subItem !== undefined}
                     opened={this._dataTree.subItem && this._openedBranch.has(this._fullNameString)}
                     rootFolder={this._isRoot} />
-                <div className={classnames(less.filename, { [less.modified]: this._modified.some(item => item.startsWith(this._fullNameString)) })}>{this._name}</div>
+                <div className={classnames(less.filename, { [less.modified]: this._modifiedFiles.some(item => item.startsWith(this._fullNameString)) })}>{this._name}</div>
             </>
         );
     };
 
     protected _renderItem() {
-        const watch: ObservableVariable<any>[] = [this._modified];
+        const watch: ObservableVariable<any>[] = [this._modifiedFiles];
         if (this._dataTree.subItem) watch.push(this._openedBranch);
 
         return <ObservableComponentWrapper watch={watch} render={this._FileIconTree_render} />

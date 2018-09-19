@@ -3,12 +3,13 @@ import { oMap } from 'observable-variable';
 import { ServerApi } from '../../../ServerApi';
 import { showMessageBox } from '../../../../module/MessageBox/MessageBox';
 import { FileIconTree } from '../FileIconTree/FileIconTree';
+import { FileIconTreePropsType } from '../FileIconTree/FileIconTreePropsType';
 import { throttle } from '../../../Tools/Tools';
 
 /**
  * 基础文件树。实现了服务器端路径读取，缓存。
  */
-export abstract class BaseFileTree<P extends { memorable?: string }> extends FileIconTree<P, { size: number, modifyTime: number }> {
+export abstract class BaseFileTree<P extends FileIconTreePropsType> extends FileIconTree<P, { size: number, modifyTime: number }> {
 
     /**
      * 是否在服务器端加载过了。value是_fullNameString

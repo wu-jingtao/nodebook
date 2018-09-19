@@ -1,4 +1,6 @@
-export interface EditableFileTreePropsType {
+import { FileIconTreePropsType } from "../FileIconTree/FileIconTreePropsType";
+
+export interface EditableFileTreePropsType extends FileIconTreePropsType {
 
     /**
      * 禁用复制和剪切

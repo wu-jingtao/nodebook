@@ -141,34 +141,40 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                 const tasks: { from: string, to: string }[] = [];
 
                 for (const item of items) {
+                    //筛除没有发生移动的文件
+                    if (action === 'cut' && item._fullNameString === `${this._fullNameString}/${item._name}`)
+                        continue;
+
                     tasks.push({
                         from: item._fullNameString,
                         to: `${this._fullNameString}/${this.deduplicateFilename(this._dataTree.subItem, item._name)}`
                     });
                 }
 
-                try {
-                    //标记正在操作
-                    [this, ...items].forEach((item: EditableFileTree<any>) => EditableFileTree._processingItems.add(item._fullNameString));
+                if (tasks.length > 0) {
+                    try {
+                        //标记正在操作
+                        [this, ...items].forEach((item: EditableFileTree<any>) => EditableFileTree._processingItems.add(item._fullNameString));
 
-                    if (action === 'copy')
-                        await Promise.all(tasks.map(item => ServerApi.file.copy(item.from, item.to)));
-                    else
-                        await Promise.all(tasks.map(item => ServerApi.file.move(item.from, item.to)));
-                } catch (error) {
-                    showMessageBox({
-                        icon: 'error',
-                        title: `${action === 'copy' ? '复制' : '剪切'}失败`,
-                        content: error.message
-                    });
-                } finally {
-                    [this, ...items].forEach((item: EditableFileTree<any>) => EditableFileTree._processingItems.delete(item._fullNameString));
+                        if (action === 'copy')
+                            await Promise.all(tasks.map(item => ServerApi.file.copy(item.from, item.to)));
+                        else
+                            await Promise.all(tasks.map(item => ServerApi.file.move(item.from, item.to)));
+                    } catch (error) {
+                        showMessageBox({
+                            icon: 'error',
+                            title: `${action === 'copy' ? '复制' : '剪切'}失败`,
+                            content: error.message
+                        });
+                    } finally {
+                        [this, ...items].forEach((item: EditableFileTree<any>) => EditableFileTree._processingItems.delete(item._fullNameString));
 
-                    //刷新文件夹
-                    const refreshItems = new Set();
-                    if (action === 'cut') items.forEach(item => item._parent && refreshItems.add(item._parent));
-                    refreshItems.add(this);
-                    refreshItems.forEach(item => item._menu_refresh());
+                        //刷新文件夹
+                        const refreshItems = new Set();
+                        if (action === 'cut') items.forEach(item => item._parent && refreshItems.add(item._parent));
+                        refreshItems.add(this);
+                        refreshItems.forEach(item => item._menu_refresh());
+                    }
                 }
             }
         }

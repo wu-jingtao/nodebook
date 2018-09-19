@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { watch } from 'observable-variable';
+import { watch, oArr } from 'observable-variable';
 
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
-import { FileBrowser } from '../FileBrowser/FileBrowser';
+import { FileFoldableContainer } from '../FileFoldableContainer/FileFoldableContainer';
 import { UserCodePropsType, UserCodeTreePropsType } from './UserCodePropsType';
 
 /**
  * 用户代码目录
  */
-export class UserCode extends FileBrowser<UserCodePropsType> {
+export class UserCode extends FileFoldableContainer<UserCodePropsType> {
 
     private readonly _createFile = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -46,7 +46,39 @@ export class UserCode extends FileBrowser<UserCodePropsType> {
             memorable={this.props.uniqueID}
             fileManagerNumber={this.props.fileManagerNumber}
             contentWindows={this.props.contentWindows}
-            ref={(e: any) => this._tree = e} />
+            ref={(e: any) => this._tree = e}
+            modifiedFiles={oArr<string>([])} />
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+
+        //确保拖拽文件到空白区域也可以上传文件
+        this._content_div.on('dragover', e => {
+            if (e.target === this._content_div[0]) {
+                const oe = e.originalEvent as DragEvent;
+                if (oe.dataTransfer.types[0] === 'Files') {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+            }
+        });
+
+        this._content_div.on('drop', e => {
+            if (e.target === this._content_div[0]) {
+                const oe = e.originalEvent as DragEvent;
+                if (oe.dataTransfer.files.length > 0) {
+                    this._tree.uploadFile(oe.dataTransfer.files[0]);
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+            }
+        });
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        this._content_div.off('drop');
     }
 }
 
@@ -70,8 +102,8 @@ class UserCodeTree extends EditableFileTree<UserCodeTreePropsType> {
         super(props, context);
 
         if (this._isRoot) {
-            this.props.fileManagerNumber.value = this._modified.length
-            this._watch_modified = watch([this._modified], () => this.props.fileManagerNumber.value = this._modified.length);
+            this.props.fileManagerNumber.value = this._modifiedFiles.length
+            this._watch_modified = watch([this._modifiedFiles], () => this.props.fileManagerNumber.value = this._modifiedFiles.length);
         }
     }
 

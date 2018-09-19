@@ -4,12 +4,12 @@ import { FoldableContainer } from '../../../../../../../../global/Component/Fold
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
 
-const less = require('./FileBrowser.less');
+const less = require('./FileFoldableContainer.less');
 
 /**
- * 文件资源浏览器
+ * 文件折叠容器
  */
-export abstract class FileBrowser<T extends FoldableContainerPropsType> extends FoldableContainer<T> {
+export abstract class FileFoldableContainer<T extends FoldableContainerPropsType> extends FoldableContainer<T> {
 
     protected _titleBarClassName = less.titleBar;
     protected _contentClassName = less.contentBox;
