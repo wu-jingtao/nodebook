@@ -1,10 +1,13 @@
 import * as React from 'react';
+import { ObservableMap, ObservableVariable, oMap } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
 import { FileManagerPropsType } from './FileManagerPropsType';
 import { UserCode } from './component/UserCode/UserCode';
 
 const less = require('./FileManager.less');
+
+const fileCache: ObservableMap<string, ObservableVariable<string>> = oMap([]);
 
 /**
  * 文件资源管理器

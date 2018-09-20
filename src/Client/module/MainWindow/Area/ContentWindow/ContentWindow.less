@@ -1,1 +1,30 @@
 @import "../../../../global/ThemeColor.less";
+
+#ContentWindow {
+    width: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    display: flex;
+}
+
+:local(.left) {
+    flex-grow: 1;
+    flex-shrink: 1;
+    height: 100%;
+    overflow: hidden;
+}
+
+:local(.right) {
+    max-width: 90%;
+    min-width: 10%;
+    position: relative;
+}
+
+:local(.splitter) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    border-left: 1px solid @lightBackColor;
+}

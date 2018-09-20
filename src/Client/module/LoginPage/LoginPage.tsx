@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { oVar, ObservableVariable } from 'observable-variable';
+import { oVar } from 'observable-variable';
 
 import { ObservableComponent } from '../../global/Tools/ObservableComponent';
 import { permanent_oVar } from '../../global/Tools/PermanentVariable';
@@ -13,9 +13,14 @@ import { showMessageBox } from '../MessageBox/MessageBox';
 const less = require('./LoginPage.less');
 
 /**
+ * 是否已经登录
+ */
+export const logged = oVar(false);
+
+/**
  * 登陆页面
  */
-export class LoginPage extends ObservableComponent<{ logged: ObservableVariable<boolean> }> {
+export class LoginPage extends ObservableComponent {
 
     private readonly _userName = permanent_oVar('ui.LoginPage._userName', '""');//用户名
     private readonly _password = oVar('');                                      //密码
@@ -31,9 +36,9 @@ export class LoginPage extends ObservableComponent<{ logged: ObservableVariable<
             await ServerApi.user.login(this._userName.value, this._password.value);
             await loadSystemSetting();
             this._password.value = '';
-            this.props.logged.value = true;
+            logged.value = true;
         } catch (error) {
-            this.props.logged.value = false;
+            logged.value = false;
             showMessageBox({ icon: 'error', title: error.message });
         } finally {
             this._logging.value = false;
@@ -41,15 +46,15 @@ export class LoginPage extends ObservableComponent<{ logged: ObservableVariable<
     }
 
     componentDidMount() {
-        this.watch(this._userName, this._password, this._logging, this.props.logged);
+        this.watch(this._userName, this._password, this._logging, logged);
 
-        this.props.logged.on('set', value => {
+        logged.on('set', value => {
             if (value) {    //登录成功后每隔7分钟更新一次令牌
                 this._timer = setInterval(async () => {
                     try {
                         await ServerApi.user.updateToken();
                     } catch (error) {
-                        this.props.logged.value = false;
+                        logged.value = false;
                         showMessageBox({ icon: "error", title: error.message });
                     }
                 }, 7 * 60 * 1000);
@@ -60,7 +65,7 @@ export class LoginPage extends ObservableComponent<{ logged: ObservableVariable<
         //第一次打开后检查是否已经登录
         ServerApi.user.updateToken().then(async () => {
             await loadSystemSetting();
-            this.props.logged.value = true;
+            logged.value = true;
         }).catch(() => { }).then(() => {
             this._logging.value = false;
         });
@@ -72,7 +77,7 @@ export class LoginPage extends ObservableComponent<{ logged: ObservableVariable<
     }
 
     render() {
-        if (this.props.logged.value) {
+        if (logged.value) {
             return false;
         } else {
             let content;
