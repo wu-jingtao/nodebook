@@ -5,6 +5,8 @@ import { ObservableVariable } from 'observable-variable';
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { normalSettings } from '../../../../global/SystemSetting';
 import { displayType } from '../FunctionArea/FunctionArea';
+import { cachedFiles } from '../FunctionArea/FunctionPanel/FileManager/UnsavedFiles';
+import { crashedServiceNumber } from '../FunctionArea/FunctionPanel/ServiceManager/ServiceManager';
 import { showLogWindow } from '../LogWindow/LogWindow';
 
 const less = require('./SideBar.less');
@@ -28,7 +30,7 @@ export class SideBar extends ObservableComponent {
      * 打开设置窗口
      */
     private readonly _openSettingWindow = () => {
- 
+
     };
 
     /**
@@ -38,11 +40,8 @@ export class SideBar extends ObservableComponent {
         displayType.value = displayType.value === changeTo ? null : changeTo;
     }
 
-    constructor(props: any, context: any) {
-        super(props, context);
-
-        this.watch(this._showLogo, displayType, showLogWindow,
-            this.props.fileManagerNumber, this.props.serviceManagerErrorNumber);
+    componentDidMount() {
+        this.watch(this._showLogo, this._logoPadding, displayType, showLogWindow, cachedFiles, crashedServiceNumber);
     }
 
     render() {
@@ -58,18 +57,18 @@ export class SideBar extends ObservableComponent {
                     <div className={classnames(less.icon, { selected: displayType.value === 'file' })}
                         onClick={() => this._changeFunctionArea('file')} title="资源管理器" >
                         <i className="iconfont icon-folder" />
-                        {this.props.fileManagerNumber.value > 0 &&
-                            <span className={classnames(less.iconNumber, 'blue')}>{Math.min(this.props.fileManagerNumber.value, 99)}</span>}
+                        {cachedFiles.size > 0 &&
+                            <span className={classnames(less.iconNumber, 'blue')}>{Math.min(cachedFiles.size, 99)}</span>}
                     </div>
                     <div className={classnames(less.icon, { selected: displayType.value === 'task' })}
                         onClick={() => this._changeFunctionArea('task')} title="任务管理器" >
                         <i className="iconfont icon-page1" />
                     </div>
                     <div className={classnames(less.icon, { selected: displayType.value === 'service' })}
-                        onClick={() => this._changeFunctionArea('service')} title="服务列表" >
+                        onClick={() => this._changeFunctionArea('service')} title="服务管理器" >
                         <i className="iconfont icon-ic_networkservices" />
-                        {this.props.serviceManagerErrorNumber.value > 0 &&
-                            <span className={classnames(less.iconNumber, 'red')}>{Math.min(this.props.serviceManagerErrorNumber.value, 99)}</span>}
+                        {crashedServiceNumber.value > 0 &&
+                            <span className={classnames(less.iconNumber, 'red')}>{Math.min(crashedServiceNumber.value, 99)}</span>}
                     </div>
                 </div>
                 <div className={less.bottom}>
@@ -77,8 +76,8 @@ export class SideBar extends ObservableComponent {
                         onClick={this._openSettingWindow} title="系统设置" >
                         <i className="iconfont icon-setting1" />
                     </div>
-                    <div className={classnames(less.icon, { selected: this.props.showLogWindow.value })}
-                        onClick={() => this.props.showLogWindow.value = !this.props.showLogWindow.value} title="日志窗口" >
+                    <div className={classnames(less.icon, { selected: showLogWindow.value })}
+                        onClick={() => showLogWindow.value = !showLogWindow.value} title="终端与日志" >
                         <i className="iconfont icon-bxs-terminal" />
                     </div>
                 </div>

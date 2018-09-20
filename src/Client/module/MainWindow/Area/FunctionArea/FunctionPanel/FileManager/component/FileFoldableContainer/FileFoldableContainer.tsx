@@ -9,7 +9,7 @@ const less = require('./FileFoldableContainer.less');
 /**
  * 文件折叠容器
  */
-export abstract class FileFoldableContainer<T extends FoldableContainerPropsType> extends FoldableContainer<T> {
+export abstract class FileFoldableContainer extends FoldableContainer<FoldableContainerPropsType> {
 
     protected _titleBarClassName = less.titleBar;
     protected _contentClassName = less.contentBox;

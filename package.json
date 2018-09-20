@@ -69,6 +69,7 @@
         "less": "^3.8.1",
         "less-loader": "^4.1.0",
         "less-plugin-clean-css": "^1.5.1",
+        "localforage": "^1.7.2",
         "normalize.css": "^8.0.0",
         "react": "^16.4.2",
         "react-dom": "^16.4.2",

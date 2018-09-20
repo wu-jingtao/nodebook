@@ -180,11 +180,13 @@ function File(router: koa_router, httpServer: HttpServer) {
 
     //#region 读取文件操作
 
+    const router_etag = new koa_router().use(koa_conditional(), koa_etag());
+
     /**
      * 读取用户代码目录下的文件
      * @param path 相对于用户代码目录
      */
-    router.get(_prefix_data + '/code/:path(.+?\\..+)', async (ctx) => {
+    router_etag.get(_prefix_data + '/code/:path(.+?\\..+)', async (ctx) => {
         ctx.body = await _fileManager.readFile(node_path.join(FilePath._userCodeDir, ctx.params.path));
     });
 
@@ -192,7 +194,7 @@ function File(router: koa_router, httpServer: HttpServer) {
      * 读取用户程序数据目录下的文件
      * @param path
      */
-    router.get(_prefix_data + '/programData/:path(.+?\\..+)', async (ctx) => {
+    router_etag.get(_prefix_data + '/programData/:path(.+?\\..+)', async (ctx) => {
         ctx.body = await _fileManager.readFile(node_path.join(FilePath._programDataDir, ctx.params.path));
     });
 
@@ -200,7 +202,7 @@ function File(router: koa_router, httpServer: HttpServer) {
      * 读取用户回收站目录下的文件
      * @param path 
      */
-    router.get(_prefix_data + '/recycle/:path(.+?\\..+)', async (ctx) => {
+    router_etag.get(_prefix_data + '/recycle/:path(.+?\\..+)', async (ctx) => {
         ctx.body = await _fileManager.readFile(node_path.join(FilePath._recycleDir, ctx.params.path));
     });
 
@@ -208,7 +210,7 @@ function File(router: koa_router, httpServer: HttpServer) {
      * 读取用户类库目录下的文件
      * @param path
      */
-    router.get(_prefix_data + '/library/:path(.+?\\..+)', async (ctx) => {
+    router_etag.get(_prefix_data + '/library/:path(.+?\\..+)', async (ctx) => {
         ctx.body = await _fileManager.readFile(node_path.join(FilePath._libraryDir, ctx.params.path));
     });
 
@@ -216,7 +218,7 @@ function File(router: koa_router, httpServer: HttpServer) {
      * 这个相当于上面那4个的汇总，上面的主要是方便用户使用，这个主要是方便程序内部使用
      * @param path 传入的路径需对应服务器端全路径
      */
-    router.get(_prefix_api + '/readFile', async (ctx) => {
+    router_etag.get(_prefix_api + '/readFile', async (ctx) => {
         ctx.body = await _fileManager.readFile(ctx.request.query.path);
         //确保浏览器会弹出下载框
         ctx.set('Content-Disposition', `attachment;filename=${node_path.basename(ctx.body.path)}`);
@@ -231,6 +233,8 @@ function File(router: koa_router, httpServer: HttpServer) {
         ctx.body = await _fileManager.zipDownloadData(ctx.request.query.path);
         ctx.set('Content-Disposition', `attachment;filename=${node_path.basename(ctx.request.query.path)}.zip`);
     });
+
+    router.use(router_etag.routes(), router_etag.allowedMethods());
 
     //#endregion
 

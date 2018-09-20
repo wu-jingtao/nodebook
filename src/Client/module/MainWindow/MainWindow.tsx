@@ -1,10 +1,10 @@
 import * as React from 'react';
 
 import { ObservableComponent } from '../../global/Tools/ObservableComponent';
+import { logged } from '../LoginPage/LoginPage';
 import { SideBar } from './Area/SideBar/SideBar';
 import { FunctionArea } from './Area/FunctionArea/FunctionArea';
 import { LogWindow } from './Area/LogWindow/LogWindow';
-import { logged } from '../LoginPage/LoginPage';
 
 const less = require('./MainWindow.less');
 

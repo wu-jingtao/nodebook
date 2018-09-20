@@ -4,12 +4,11 @@ import { watch, oArr } from 'observable-variable';
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { FileFoldableContainer } from '../FileFoldableContainer/FileFoldableContainer';
-import { UserCodePropsType, UserCodeTreePropsType } from './UserCodePropsType';
 
 /**
  * 用户代码目录
  */
-export class UserCode extends FileFoldableContainer<UserCodePropsType> {
+export class UserCode extends FileFoldableContainer {
 
     private readonly _createFile = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -44,8 +43,6 @@ export class UserCode extends FileFoldableContainer<UserCodePropsType> {
         return <UserCodeTree
             name="/user_data/code"
             memorable={this.props.uniqueID}
-            fileManagerNumber={this.props.fileManagerNumber}
-            contentWindows={this.props.contentWindows}
             ref={(e: any) => this._tree = e}
             modifiedFiles={oArr<string>([])} />
     }

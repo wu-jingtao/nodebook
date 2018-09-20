@@ -7,6 +7,9 @@ import { permanent_oVar } from '../../../../global/Tools/PermanentVariable';
 
 const less = require('./LogWindow.less');
 
+/**
+ * 是否显示日志窗口
+ */
 export const showLogWindow: ObservableVariable<boolean> = permanent_oVar('ui.LogWindow._showLogWindow', 'false');
 
 /**
