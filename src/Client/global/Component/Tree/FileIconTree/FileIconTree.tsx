@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import { ObservableVariable, ObservableArray, oArr } from 'observable-variable';
+import { ObservableVariable, ObservableSet } from 'observable-variable';
 
 import { ObservableComponentWrapper } from '../../../Tools/ObservableComponent';
 import { FileIcon } from '../../FileIcon/FileIcon';
@@ -17,12 +17,21 @@ export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> ext
     /**
      * 判断文件是否被修改过value是_fullNameString
      */
-    protected readonly _modifiedFiles: ObservableArray<string> = this.props.modifiedFiles || this._root._modifiedFiles;
+    protected readonly _modifiedFiles: ObservableSet<string> = this.props.modifiedFiles || this._root._modifiedFiles;
 
     /**
      * 渲染FileIconTree的内容
      */
     private _FileIconTree_render = () => {
+        let modified = false;
+
+        for (const item of this._modifiedFiles.values()) {
+            if (item.startsWith(this._fullNameString)) {
+                modified = true;
+                break;
+            }
+        }
+
         return (
             <>
                 <FileIcon
@@ -31,7 +40,7 @@ export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> ext
                     isFolder={this._dataTree.subItem !== undefined}
                     opened={this._dataTree.subItem && this._openedBranch.has(this._fullNameString)}
                     rootFolder={this._isRoot} />
-                <div className={classnames(less.filename, { [less.modified]: this._modifiedFiles.some(item => item.startsWith(this._fullNameString)) })}>{this._name}</div>
+                <div className={classnames(less.filename, { [less.modified]: modified })}> {this._name}</div>
             </>
         );
     };

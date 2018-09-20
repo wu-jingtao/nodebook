@@ -11,7 +11,7 @@ const less = require('./FoldableContainer.less');
 
 export abstract class FoldableContainer<T extends FoldableContainerPropsType> extends ObservableComponent<T> {
 
-    protected readonly _folded = permanent_oVar(`ui.FoldableContainer.${this.props.uniqueID}`, this.props.folded ? 'true' : 'false');
+    public readonly _folded = permanent_oVar(`ui.FoldableContainer.${this.props.uniqueID}`, this.props.folded ? 'true' : 'false');
 
     protected readonly _hover = oVar(false);  //鼠标是否处于悬浮状态
 
@@ -20,6 +20,9 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
 
     protected _titleBarClassName: string;
     protected _contentClassName: string;
+
+    protected _titleBarStyle: React.CSSProperties;
+    protected _contentStyle: React.CSSProperties;
 
     protected abstract renderTitleBar(): JSX.Element;
     protected abstract renderContent(): JSX.Element;
@@ -42,7 +45,7 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        
+
         this._titleBar_div.off('mouseenter mouseleave');
         this._content_div.off('mouseenter mouseleave');
     }
@@ -51,6 +54,7 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
         return (
             <>
                 <div className={classnames(less.titleBar, this._titleBarClassName)}
+                    style={this._titleBarStyle}
                     ref={(e: any) => this._titleBar_div = e && $(e)}
                     onClick={() => this._folded.value = !this._folded.value}>
                     <i style={{ visibility: this.props.noFold ? 'hidden' : 'visible' }}
@@ -61,7 +65,7 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
                     </div>
                 </div>
                 <ScrollBar className={classnames(less.content, this._contentClassName)}
-                    style={{ display: this._folded.value ? 'none' : 'block' }}
+                    style={{ ...this._contentStyle, display: this._folded.value ? 'none' : 'block' }}
                     ref={(e: any) => this._content_div = e && $(e)}>
                     {this.renderContent()}
                 </ScrollBar>

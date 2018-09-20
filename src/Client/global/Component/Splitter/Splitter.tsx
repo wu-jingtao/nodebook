@@ -6,9 +6,9 @@ import { throttle } from '../../Tools/Tools';
 interface SplitterPropsType {
 
     /**
-     * 分隔条位置改变了多少
+     * 分隔条相对于屏幕的位置
      */
-    onChange: (variation: number) => void;
+    onChange: (position: number) => void;
 
     /**
      * 设置为垂直方向分隔条，默认水平

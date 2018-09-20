@@ -525,6 +525,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
             EditableFileTree._copyItem = [];
 
         e.dataTransfer.setDragImage(document.createElement('img'), 0, 0);
+        e.dataTransfer.setData('EditableFileTree_drag', this._root._name);
     };
 
     private readonly _onDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
@@ -539,10 +540,14 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      */
     private readonly _onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         if (this._dataTree.subItem) {
-            e.stopPropagation();
-            e.preventDefault();
+            //确保拖拽的数据类型
+            if (e.dataTransfer.types.includes('EditableFileTree_drag') ||
+                !this._root.props.noUpload && e.dataTransfer.types.includes('Files')) {
+                e.stopPropagation();
+                e.preventDefault();
 
-            this._hoveredItem.value = this;
+                this._hoveredItem.value = this;
+            }
         }
     };
 

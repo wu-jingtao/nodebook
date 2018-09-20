@@ -1,14 +1,18 @@
 import * as React from 'react';
-import { watch, oArr } from 'observable-variable';
 
-import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
-import { FileFoldableContainer } from '../FileFoldableContainer/FileFoldableContainer';
+import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
+import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
+import { FoldableContainer } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainer';
+import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
+import { cachedFiles } from '../../UnsavedFiles';
+
+const less = require('./UserCode.less');
 
 /**
  * 用户代码目录
  */
-export class UserCode extends FileFoldableContainer {
+export class UserCode<T extends FoldableContainerPropsType> extends FoldableContainer<T>  {
 
     private readonly _createFile = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -30,25 +34,42 @@ export class UserCode extends FileFoldableContainer {
         this._tree.closeAllBranch();
     };
 
+    protected _titleBarClassName = less.titleBar;
+    protected _contentClassName = less.contentBox;
     protected _tree: EditableFileTree<any>;
 
-    protected _titleBarButtons: JSX.Element = <>
-        <img title="新建文件" src="/static/res/img/buttons_icon/AddFile_inverse.svg" onClick={this._createFile} />
-        <img title="新建文件夹" src="/static/res/img/buttons_icon/AddFolder_inverse.svg" onClick={this._createDirectory} />
-        <img title="刷新" src="/static/res/img/buttons_icon/Refresh_inverse.svg" onClick={this._refreshDirectory} />
-        <img title="全部折叠" src="/static/res/img/buttons_icon/CollapseAll_inverse.svg" onClick={this._closeDirectory} />
-    </>;
+    protected renderTitleBar(): JSX.Element {
+        return (
+            <div className={less.titleButtons}>
+                <img title="新建文件" src="/static/res/img/buttons_icon/AddFile_inverse.svg" onClick={this._createFile} />
+                <img title="新建文件夹" src="/static/res/img/buttons_icon/AddFolder_inverse.svg" onClick={this._createDirectory} />
+                <img title="刷新" src="/static/res/img/buttons_icon/Refresh_inverse.svg" onClick={this._refreshDirectory} />
+                <img title="全部折叠" src="/static/res/img/buttons_icon/CollapseAll_inverse.svg" onClick={this._closeDirectory} />
+            </div>
+        );
+    }
 
     protected renderContent(): JSX.Element {
         return <UserCodeTree
             name="/user_data/code"
             memorable={this.props.uniqueID}
             ref={(e: any) => this._tree = e}
-            modifiedFiles={oArr<string>([])} />
+            modifiedFiles={cachedFiles} />
     }
 
     componentDidMount() {
         super.componentDidMount();
+
+        //点击容器空白区域，清除所有选中选项
+        this._content_div.click(e => {
+            if (e.target === e.currentTarget)
+                this._tree.unfocus();
+        });
+
+        //清除hover。因为使用了flex布局，Tree在边界的地方无法触发mouseleave事件
+        this._content_div.mouseleave(() => {
+            this._tree.unhover();
+        });
 
         //确保拖拽文件到空白区域也可以上传文件
         this._content_div.on('dragover', e => {
@@ -75,13 +96,11 @@ export class UserCode extends FileFoldableContainer {
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        this._content_div.off('drop');
+        this._content_div.off('dragover drop click mouseleave');
     }
 }
 
-class UserCodeTree extends EditableFileTree<UserCodeTreePropsType> {
-
-    private readonly _watch_modified: Function;
+class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
 
     protected async _onDelete(): Promise<void> {
         await ServerApi.file.deleteCodeData(this._fullNameString);
@@ -93,20 +112,5 @@ class UserCodeTree extends EditableFileTree<UserCodeTreePropsType> {
                 resolve()
             }, 1000);
         });
-    }
-
-    constructor(props: any, context: any) {
-        super(props, context);
-
-        if (this._isRoot) {
-            this.props.fileManagerNumber.value = this._modifiedFiles.length
-            this._watch_modified = watch([this._modifiedFiles], () => this.props.fileManagerNumber.value = this._modifiedFiles.length);
-        }
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-
-        if (this._isRoot) this._watch_modified();
     }
 }
