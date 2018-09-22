@@ -135,7 +135,7 @@ export class RecyclePanel extends FoldableContainer<FoldableContainerPropsType &
     }
 
     render() {
-        this._contentStyle = { height: this.props.height + 'px' };
+        this._contentStyle = { flexBasis: this.props.height.value + 'px' };
         return super.render();
     }
 }

@@ -8,6 +8,7 @@ import { UserCodePanel } from './component/UserCodePanel/UserCodePanel';
 import { ProgramDataPanel } from './component/ProgramDataPanel/ProgramDataPanel';
 import { RecyclePanel } from './component/RecyclePanel/RecyclePanel';
 import { UnsavedFilesPanel } from './component/UnsavedFilesPanel/UnsavedFilesPanel';
+import { OpenedWindows } from './component/OpenedWindows/OpenedWindows';
 
 const less = require('./FileManager.less');
 
@@ -33,15 +34,15 @@ export class FileManager extends ObservableComponent {
     private readonly _change_programDataHeight = (position: number) => {
         if (!this._programDataPanel._folded.value) {
             if (this._recyclePanel._folded.value)
-                this._programDataHeight.value = window.innerHeight - position - 25 * 2 - 3;
+                this._programDataHeight.value = window.innerHeight - position - 25 * 2;
             else
-                this._programDataHeight.value = window.innerHeight - position - this._recycleHeight.value - 25 - 3;
+                this._programDataHeight.value = window.innerHeight - position - 25 * 2 - this._recycleHeight.value;
         }
     };
 
     private readonly _change_recycleHeight = (position: number) => {
         if (!this._recyclePanel._folded.value)
-            this._recycleHeight.value = window.innerHeight - position - 25 - 3;
+            this._recycleHeight.value = window.innerHeight - position - 25;
     };
 
     componentDidMount() {
@@ -52,7 +53,8 @@ export class FileManager extends ObservableComponent {
         return (
             <div id="FileManager" style={{ display: displayType.value === 'file' ? 'flex' : 'none' }}>
                 <div className={less.header}>资源管理器</div>
-                <UnsavedFilesPanel title="未保存的文件" uniqueID="_unsavedFilesPanel" noFold/>
+                <UnsavedFilesPanel title="未保存的文件" uniqueID="_unsavedFilesPanel" noFold />
+                <OpenedWindows title="打开的窗口" uniqueID="_openedWindows" noFold />
                 <UserCodePanel title="用户代码" uniqueID="_userCode" />
                 <Splitter className={less.splitter} onChange={this._change_programDataHeight} vertical />
                 <ProgramDataPanel title="程序数据" uniqueID="_programData"

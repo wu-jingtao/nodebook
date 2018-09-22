@@ -11,6 +11,7 @@ import { cachedFiles, removeCache, saveToServer } from '../../UnsavedFiles';
 import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { ContextMenuItemOptions } from '../../../../../../../ContextMenu/ContextMenuOptions';
+import { openWindow } from '../../../../../ContentWindow/ContentWindow';
 
 const less = require('./UnsavedFilesPanel.less');
 
@@ -141,9 +142,8 @@ class ContentItem extends ObservableComponent<{ fullName: string }> {
         e.stopPropagation();
         e.preventDefault();
 
-        if (e.button === 0) {
-
-        }
+        if (e.button === 0) 
+            openWindow(this.props.fullName, 'file');
     };
 
     render() {

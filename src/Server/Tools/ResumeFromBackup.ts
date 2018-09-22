@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as node_path from 'path';
-import * as unzip from 'unzip';
+import * as unzipper from 'unzipper';
 import * as child_process from 'child_process';
 import log from 'log-formatter';
 
@@ -34,7 +34,7 @@ import * as FilePath from '../FilePath';
 
     //todo 这里需要测试
     await new Promise((resolve, reject) => {
-        fs.createReadStream(path).pipe(unzip.Extract({ path: FilePath._userDataDir }))
+        fs.createReadStream(path).pipe(unzipper.Extract({ path: FilePath._userDataDir }))
             .on('error', reject).on('close', resolve);
     });
     log.round('解压备份文件成功', filename);
