@@ -8,6 +8,7 @@ import { displayType } from '../FunctionArea/FunctionArea';
 import { cachedFiles } from '../FunctionArea/FunctionPanel/FileManager/UnsavedFiles';
 import { crashedServiceNumber } from '../FunctionArea/FunctionPanel/ServiceManager/ServiceManager';
 import { showLogWindow } from '../LogWindow/LogWindow';
+import { openWindow } from '../ContentWindow/ContentWindow';
 
 const less = require('./SideBar.less');
 
@@ -30,7 +31,7 @@ export class SideBar extends ObservableComponent {
      * 打开设置窗口
      */
     private readonly _openSettingWindow = () => {
-
+        openWindow('系统设置', 'setting', true);
     };
 
     /**

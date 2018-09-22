@@ -1,0 +1,90 @@
+@import "../../../../../../../../global/ThemeColor.less";
+
+:local(.titleBar) {
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+:local(.contentBox) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    overflow: unset !important;
+}
+
+:local(.titleButtons) {
+    width: 100%;
+    height: 25px;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    color: @darkFontColor;
+
+    & > img {
+        height: 16px;
+        width: 16px;
+        padding: 5px 6px;
+
+        &:last-child {
+            padding-right: 12px;
+        }
+
+        &:active {
+            transform: scale(1.2);
+        }
+    }
+}
+
+:local(.contentItem) {
+    width: 100%;
+    height: 25px;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    flex-wrap: nowrap;
+
+    &:local(.focused) {
+        background-color: darken(@lightBackColor, 10%, relative) !important;
+    }
+
+    &:hover {
+        background-color: darken(@lightBackColor, 30%, relative);
+    }
+}
+
+:local(.close) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    line-break: 25px;
+    font-size: 1.1em;
+    color: @darkFontColor;
+
+    &:hover {
+        color: @fontColor;
+    }
+}
+
+:local(.fileIcon) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    height: 15px;
+    width: 15px;
+    padding: 5px;
+}
+
+:local(.fileName) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    line-height: 25px;
+    padding: 5px;
+}
+
+:local(.fileFullName) {
+    flex-grow: 1;
+    flex-shrink: 1;
+    line-height: 25px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

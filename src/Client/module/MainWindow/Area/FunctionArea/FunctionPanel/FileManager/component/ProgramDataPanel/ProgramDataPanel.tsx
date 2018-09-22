@@ -6,14 +6,14 @@ import { EditableFileTreePropsType } from '../../../../../../../../global/Compon
 import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { cachedFiles } from '../../UnsavedFiles';
-import { UserCode } from '../UserCode/UserCode';
+import { UserCodePanel } from '../UserCodePanel/UserCodePanel';
 
-const less = require('./ProgramData.less');
+const less = require('./ProgramDataPanel.less');
 
 /**
  * 程序数据目录
  */
-export class ProgramData extends UserCode<FoldableContainerPropsType & { height: ObservableVariable<number> }> {
+export class ProgramDataPanel extends UserCodePanel<FoldableContainerPropsType & { height: ObservableVariable<number> }> {
 
     protected _contentClassName = less.contentBox;
 

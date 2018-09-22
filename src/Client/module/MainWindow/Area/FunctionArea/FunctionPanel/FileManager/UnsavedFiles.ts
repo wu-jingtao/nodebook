@@ -9,26 +9,16 @@ const db = localforage.createInstance({
     description: '缓存未保存到服务器端的文件'
 });
 
-function errorHandler<T>(promise: Promise<T>, errorTip: string, fullNameString?: string): Promise<T | void> {
-    return promise.catch(err => {
-        showMessageBox({
-            icon: 'error',
-            title: errorTip,
-            content: fullNameString ? `文件：${fullNameString}。${err.message}` : err.message
-        });
-    });
-}
-
 /**
- * 缓存的文件名称列表
+ * 缓存的文件名称列表。
  */
-export const cachedFiles = oSet<string>([], { readonly: true });
-errorHandler(db.keys(), '读取缓存文件列表失败').then(value => {
-    if (value) {
-        cachedFiles.readonly = false;
-        cachedFiles.value = new Set(value);
-        cachedFiles.readonly = true;
-    }
+export const cachedFiles = oSet<string>([]);
+db.keys().then(value => cachedFiles.value = new Set(value)).catch(err => {
+    showMessageBox({
+        icon: 'error',
+        title: '读取缓存文件列表失败',
+        content: err.message
+    });
 });
 
 /**
@@ -36,12 +26,13 @@ errorHandler(db.keys(), '读取缓存文件列表失败').then(value => {
  * @param fullNameString 文件的完整路径名称
  * @param data 要缓存的数据
  */
-export function cache(fullNameString: string, data: string): Promise<string | void> {
-    return errorHandler(db.setItem(fullNameString, data), '缓存文件改变失败', fullNameString).then(v => {
-        cachedFiles.readonly = false;
-        cachedFiles.add(fullNameString);
-        cachedFiles.readonly = true;
-        return v;
+export function cache(fullNameString: string, data: string): Promise<void> {
+    return db.setItem(fullNameString, data).then(() => { cachedFiles.add(fullNameString) }).catch(err => {
+        showMessageBox({
+            icon: 'error',
+            title: '缓存文件失败',
+            content: `文件：${fullNameString}。${err.message}`
+        });
     });
 }
 
@@ -49,8 +40,16 @@ export function cache(fullNameString: string, data: string): Promise<string | vo
  * 读取某个缓存文件
  * @param fullNameString 文件的完整路径名称
  */
-export function readCache(fullNameString: string): Promise<string | void> {
-    return errorHandler(db.getItem(fullNameString), '读取缓存文件失败', fullNameString);
+export function readCache(fullNameString: string): Promise<string | null> {
+    return db.getItem<string>(fullNameString).catch(err => {
+        showMessageBox({
+            icon: 'error',
+            title: '读取缓存文件失败',
+            content: `文件：${fullNameString}。${err.message}`
+        });
+
+        return null;
+    });
 }
 
 /**
@@ -58,10 +57,12 @@ export function readCache(fullNameString: string): Promise<string | void> {
  * @param fullNameString 文件的完整路径名称
  */
 export function removeCache(fullNameString: string): Promise<void> {
-    return errorHandler(db.removeItem(fullNameString), '删除缓存文件失败', fullNameString).then(() => {
-        cachedFiles.readonly = false;
-        cachedFiles.delete(fullNameString);
-        cachedFiles.readonly = true;
+    return db.removeItem(fullNameString).then(() => { cachedFiles.delete(fullNameString) }).catch(err => {
+        showMessageBox({
+            icon: 'error',
+            title: '删除缓存文件失败',
+            content: `文件：${fullNameString}。${err.message}`
+        });
     });
 }
 
@@ -69,24 +70,40 @@ export function removeCache(fullNameString: string): Promise<void> {
  * 清空缓存文件
  */
 export function clearCache(): Promise<void> {
-    return errorHandler(db.clear(), '清空缓存文件失败');
+    return db.clear().then(() => { cachedFiles.clear() }).catch(err => {
+        showMessageBox({
+            icon: 'error',
+            title: '清空缓存文件失败',
+            content: err.message
+        });
+    });
 }
 
 /**
  * 将缓存的文件保存到服务器端，上传成功后将删除本地缓存
  * @param fullNameString 文件的完整路径名称
  */
-export function saveToServer(fullNameString: string): Promise<void> {
-    return errorHandler(db.getItem<string | null>(fullNameString).then(async (value) => {
+export async function saveToServer(fullNameString: string): Promise<void> {
+    try {
+        const value = await db.getItem<string | null>(fullNameString);
         if (value !== null) {
             const data = new Blob([value], { type: 'text/plain' });
             await ServerApi.file.uploadFile(data, fullNameString);
-            
             await db.removeItem(fullNameString);
-
-            cachedFiles.readonly = false;
             cachedFiles.delete(fullNameString);
-            cachedFiles.readonly = true;
         }
-    }), '将缓存的文件保存到服务器端失败', fullNameString);
+    } catch (err) {
+        showMessageBox({
+            icon: 'error',
+            title: '将缓存的文件保存到服务器端失败',
+            content: `文件：${fullNameString}。${err.message}`
+        });
+    }
+}
+
+/**
+ * 保存全部到服务器端
+ */
+export async function saveAllToServer(): Promise<void> {
+    await Promise.all([...cachedFiles.values()].map(path => saveToServer(path)));
 }

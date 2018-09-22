@@ -4,9 +4,10 @@ import { ObservableComponent } from '../../../../../../global/Tools/ObservableCo
 import { permanent_oVar } from '../../../../../../global/Tools/PermanentVariable';
 import { Splitter } from '../../../../../../global/Component/Splitter/Splitter';
 import { displayType } from '../../FunctionArea';
-import { UserCode } from './component/UserCode/UserCode';
-import { ProgramData } from './component/ProgramData/ProgramData';
-import { Recycle } from './component/Recycle/Recycle';
+import { UserCodePanel } from './component/UserCodePanel/UserCodePanel';
+import { ProgramDataPanel } from './component/ProgramDataPanel/ProgramDataPanel';
+import { RecyclePanel } from './component/RecyclePanel/RecyclePanel';
+import { UnsavedFilesPanel } from './component/UnsavedFilesPanel/UnsavedFilesPanel';
 
 const less = require('./FileManager.less');
 
@@ -15,9 +16,9 @@ const less = require('./FileManager.less');
  */
 export class FileManager extends ObservableComponent {
 
-    private _programData: ProgramData;
+    private _programDataPanel: ProgramDataPanel;
 
-    private _recycle: Recycle;
+    private _recyclePanel: RecyclePanel;
 
     /**
      * 程序数据窗口高度
@@ -30,8 +31,8 @@ export class FileManager extends ObservableComponent {
     private readonly _recycleHeight = permanent_oVar('ui.FileManager._recycleHeight', '300');
 
     private readonly _change_programDataHeight = (position: number) => {
-        if (!this._programData._folded.value) {
-            if (this._recycle._folded.value)
+        if (!this._programDataPanel._folded.value) {
+            if (this._recyclePanel._folded.value)
                 this._programDataHeight.value = window.innerHeight - position - 25 * 2 - 3;
             else
                 this._programDataHeight.value = window.innerHeight - position - this._recycleHeight.value - 25 - 3;
@@ -39,7 +40,7 @@ export class FileManager extends ObservableComponent {
     };
 
     private readonly _change_recycleHeight = (position: number) => {
-        if (!this._recycle._folded.value)
+        if (!this._recyclePanel._folded.value)
             this._recycleHeight.value = window.innerHeight - position - 25 - 3;
     };
 
@@ -51,13 +52,14 @@ export class FileManager extends ObservableComponent {
         return (
             <div id="FileManager" style={{ display: displayType.value === 'file' ? 'flex' : 'none' }}>
                 <div className={less.header}>资源管理器</div>
-                <UserCode title="用户代码" uniqueID="_userCode" />
+                <UnsavedFilesPanel title="未保存的文件" uniqueID="_unsavedFilesPanel" noFold/>
+                <UserCodePanel title="用户代码" uniqueID="_userCode" />
                 <Splitter className={less.splitter} onChange={this._change_programDataHeight} vertical />
-                <ProgramData title="程序数据" uniqueID="_programData"
-                    height={this._programDataHeight} ref={(e: any) => this._programData = e} />
+                <ProgramDataPanel title="程序数据" uniqueID="_programData"
+                    height={this._programDataHeight} ref={(e: any) => this._programDataPanel = e} />
                 <Splitter className={less.splitter} onChange={this._change_recycleHeight} vertical />
-                <Recycle title="回收站" uniqueID="_recycle"
-                    height={this._recycleHeight} ref={(e: any) => this._recycle = e} />
+                <RecyclePanel title="回收站" uniqueID="_recycle"
+                    height={this._recycleHeight} ref={(e: any) => this._recyclePanel = e} />
             </div>
         );
     }

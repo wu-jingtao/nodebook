@@ -7,12 +7,12 @@ import { FoldableContainer } from '../../../../../../../../global/Component/Fold
 import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
 import { cachedFiles } from '../../UnsavedFiles';
 
-const less = require('./UserCode.less');
+const less = require('./UserCodePanel.less');
 
 /**
  * 用户代码目录
  */
-export class UserCode<T extends FoldableContainerPropsType> extends FoldableContainer<T>  {
+export class UserCodePanel<T extends FoldableContainerPropsType> extends FoldableContainer<T>  {
 
     private readonly _createFile = (e: React.MouseEvent) => {
         e.stopPropagation();

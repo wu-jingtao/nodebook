@@ -464,7 +464,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      */
     protected readonly _menu_copyPath = () => {
         if (!clipboard(this._fullNameString)) {
-            showMessageBox({ icon: 'message', title: '复制失败请手动复制', content: this._fullNameString, autoClose: 0 });
+            showMessageBox({ icon: 'message', title: '复制绝对路径失败，请手动复制', content: this._fullNameString, autoClose: 0 });
         }
     };
 

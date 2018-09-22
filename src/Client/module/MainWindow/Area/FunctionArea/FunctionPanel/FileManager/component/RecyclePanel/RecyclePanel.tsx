@@ -10,12 +10,12 @@ import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { cachedFiles } from '../../UnsavedFiles';
 
-const less = require('./Recycle.less');
+const less = require('./RecyclePanel.less');
 
 /**
  * 回收站
  */
-export class Recycle extends FoldableContainer<FoldableContainerPropsType & { height: ObservableVariable<number> }>{
+export class RecyclePanel extends FoldableContainer<FoldableContainerPropsType & { height: ObservableVariable<number> }>{
 
     /**
      * 拖拽到回收站上后显示删除图标

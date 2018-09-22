@@ -1,9 +1,6 @@
 import * as React from 'react';
-import * as classnames from 'classnames';
 
 import { getIconPath } from './GetIconPath';
-
-const less = require('./FileIcon.less');
 
 export interface FileIconPropsType {
     /**
@@ -32,7 +29,7 @@ export interface FileIconPropsType {
  */
 export class FileIcon extends React.PureComponent<FileIconPropsType> {
     render() {
-        return <img className={classnames(less.FileIcon, this.props.className)}
+        return <img className={this.props.className}
             style={this.props.style}
             src={`/static/res/img/file_icons/${
                 getIconPath(
