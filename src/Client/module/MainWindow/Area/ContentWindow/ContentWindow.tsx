@@ -41,7 +41,7 @@ export function openWindow(name: string, type: 'file' | 'task' | 'service' | 'se
         const tempWindowIndex = focusedSide.findIndex(item => item.fixed.value === false);
 
         if (tempWindowIndex !== -1) //如果有临时窗口就替换
-            focusedSide.splice(tempWindowIndex, 1, window);
+            focusedSide.set(tempWindowIndex, window);
         else
             focusedSide.push(window);
     }

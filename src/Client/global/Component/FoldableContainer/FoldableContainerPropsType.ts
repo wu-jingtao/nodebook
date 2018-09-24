@@ -1,3 +1,5 @@
+import { ObservableVariable } from "observable-variable";
+
 export interface FoldableContainerPropsType {
     /**
      * 标题
@@ -10,9 +12,9 @@ export interface FoldableContainerPropsType {
     uniqueID: string;
 
     /**
-     * 默认是否处于折叠状态，默认false
+     * 是否处于折叠状态
      */
-    folded?: boolean;
+    folded?: ObservableVariable<boolean>;
 
     /**
      * 不允许折叠

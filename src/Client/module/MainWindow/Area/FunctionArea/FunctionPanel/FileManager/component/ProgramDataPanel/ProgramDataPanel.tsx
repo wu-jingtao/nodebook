@@ -13,14 +13,9 @@ const less = require('./ProgramDataPanel.less');
 /**
  * 程序数据目录
  */
-export class ProgramDataPanel extends UserCodePanel<FoldableContainerPropsType & { height: ObservableVariable<number> }> {
+export class ProgramDataPanel extends UserCodePanel {
 
     protected _contentClassName = less.contentBox;
-
-    componentDidMount() {
-        super.componentDidMount();
-        this.watch(this.props.height);
-    }
 
     protected renderContent(): JSX.Element {
         return <ProgramDataTree
@@ -28,11 +23,6 @@ export class ProgramDataPanel extends UserCodePanel<FoldableContainerPropsType &
             memorable={this.props.uniqueID}
             ref={(e: any) => this._tree = e}
             modifiedFiles={cachedFiles} />
-    }
-
-    render() {
-        this._contentStyle = { flexBasis: this.props.height.value + 'px' };
-        return super.render();
     }
 }
 

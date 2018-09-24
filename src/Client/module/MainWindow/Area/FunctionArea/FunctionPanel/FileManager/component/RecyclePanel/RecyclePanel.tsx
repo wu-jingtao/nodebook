@@ -15,11 +15,9 @@ const less = require('./RecyclePanel.less');
 /**
  * 回收站
  */
-export class RecyclePanel extends FoldableContainer<FoldableContainerPropsType & { height: ObservableVariable<number> }>{
+export class RecyclePanel extends FoldableContainer<FoldableContainerPropsType & { height: ObservableVariable<string> }>{
 
-    /**
-     * 拖拽到回收站上后显示删除图标
-     */
+    //拖拽到回收站上后显示删除图标
     private readonly _showTrashcanIcon = oVar(false);
 
     private readonly _clearRecycle = (e: React.MouseEvent) => {
@@ -37,8 +35,6 @@ export class RecyclePanel extends FoldableContainer<FoldableContainerPropsType &
         this._tree.closeAllBranch();
     };
 
-    protected _titleBarClassName = less.titleBar;
-    protected _contentClassName = less.contentBox;
     protected _tree: RecycleTree;
 
     protected renderTitleBar(): JSX.Element {
@@ -135,7 +131,7 @@ export class RecyclePanel extends FoldableContainer<FoldableContainerPropsType &
     }
 
     render() {
-        this._contentStyle = { flexBasis: this.props.height.value + 'px' };
+        this._contentStyle = { height: this.props.height.value + '%' };
         return super.render();
     }
 }

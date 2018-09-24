@@ -1,4 +1,4 @@
-import { ObservableVariable, oVar, watch, ObservableSet, oSet } from "observable-variable";
+import { ObservableVariable, oVar, watch, ObservableSet, oSet, ObservableArray, oArr } from "observable-variable";
 
 import { throttle } from "./Tools";
 
@@ -10,6 +10,17 @@ import { throttle } from "./Tools";
 export function permanent_oVar(name: string, defaultValue: string = 'null'): ObservableVariable<any> {
     const _value = oVar(JSON.parse(localStorage.getItem(name) || defaultValue));
     _value.on('set', throttle(() => localStorage.setItem(name, JSON.stringify(_value)), 1000));
+    return _value;
+}
+
+/**
+ * 自动将数据读取和保存到localStorage的oArr
+ * @param name localStorage 中的键名
+ * @param defaultValue 默认值的JSON字符串
+ */
+export function permanent_oArr(name: string, defaultValue: string = '[]'): ObservableArray<any> {
+    const _value = oArr(JSON.parse(localStorage.getItem(name) || defaultValue));
+    watch([_value], throttle(() => localStorage.setItem(name, JSON.stringify(_value)), 1000));
     return _value;
 }
 

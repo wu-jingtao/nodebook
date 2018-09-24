@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ObservableVariable } from 'observable-variable';
 
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
@@ -12,7 +13,7 @@ const less = require('./UserCodePanel.less');
 /**
  * 用户代码目录
  */
-export class UserCodePanel<T extends FoldableContainerPropsType> extends FoldableContainer<T>  {
+export class UserCodePanel extends FoldableContainer<FoldableContainerPropsType & { height: ObservableVariable<string> }>  {
 
     private readonly _createFile = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -34,8 +35,6 @@ export class UserCodePanel<T extends FoldableContainerPropsType> extends Foldabl
         this._tree.closeAllBranch();
     };
 
-    protected _titleBarClassName = less.titleBar;
-    protected _contentClassName = less.contentBox;
     protected _tree: EditableFileTree<any>;
 
     protected renderTitleBar(): JSX.Element {
@@ -59,6 +58,7 @@ export class UserCodePanel<T extends FoldableContainerPropsType> extends Foldabl
 
     componentDidMount() {
         super.componentDidMount();
+        this.watch(this.props.height);
 
         //点击容器空白区域，清除所有选中选项
         this._content_div.click(e => {
@@ -97,6 +97,11 @@ export class UserCodePanel<T extends FoldableContainerPropsType> extends Foldabl
     componentWillUnmount() {
         super.componentWillUnmount();
         this._content_div.off('dragover drop click mouseleave');
+    }
+
+    render() {
+        this._contentStyle = { height: this.props.height.value + '%' };
+        return super.render();
     }
 }
 

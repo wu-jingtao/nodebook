@@ -42,9 +42,6 @@ export class UnsavedFilesPanel extends FoldableContainer<FoldableContainerPropsT
         });
     };
 
-    protected _titleBarClassName = less.titleBar;
-    protected _contentClassName = less.contentBox;
-
     protected renderTitleBar(): JSX.Element {
         return (
             <div className={less.titleButtons}>
@@ -64,6 +61,13 @@ export class UnsavedFilesPanel extends FoldableContainer<FoldableContainerPropsT
     componentDidMount() {
         super.componentDidMount();
         this.watch(cachedFiles);
+    }
+
+    render() {
+        if (cachedFiles.size > 0)
+            return super.render();
+        else
+            return false as any;
     }
 }
 
@@ -142,7 +146,7 @@ class ContentItem extends ObservableComponent<{ fullName: string }> {
         e.stopPropagation();
         e.preventDefault();
 
-        if (e.button === 0) 
+        if (e.button === 0)
             openWindow(this.props.fullName, 'file');
     };
 

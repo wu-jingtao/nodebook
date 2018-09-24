@@ -1,6 +1,17 @@
 @import "../../ThemeColor.less";
 @height: 25px;
 
+:local(.FoldableContainer) {
+    width: 100%;
+    overflow: hidden;
+
+    &:hover {
+        :local(.titleBox) {
+            display: block;
+        }
+    }
+}
+
 :local(.titleBar) {
     background-color: @backColor;
     height: @height;
@@ -51,6 +62,7 @@
     overflow: hidden;
     height: @height;
     position: relative;
+    display: none;
 }
 
 :local(.content) {

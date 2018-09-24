@@ -36,9 +36,6 @@ export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>
         windowList.rightWindows.length = 0;
     };
 
-    protected _titleBarClassName = less.titleBar;
-    protected _contentClassName = less.contentBox;
-
     protected renderTitleBar(): JSX.Element {
         return (
             <div className={less.titleButtons}>
@@ -82,6 +79,13 @@ export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>
     componentDidMount() {
         super.componentDidMount();
         this.watch(windowList.leftWindows, windowList.rightWindows);
+    }
+
+    render() {
+        if (windowList.leftWindows.length > 0 && windowList.rightWindows.length > 0)
+            return super.render();
+        else
+            return false as any;
     }
 }
 

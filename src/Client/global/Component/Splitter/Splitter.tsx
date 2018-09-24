@@ -16,6 +16,7 @@ interface SplitterPropsType {
     vertical?: boolean;
 
     className?: string;
+    style?: React.CSSProperties;
 }
 
 /**
@@ -56,6 +57,6 @@ export class Splitter extends ObservableComponent<SplitterPropsType> {
 
     render() {
         return <div className={this.props.className} ref={e => (this._splitter as any) = e && $(e)}
-            style={{ cursor: this.props.vertical ? 's-resize' : 'w-resize' }} />;
+            style={{ ...this.props.style, cursor: this.props.vertical ? 's-resize' : 'w-resize' }} />;
     }
 }
