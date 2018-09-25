@@ -65,7 +65,7 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
         return (
             <div className={less.FoldableContainer}>
                 <div className={classnames(less.titleBar, { [less.titleBarFocused]: this._titleBarFocused.value }, this._titleBarClassName)}
-                    style={this._titleBarStyle}
+                    style={{...this._titleBarStyle}}
                     ref={(e: any) => this._titleBar_div = e && $(e)}
                     onClick={this._titleBarOnClick}>
                     <i style={{ visibility: this.props.noFold ? 'hidden' : 'visible' }}

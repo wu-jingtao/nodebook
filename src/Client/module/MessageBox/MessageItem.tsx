@@ -1,8 +1,10 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
+import { oVar } from 'observable-variable';
 
 import { ObservableComponent, ObservableComponentWrapper } from '../../global/Tools/ObservableComponent';
 import { Button } from '../../global/Component/Button/Button';
+import { getIconPath } from '../../global/Component/FileIcon/GetIconPath';
 import { MessageBoxOptions } from './MessageBoxOptions';
 import { closeMessageBox } from './MessageBox';
 
@@ -15,16 +17,21 @@ export class MessageItem extends ObservableComponent<{ config: MessageBoxOptions
 
     private readonly _progress: JSX.Element;
     private readonly _button: JSX.Element;
-    private _icon: JSX.Element;
+
+    private _icon = oVar<string | undefined>(undefined);
     private _timer: any;
 
     constructor(props: any, context: any) {
         super(props, context);
 
-        const { icon, buttons, progress, autoClose = 7 } = this.props.config;
+        const { icon, fileName, buttons, progress, autoClose = 7 } = this.props.config;
 
-        if (icon)
-            this._icon = <img className={less.icon} src={`./res/img/message_icon/${icon}.png`} />;
+        if (icon) {
+            if (icon === 'file' && fileName)
+                this._icon.value = `/static/res/img/file_icons/${getIconPath(fileName)}`;
+            else
+                this._icon.value = `./res/img/message_icon/${icon}.png`;
+        }
 
         if (buttons) {
             this._button = (
@@ -51,11 +58,11 @@ export class MessageItem extends ObservableComponent<{ config: MessageBoxOptions
 
                 if (!reached100 && value === 100) {
                     reached100 = true;
-                    if (autoClose > 0) {
-                        this._timer = setTimeout(() => closeMessageBox(this.props.messageId), autoClose * 1000);
-                        this._icon = <img className={less.icon} src={`./res/img/message_icon/ok.png`} />;
-                        this.forceUpdate();
-                    }
+
+                    //避免在render中执行forceUpdate
+                    setTimeout(() => this._icon.value = './res/img/message_icon/ok.png', 1);
+
+                    if (autoClose > 0) this._timer = setTimeout(() => closeMessageBox(this.props.messageId), autoClose * 1000);
                 }
 
                 return (
@@ -71,19 +78,23 @@ export class MessageItem extends ObservableComponent<{ config: MessageBoxOptions
             this._timer = setTimeout(() => closeMessageBox(this.props.messageId), autoClose * 1000);
     }
 
+    componentDidMount() {
+        this.watch(this._icon);
+    }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         clearTimeout(this._timer);
     }
 
     render() {
-        const { icon, title, content } = this.props.config;
+        const { title, content } = this.props.config;
 
         return (
             <div className={less.MessageItem}>
                 <span className={less.close} onClick={() => closeMessageBox(this.props.messageId)}>×</span>
-                {this._icon}
-                <div className={classnames(less.right, { hasIcon: icon })}>
+                {this._icon.value && <img className={less.icon} src={this._icon.value} />}
+                <div className={classnames(less.right, { hasIcon: this._icon.value })}>
                     <div className={less.title}>{title}</div>
                     {this._progress}
                     {content && <div className={less.content}>{content}</div>}

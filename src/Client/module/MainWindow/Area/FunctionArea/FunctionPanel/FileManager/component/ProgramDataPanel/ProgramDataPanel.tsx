@@ -1,10 +1,8 @@
 import * as React from 'react';
 
-import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
-import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { cachedFiles } from '../../UnsavedFiles';
-import { UserCodePanel } from '../UserCodePanel/UserCodePanel';
+import { UserCodePanel, UserCodeTree } from '../UserCodePanel/UserCodePanel';
 
 /**
  * 程序数据目录
@@ -19,7 +17,7 @@ export class ProgramDataPanel extends UserCodePanel {
     }
 }
 
-class ProgramDataTree extends EditableFileTree<EditableFileTreePropsType>{
+class ProgramDataTree extends UserCodeTree {
 
     protected async _onDelete(): Promise<void> {
         await ServerApi.file.deleteProgramData(this._fullNameString);

@@ -11,6 +11,11 @@ export interface MessageBoxOptions {
     icon?: 'error' | 'message' | 'ok' | 'question' | 'recovery' | 'star' | 'warning' | 'write' | 'file' | 'attachment';
 
     /**
+     * 如果icon为file，可以提供文件名来显示一个与文件类型对应的图标
+     */
+    fileName?: string;
+
+    /**
      * 标题
      */
     title: string;

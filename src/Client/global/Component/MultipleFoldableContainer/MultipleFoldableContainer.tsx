@@ -99,9 +99,7 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
                 //最后一个分隔条要显示，需要上下两个容器都未折叠
                 return (
                     <React.Fragment key={index}>
-                        <MultipleFoldableContainerSplitter index={index - 1}
-                            folded={this._containerFolded.slice(index - 1, index === this.foldableContainers.length - 1 ? 2 : 1)}
-                            changeHeight={this._changeHeight} />
+                        <MultipleFoldableContainerSplitter index={index - 1} folded={this._containerFolded[index - 1]} changeHeight={this._changeHeight} />
                         {React.cloneElement(item, { _height: this._containerActualHeight[index], folded: this._containerFolded[index] })}
                     </React.Fragment>
                 );
@@ -132,13 +130,13 @@ export abstract class MultipleFoldableContainerItem<T extends MultipleFoldableCo
 class MultipleFoldableContainerSplitter extends ObservableComponent<MultipleFoldableContainerSplitterPropsType>{
 
     componentDidMount() {
-        this.watch(...this.props.folded);
+        this.watch(this.props.folded);
     }
 
     render() {
         return (
             <Splitter className={less.MultipleFoldableContainerSplitter} vertical
-                style={{ display: this.props.folded.some(item => item.value) ? 'none' : 'block' }}
+                style={{ display: this.props.folded.value ? 'none' : 'block' }}
                 onChange={position => this.props.changeHeight(this.props.index, position)} />
         );
     }

@@ -22,7 +22,7 @@ export interface MultipleFoldableContainerSplitterPropsType {
     /**
      * 对应的容器是否处于折叠状态。
      */
-    folded: ObservableVariable<boolean>[];
+    folded: ObservableVariable<boolean>;
 
     /**
      * 对应容器的编号

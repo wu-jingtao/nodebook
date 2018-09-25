@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { ObservableVariable } from 'observable-variable';
 
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
+import { refreshRecycleRoot } from '../RecyclePanel/RecyclePanel';
 import { cachedFiles } from '../../UnsavedFiles';
 
 const less = require('./UserCodePanel.less');
@@ -35,7 +35,7 @@ export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldabl
         this._tree.closeAllBranch();
     };
 
-    protected _tree: EditableFileTree<any>;
+    protected _tree: UserCodeTree;
 
     protected renderTitleBar(): JSX.Element {
         return (
@@ -69,7 +69,7 @@ export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldabl
         this._content_div.on('dragover', e => {
             if (e.target === this._content_div[0]) {
                 const oe = e.originalEvent as DragEvent;
-                if (oe.dataTransfer.types[0] === 'Files') {
+                if (oe.dataTransfer.types.includes('editable_file_tree_drag') || oe.dataTransfer.types.includes('Files')) {
                     e.stopPropagation();
                     e.preventDefault();
                 }
@@ -78,12 +78,15 @@ export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldabl
 
         this._content_div.on('drop', e => {
             if (e.target === this._content_div[0]) {
+                e.stopPropagation();
+                e.preventDefault();
+
                 const oe = e.originalEvent as DragEvent;
-                if (oe.dataTransfer.files.length > 0) {
-                    this._tree.uploadFile(oe.dataTransfer.files[0]);
-                    e.stopPropagation();
-                    e.preventDefault();
-                }
+
+                if (oe.dataTransfer.files.length > 0)
+                    [...oe.dataTransfer.files].forEach(file => this._tree.uploadFile(file));
+                else
+                    this._tree.pasteDragItems(e.ctrlKey ? 'copy' : 'cut');
             }
         });
     }
@@ -94,10 +97,11 @@ export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldabl
     }
 }
 
-class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
+export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
 
     protected async _onDelete(): Promise<void> {
         await ServerApi.file.deleteCodeData(this._fullNameString);
+        refreshRecycleRoot && refreshRecycleRoot();
     }
 
     protected _onOpenItem(): Promise<void> {
@@ -106,5 +110,21 @@ class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
                 resolve()
             }, 1000);
         });
+    }
+
+    /**
+     * 上传文件到根
+     */
+    public uploadFile(file: File) {
+        this._root._prepareUploadFile(file);
+    }
+
+    /**
+     * 粘贴文件
+     */
+    public pasteDragItems(action: 'copy' | 'cut') {
+        const items = EditableFileTree._copyItem;
+        EditableFileTree._copyItem = [];
+        this._preparePaste(items, action);
     }
 }
