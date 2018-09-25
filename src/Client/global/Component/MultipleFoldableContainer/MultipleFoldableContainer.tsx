@@ -34,19 +34,19 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
 
     //拖拽分隔条改变容器高度
     private readonly _changeHeight = (splitterIndex: number, position: number) => {
-        let topHeight = 0;   //计算底部其他容器的高度。25是标题栏高度
+        let topHeight = 25 * (splitterIndex + 1);   //计算顶部其他容器的高度。25是标题栏高度
 
         for (let index = 0; index < splitterIndex; index++) {
-            topHeight += 25 + this._containerActualHeight[index].value;
+            topHeight += this._containerActualHeight[index].value;
         }
 
-        this._containerExpectHeight.set(splitterIndex - 1, Math.max(position - (this._ref.offset() as any).top - topHeight, 0));
+        this._containerExpectHeight.set(splitterIndex, Math.max(position - (this._ref.offset() as any).top - topHeight, 0));
     }
 
     //计算每个容器高度
     private readonly _calculateHeight = () => {
-        let remain = (this._ref.height() || 0) - 25 * this._containerExpectHeight.length;    //剩下的可分配高度
-        let lastHeight: ObservableVariable<number> | undefined = undefined; //最后一个未折叠容器的高度
+        let remain = (this._ref.height() as any) - 25 * this._containerExpectHeight.length;    //剩下的可分配高度
+        let lastHeight: ObservableVariable<number> | undefined = undefined;     //最后一个未折叠容器的高度
 
         //先分配排在上面的容器，最后剩下的部分全部留给最后一个未折叠的容器
         for (let index = 0; index < this._containerExpectHeight.length; index++) {
@@ -85,19 +85,24 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
     componentDidMount() {
         //观察MultipleFoldableContainer DIV 大小的改变。目前tsd还没有ResizeObserver的定义
         (new (window as any).ResizeObserver(throttle(this._calculateHeight, 5))).observe(this._ref[0]);
+
         watch([this._containerExpectHeight, ...this._containerFolded], throttle(this._calculateHeight, 1));
+
         this._calculateHeight();
     }
 
     render() {
         const elements = this.foldableContainers.map((item, index) => {
             if (index === 0)
-                return React.cloneElement(item, { key: index, height: this._containerActualHeight[index], folded: this._containerFolded[index] });
+                return React.cloneElement(item, { key: index, _height: this._containerActualHeight[index], folded: this._containerFolded[index] });
             else {
+                //最后一个分隔条要显示，需要上下两个容器都未折叠
                 return (
                     <React.Fragment key={index}>
-                        <MultipleFoldableContainerSplitter index={index} folded={this._containerFolded[index - 1]} changeHeight={this._changeHeight} />
-                        {React.cloneElement(item, { height: this._containerActualHeight[index], folded: this._containerFolded[index] })}
+                        <MultipleFoldableContainerSplitter index={index - 1}
+                            folded={this._containerFolded.slice(index - 1, index === this.foldableContainers.length - 1 ? 2 : 1)}
+                            changeHeight={this._changeHeight} />
+                        {React.cloneElement(item, { _height: this._containerActualHeight[index], folded: this._containerFolded[index] })}
                     </React.Fragment>
                 );
             }
@@ -115,11 +120,11 @@ export abstract class MultipleFoldableContainerItem<T extends MultipleFoldableCo
 
     componentDidMount() {
         super.componentDidMount();
-        this.watch(this.props.height);
+        this.watch(this.props._height as any);
     }
 
     render() {
-        this._contentStyle.height = this.props.height.value + 'px';
+        this._contentStyle.height = (this.props._height as any).value + 'px';
         return super.render();
     }
 }
@@ -127,12 +132,14 @@ export abstract class MultipleFoldableContainerItem<T extends MultipleFoldableCo
 class MultipleFoldableContainerSplitter extends ObservableComponent<MultipleFoldableContainerSplitterPropsType>{
 
     componentDidMount() {
-        this.watch(this.props.folded);
+        this.watch(...this.props.folded);
     }
 
     render() {
-        return <Splitter className={less.MultipleFoldableContainerSplitter} vertical
-            style={{ display: this.props.folded.value ? 'none' : 'block' }}
-            onChange={position => this.props.changeHeight(this.props.index, position)} />
+        return (
+            <Splitter className={less.MultipleFoldableContainerSplitter} vertical
+                style={{ display: this.props.folded.some(item => item.value) ? 'none' : 'block' }}
+                onChange={position => this.props.changeHeight(this.props.index, position)} />
+        );
     }
 }

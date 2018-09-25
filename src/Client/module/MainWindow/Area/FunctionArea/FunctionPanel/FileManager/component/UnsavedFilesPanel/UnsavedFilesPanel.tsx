@@ -45,8 +45,8 @@ export class UnsavedFilesPanel extends FoldableContainer<FoldableContainerPropsT
     protected renderTitleBar(): JSX.Element {
         return (
             <div className={less.titleButtons}>
-                <img title="保存全部" src="/static/res/img/buttons_icon/saveall_inverse.svg" onClick={this._saveAll} />
-                <img title="全部放弃保存" src="/static/res/img/buttons_icon/undo-inverse.svg" onClick={this._undoAll} />
+                <img title="保存全部" src="/static/res/img/buttons_icon/save-inverse.svg" onClick={this._saveAll} />
+                <img title="全部放弃保存" src="/static/res/img/buttons_icon/clean-dark.svg" onClick={this._undoAll} />
             </div>
         );
     }
@@ -64,10 +64,8 @@ export class UnsavedFilesPanel extends FoldableContainer<FoldableContainerPropsT
     }
 
     render() {
-        if (cachedFiles.size > 0)
-            return super.render();
-        else
-            return false as any;
+        this._titleBarStyle.display = cachedFiles.size === 0 ? 'none' : '';
+        return super.render();
     }
 }
 

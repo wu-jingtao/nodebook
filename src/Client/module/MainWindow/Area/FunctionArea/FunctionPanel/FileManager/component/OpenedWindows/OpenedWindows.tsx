@@ -82,10 +82,8 @@ export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>
     }
 
     render() {
-        if (windowList.leftWindows.length > 0 && windowList.rightWindows.length > 0)
-            return super.render();
-        else
-            return false as any;
+        this._titleBarStyle.display = windowList.leftWindows.length === 0 && windowList.rightWindows.length === 0 ? 'none' : '';
+        return super.render();
     }
 }
 

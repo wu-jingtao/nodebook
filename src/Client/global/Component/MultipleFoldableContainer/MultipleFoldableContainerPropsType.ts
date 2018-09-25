@@ -15,14 +15,14 @@ export interface MultipleFoldableContainerItemPropsType extends FoldableContaine
     /**
      * 容器的高度
      */
-    height: ObservableVariable<number>;
+    _height?: ObservableVariable<number>;
 }
 
 export interface MultipleFoldableContainerSplitterPropsType {
     /**
-     * 对应的容器是否处于折叠状态
+     * 对应的容器是否处于折叠状态。
      */
-    folded: ObservableVariable<boolean>;
+    folded: ObservableVariable<boolean>[];
 
     /**
      * 对应容器的编号

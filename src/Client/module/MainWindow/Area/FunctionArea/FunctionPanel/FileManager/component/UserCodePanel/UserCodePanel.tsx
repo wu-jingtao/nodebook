@@ -4,8 +4,8 @@ import { ObservableVariable } from 'observable-variable';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
-import { FoldableContainer } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainer';
-import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
+import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
+import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { cachedFiles } from '../../UnsavedFiles';
 
 const less = require('./UserCodePanel.less');
@@ -13,7 +13,7 @@ const less = require('./UserCodePanel.less');
 /**
  * 用户代码目录
  */
-export class UserCodePanel extends FoldableContainer<FoldableContainerPropsType & { height: ObservableVariable<string> }>  {
+export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldableContainerItemPropsType>  {
 
     private readonly _createFile = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -58,17 +58,11 @@ export class UserCodePanel extends FoldableContainer<FoldableContainerPropsType 
 
     componentDidMount() {
         super.componentDidMount();
-        this.watch(this.props.height);
 
         //点击容器空白区域，清除所有选中选项
-        this._content_div.click(e => {
+        this._content_div.on('click', e => {
             if (e.target === e.currentTarget)
                 this._tree.unfocus();
-        });
-
-        //清除hover。因为使用了flex布局，Tree在边界的地方无法触发mouseleave事件
-        this._content_div.mouseleave(() => {
-            this._tree.unhover();
         });
 
         //确保拖拽文件到空白区域也可以上传文件
@@ -96,12 +90,7 @@ export class UserCodePanel extends FoldableContainer<FoldableContainerPropsType 
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        this._content_div.off('dragover drop click mouseleave');
-    }
-
-    render() {
-        this._contentStyle = { height: this.props.height.value + '%' };
-        return super.render();
+        this._content_div.off('dragover drop click');
     }
 }
 

@@ -1,22 +1,15 @@
 import * as React from 'react';
-import { ObservableVariable } from 'observable-variable';
 
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
-import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { cachedFiles } from '../../UnsavedFiles';
 import { UserCodePanel } from '../UserCodePanel/UserCodePanel';
-
-const less = require('./ProgramDataPanel.less');
 
 /**
  * 程序数据目录
  */
 export class ProgramDataPanel extends UserCodePanel {
-
-    protected _contentClassName = less.contentBox;
-
     protected renderContent(): JSX.Element {
         return <ProgramDataTree
             name="/program_data"

@@ -19,14 +19,20 @@
     cursor: pointer;
     display: flex;
     flex-wrap: nowrap;
+    box-sizing: border-box;
+    border: @backColor solid 1px;
+}
+
+:local(.titleBarFocused) {
+    border-color: @borderColor;
 }
 
 :local(.icon) {
     flex-grow: 0;
     flex-shrink: 0;
-    width: @height;
-    height: @height;
-    line-height: @height;
+    width: @height - 2px;
+    height: @height - 2px;
+    line-height: @height - 2px;
     text-align: center;
     color: lighten(@darkFontColor, 10%, relative);
 
@@ -34,25 +40,24 @@
         font-size: .9em;
         position: relative;
         left: 2px;
-        top: 1px;
     }
 
     &.icon-arrowdroprightdown {
         font-size: 1.75em;
         position: relative;
         left: 6px;
-        top: -1px;
+        top: -2px;
     }
 }
 
 :local(.title) {
     flex-grow: 0;
     flex-shrink: 0;
-    height: @height;
+    height: @height - 2px;
     font-weight: 700;
     font-size: .9em;
     margin: 0 2px;
-    line-height: @height + 3px;
+    line-height: @height - 2px + 2px;
     color: lighten(@darkFontColor, 10%, relative);
 }
 
@@ -60,7 +65,7 @@
     flex-grow: 1;
     flex-shrink: 1;
     overflow: hidden;
-    height: @height;
+    height: @height - 2px;
     position: relative;
     display: none;
 }

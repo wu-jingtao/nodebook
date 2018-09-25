@@ -2,10 +2,10 @@ import * as React from 'react';
 import * as classnames from 'classnames';
 import { ObservableVariable, oVar } from 'observable-variable';
 
-import { FoldableContainer } from "../../../../../../../../global/Component/FoldableContainer/FoldableContainer";
-import { FoldableContainerPropsType } from "../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType";
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
+import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
+import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { cachedFiles } from '../../UnsavedFiles';
@@ -15,7 +15,7 @@ const less = require('./RecyclePanel.less');
 /**
  * 回收站
  */
-export class RecyclePanel extends FoldableContainer<FoldableContainerPropsType & { height: ObservableVariable<string> }>{
+export class RecyclePanel extends MultipleFoldableContainerItem<MultipleFoldableContainerItemPropsType> {
 
     //拖拽到回收站上后显示删除图标
     private readonly _showTrashcanIcon = oVar(false);
@@ -40,7 +40,7 @@ export class RecyclePanel extends FoldableContainer<FoldableContainerPropsType &
     protected renderTitleBar(): JSX.Element {
         return (
             <div className={less.titleButtons}>
-                <img title="清空回收站" src="/static/res/img/buttons_icon/clear.svg" onClick={this._clearRecycle} />
+                <img title="清空回收站" src="/static/res/img/buttons_icon/kill-inverse.svg" onClick={this._clearRecycle} />
                 <img title="刷新" src="/static/res/img/buttons_icon/Refresh_inverse.svg" onClick={this._refreshDirectory} />
                 <img title="全部折叠" src="/static/res/img/buttons_icon/CollapseAll_inverse.svg" onClick={this._closeDirectory} />
             </div>
@@ -69,17 +69,12 @@ export class RecyclePanel extends FoldableContainer<FoldableContainerPropsType &
 
     componentDidMount() {
         super.componentDidMount();
-        this.watch(this.props.height, this._showTrashcanIcon);
+        this.watch(this._showTrashcanIcon);
 
         //点击容器空白区域，清除所有选中选项
-        this._content_div.click(e => {
+        this._content_div.on('click', e => {
             if (e.target === e.currentTarget)
                 this._tree.unfocus();
-        });
-
-        //清除hover。因为使用了flex布局，Tree在边界的地方无法触发mouseleave事件
-        this._content_div.mouseleave(() => {
-            this._tree.unhover();
         });
 
         //拖拽到回收站上时显示删除图标
@@ -127,12 +122,7 @@ export class RecyclePanel extends FoldableContainer<FoldableContainerPropsType &
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        this._content_div.off('dragenter dragleave dragover drop click mouseleave');
-    }
-
-    render() {
-        this._contentStyle = { height: this.props.height.value + '%' };
-        return super.render();
+        this._content_div.off('click dragenter dragleave dragover drop');
     }
 }
 

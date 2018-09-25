@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { ObservableComponent } from '../../Tools/ObservableComponent';
 import { throttle } from '../../Tools/Tools';
 
 interface SplitterPropsType {
@@ -22,7 +21,7 @@ interface SplitterPropsType {
 /**
  * 分隔条。使用前需用css确定好分隔条的位置
  */
-export class Splitter extends ObservableComponent<SplitterPropsType> {
+export class Splitter extends React.PureComponent<SplitterPropsType> {
 
     private _splitter: JQuery<HTMLDivElement>;
     private _document = $(document);
@@ -56,7 +55,9 @@ export class Splitter extends ObservableComponent<SplitterPropsType> {
     }
 
     render() {
-        return <div className={this.props.className} ref={e => (this._splitter as any) = e && $(e)}
-            style={{ ...this.props.style, cursor: this.props.vertical ? 's-resize' : 'w-resize' }} />;
+        return (
+            <div className={this.props.className} ref={e => (this._splitter as any) = e && $(e)}
+                style={{ ...this.props.style, cursor: this.props.vertical ? 's-resize' : 'w-resize' }} />
+        );
     }
 }
