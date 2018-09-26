@@ -8,4 +8,7 @@ import { SystemSetting } from "./SystemSetting";
 SystemSetting.addSystemSetting('client.sidebar.showLogo', true, false, 'boolean');
 
 //侧边栏功能区logo添加一些内边距
-SystemSetting.addSystemSetting('client.sidebar.logoPadding', true, false, 'boolean');   
+SystemSetting.addSystemSetting('client.sidebar.logoPadding', true, false, 'boolean');
+
+//在浏览器标题栏上显示的程序名称
+SystemSetting.addSystemSetting('client.programName', 'NodeBook', false, 'string');   

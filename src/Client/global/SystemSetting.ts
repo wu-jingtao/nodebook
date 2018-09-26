@@ -17,7 +17,7 @@ export async function loadSystemSetting(): Promise<void> {
     const _normalSettings = normalSettings as Map<string, ObservableVariable<any>>;
     const _secretSettings = secretSettings as Map<string, ObservableVariable<any>>;
 
-    //清楚旧的设置
+    //清除旧的设置
     _normalSettings.clear();
     _secretSettings.clear();
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { oVar } from 'observable-variable';
+import { oVar, ObservableVariable } from 'observable-variable';
 
 import { ObservableComponent } from '../../global/Tools/ObservableComponent';
 import { permanent_oVar } from '../../global/Tools/PermanentVariable';
@@ -7,7 +7,7 @@ import { Container } from '../../global/Component/Container/Container';
 import { TextInput } from '../../global/Component/TextInput/TextInput';
 import { Button } from '../../global/Component/Button/Button';
 import { ServerApi } from '../../global/ServerApi';
-import { loadSystemSetting } from '../../global/SystemSetting';
+import { loadSystemSetting, normalSettings } from '../../global/SystemSetting';
 import { showMessageBox } from '../MessageBox/MessageBox';
 
 const less = require('./LoginPage.less');
@@ -22,19 +22,17 @@ export const logged = oVar(false);
  */
 export class LoginPage extends ObservableComponent {
 
-    private readonly _userName = permanent_oVar('ui.LoginPage._userName', '""');//用户名
-    private readonly _password = oVar('');                                      //密码
-    private readonly _logging = oVar(true);                                     //是否正在登陆
-    private _timer: any;                                                        //定时更新令牌计时器
+    private readonly _userName = permanent_oVar('ui.LoginPage._userName', '""');    //用户名
+    private readonly _password = oVar('');                                          //密码
+    private readonly _logging = oVar(true);                                         //是否正在登陆
+    private _timer: any;                                                            //定时更新令牌计时器
 
-    /**
-     * 登陆系统
-     */
+    //登陆系统
     private async _login(): Promise<void> {
         try {
             this._logging.value = true;
             await ServerApi.user.login(this._userName.value, this._password.value);
-            await loadSystemSetting();
+            await this._loadSystemSetting();
             this._password.value = '';
             logged.value = true;
         } catch (error) {
@@ -45,11 +43,22 @@ export class LoginPage extends ObservableComponent {
         }
     }
 
+    //加载系统设置
+    private async _loadSystemSetting(): Promise<void> {
+        await loadSystemSetting();
+
+        //设置浏览器标题栏文字
+        const programName = normalSettings.get('client.programName') as ObservableVariable<string>;
+        programName.on('set', value => document.title = value);
+        document.title = programName.value;
+    }
+
     componentDidMount() {
         this.watch(this._userName, this._password, this._logging, logged);
 
+        //登录成功后每隔7分钟更新一次令牌
         logged.on('set', value => {
-            if (value) {    //登录成功后每隔7分钟更新一次令牌
+            if (value) {
                 this._timer = setInterval(async () => {
                     try {
                         await ServerApi.user.updateToken();
@@ -64,7 +73,7 @@ export class LoginPage extends ObservableComponent {
 
         //第一次打开后检查是否已经登录
         ServerApi.user.updateToken().then(async () => {
-            await loadSystemSetting();
+            await this._loadSystemSetting();
             logged.value = true;
         }).catch(() => { }).then(() => {
             this._logging.value = false;
