@@ -5,6 +5,7 @@ import { EditableFileTree } from '../../../../../../../../global/Component/Tree/
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
+import { openWindow } from '../../../../../ContentWindow/ContentWindow';
 import { refreshRecycleRoot } from '../RecyclePanel/RecyclePanel';
 import { cachedFiles } from '../../UnsavedFiles';
 
@@ -104,12 +105,8 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
         refreshRecycleRoot && refreshRecycleRoot();
     }
 
-    protected _onOpenItem(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve()
-            }, 1000);
-        });
+    protected async _onOpenItem(): Promise<void> {
+        openWindow({ name: this._fullNameString, type: 'file' });
     }
 
     /**

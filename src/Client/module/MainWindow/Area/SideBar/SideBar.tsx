@@ -31,7 +31,7 @@ export class SideBar extends ObservableComponent {
      * 打开设置窗口
      */
     private readonly _openSettingWindow = () => {
-        openWindow('系统设置', 'setting', true);
+        openWindow({ name: '系统设置', type: 'setting', fixed: true });
     };
 
     /**

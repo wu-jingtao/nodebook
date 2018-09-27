@@ -10,21 +10,31 @@
 :local(.left) {
     flex-grow: 1;
     flex-shrink: 1;
-    height: 100%;
-    overflow: hidden;
+    min-width: 10%;
 }
 
 :local(.right) {
-    max-width: 90%;
+    flex-grow: 0;
+    flex-shrink: 0;
     min-width: 10%;
-    position: relative;
 }
 
 :local(.splitter) {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 5px;
-    border-left: 1px solid @lightBackColor;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 1px;
+    background-color: @lightBackColor;
+    position: relative;
+
+    &::before {
+        content: '';
+        display: block;
+        height: 100%;
+        width: 6px;
+        position: absolute;
+        top: 0;
+        left: -3px;
+        cursor: w-resize;
+        z-index: 20;
+    }
 }

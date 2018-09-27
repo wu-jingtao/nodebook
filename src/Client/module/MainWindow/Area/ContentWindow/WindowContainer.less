@@ -1,5 +1,87 @@
 @import "../../../../global/ThemeColor.less";
 
-:local(.WindowContainer){
-    
+:local(.WindowContainer) {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+:local(.titleBar) {
+    height: 35px;
+    width: 100%;
+    display: flex;
+    background-color: @darkBackColor;
+}
+
+:local(.tabs) {
+    flex-grow: 1;
+    flex-shrink: 1;
+    height: 35px;
+    display: flex;
+    overflow: hidden;
+}
+
+:local(.tabItem) {
+    flex-grow: 0;
+    flex-shrink: 1;
+    height: 35px;
+    min-width: 30px;
+    background-color: @lightBackColor;
+    font-style: italic;
+    margin-right: 1px;
+    display: flex;
+    color: @darkFontColor;
+
+    &:hover {
+        :local(.tabItemCloseButton) {
+            visibility: visible;
+        }
+    }
+}
+
+:local(.tabItemFocus) {
+    background-color: @darkBackColor;
+    color: @fontColor;
+}
+
+:local(.tabItemFixed) {
+    font-style: normal;
+}
+
+:local(.tabItemCloseButton) {
+    font-style: normal;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 30px;
+    height: 35px;
+    line-height: 35px;
+    color: @fontColor;
+    visibility: hidden;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+:local(.tabItemContent) {
+    flex-grow: 0;
+    flex-shrink: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+:local(.functionButtons) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    height: 35px;
+    overflow: hidden;
+}
+
+:local(.functionButtonItem) {
+    width: 35px;
+    height: 35px;
+}
+
+:local(.content) {
+    height: ~"calc(100% - 35px)";
+    width: 100%;
 }

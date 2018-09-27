@@ -145,7 +145,7 @@ class ContentItem extends ObservableComponent<{ fullName: string }> {
         e.preventDefault();
 
         if (e.button === 0)
-            openWindow(this.props.fullName, 'file');
+            openWindow({ name: this.props.fullName, type: 'file' });
     };
 
     render() {

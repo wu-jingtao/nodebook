@@ -25,7 +25,7 @@ export class LogWindow extends ObservableComponent {
 
     render() {
         return (
-            <div id="LogWindow" style={{ height: this._height.value, display: showLogWindow.value ? 'block' : 'none' }}>
+            <div id="LogWindow" style={{ flexBasis: this._height.value, display: showLogWindow.value ? 'block' : 'none' }}>
                 <Splitter className={less.splitter} onChange={position => this._height.value = window.innerHeight - position} vertical />
             </div>
         );

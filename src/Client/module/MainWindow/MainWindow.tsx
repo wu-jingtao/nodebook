@@ -5,6 +5,7 @@ import { logged } from '../LoginPage/LoginPage';
 import { SideBar } from './Area/SideBar/SideBar';
 import { FunctionArea } from './Area/FunctionArea/FunctionArea';
 import { LogWindow } from './Area/LogWindow/LogWindow';
+import { ContentWindow } from './Area/ContentWindow/ContentWindow';
 
 const less = require('./MainWindow.less');
 
@@ -24,6 +25,7 @@ export class MainWindow extends ObservableComponent {
                     <SideBar />
                     <FunctionArea />
                     <div className={less.right}>
+                        <ContentWindow />
                         <LogWindow />
                     </div>
                 </div>

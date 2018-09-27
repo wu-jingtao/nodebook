@@ -6,10 +6,10 @@ import clipboard = require('copy-text-to-clipboard');
 import { FoldableContainer } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainer';
 import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
 import { ObservableComponent } from '../../../../../../../../global/Tools/ObservableComponent';
+import { FileIcon } from '../../../../../../../../global/Component/FileIcon/FileIcon';
 import { windowList, closeWindow, moveToOtherSide } from '../../../../../ContentWindow/ContentWindow';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
-import { FileIcon } from '../../../../../../../../global/Component/FileIcon/FileIcon';
 
 
 const less = require('./OpenedWindows.less');
@@ -21,7 +21,7 @@ export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>
 
     //关闭所有窗口
     private readonly _closeAll = () => {
-        windowList.focusedWindow.value = undefined;
+        windowList.focusedWindow.value = null;
         windowList.leftWindows.length = 0;
         windowList.rightWindows.length = 0;
     };
@@ -109,12 +109,12 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', nam
 
     //关闭窗口
     private readonly _menu_close = () => {
-        closeWindow(this.props.name, this.props.type, this.props.side);
+        closeWindow({ name: this.props.name, type: this.props.type, side: this.props.side });
     };
 
     //将窗口移动到另一边显示
     private readonly _menu_moveToOtherSide = () => {
-        moveToOtherSide(this.props.name, this.props.type, this.props.side);
+        moveToOtherSide({ name: this.props.name, type: this.props.type, side: this.props.side });
     };
 
     //使得当前窗口处于焦点
