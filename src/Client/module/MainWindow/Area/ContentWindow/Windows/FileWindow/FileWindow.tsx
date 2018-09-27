@@ -10,7 +10,7 @@ const windowStyle = require('../WindowStyle.less');
 export class FileWindow extends ObservableComponent<WindowPropsType> {
 
     componentDidMount() {
-        const name = this.props.name.split('/').pop() || '';
+        const name = this.props.name.split('/').pop() as string;
 
         this.props.title.value = (
             <div className={windowStyle.title}>

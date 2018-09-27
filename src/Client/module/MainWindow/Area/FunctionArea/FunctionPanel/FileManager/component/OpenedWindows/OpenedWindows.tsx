@@ -7,10 +7,10 @@ import { FoldableContainer } from '../../../../../../../../global/Component/Fold
 import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
 import { ObservableComponent } from '../../../../../../../../global/Tools/ObservableComponent';
 import { FileIcon } from '../../../../../../../../global/Component/FileIcon/FileIcon';
+import { dragText } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { windowList, closeWindow, moveToOtherSide } from '../../../../../ContentWindow/ContentWindow';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
-
 
 const less = require('./OpenedWindows.less');
 
@@ -50,10 +50,12 @@ export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>
         if (windowList.leftWindows.length > 0) {
             windowLeft = (
                 <>
-                    <div className={less.windowSideTitle}>
-                        <span>左侧</span>
-                        <img title="关闭左侧窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg" onClick={this._closeLeft} />
-                    </div>
+                    {windowList.rightWindows.length > 0 &&
+                        <div className={less.windowSideTitle}>
+                            <span>左侧</span>
+                            <img title="关闭左侧窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg" onClick={this._closeLeft} />
+                        </div>
+                    }
                     {windowList.leftWindows.map(item =>
                         <OpenedWindowItem key={`${item.type}-${item.name}`} name={item.name} type={item.type} fixed={item.fixed} side="left" />)}
                 </>
@@ -63,11 +65,14 @@ export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>
         if (windowList.rightWindows.length > 0) {
             windowRight = (
                 <>
-                    <div className={less.windowSideTitle}>
-                        <span>右侧</span>
-                        <img title="关闭右侧窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg" onClick={this._closeRight} />
-                    </div>
-                    {windowList.leftWindows.map(item =>
+                    {
+                        windowList.leftWindows.length > 0 &&
+                        <div className={less.windowSideTitle}>
+                            <span>右侧</span>
+                            <img title="关闭右侧窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg" onClick={this._closeRight} />
+                        </div>
+                    }
+                    {windowList.rightWindows.map(item =>
                         <OpenedWindowItem key={`${item.type}-${item.name}`} name={item.name} type={item.type} fixed={item.fixed} side="right" />)}
                 </>
             );
@@ -122,6 +127,11 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', nam
         windowList.focusedWindow.value = { name: this.props.name, type: this.props.type, side: this.props.side };
     };
 
+    //使得窗口固定
+    private readonly _fixWindow = () => {
+        this.props.fixed.value = true;
+    }
+
     //右键菜单
     private readonly _contextMenu = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -132,7 +142,7 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', nam
                 position: { x: e.clientX, y: e.clientY }, items: [
                     [
                         { name: '关闭窗口', callback: this._menu_close },
-                        { name: `移动到${this.props.side === 'left' ? '右侧' : '左侧'}显示`, callback: this._menu_moveToOtherSide }
+                        { name: `移动到${this.props.side === 'left' ? '右' : '左'}侧显示`, callback: this._menu_moveToOtherSide }
                     ],
                     [
                         { name: '复制绝对路径', callback: this._menu_copyPath }
@@ -141,6 +151,17 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', nam
             });
         }
     }
+
+    //拖拽
+    private readonly _onDragStart = (e: React.DragEvent) => {
+        e.dataTransfer.effectAllowed = 'copy';
+
+        dragText.text(this._name);
+        e.dataTransfer.setDragImage(dragText[0], -20, 0);
+
+        //配置数据
+        e.dataTransfer.setData('text/plain', this.props.name);
+    };
 
     componentDidMount() {
         this.watch(this.props.fixed, windowList.focusedWindow);
@@ -153,7 +174,12 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', nam
             windowList.focusedWindow.value.name === this.props.name;
 
         return (
-            <div className={classnames(less.contentItem, { [less.focused]: focused })} onClick={this._focusWindow} onContextMenu={this._contextMenu}>
+            <div className={classnames(less.contentItem, { [less.focused]: focused, [less.fixed]: this.props.fixed.value })}
+                draggable
+                onDragStart={this._onDragStart}
+                onClick={this._focusWindow}
+                onDoubleClick={this._fixWindow}
+                onContextMenu={this._contextMenu}>
                 <div className={less.close} title="关闭窗口" onClick={this._menu_close}>×</div>
                 <FileIcon className={less.fileIcon} filename={this._icon} />
                 <div className={less.fileName}>{this._name}</div>

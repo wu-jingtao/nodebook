@@ -24,35 +24,85 @@
     }
 }
 
+:local(.windowSideTitle) {
+    width: 100%;
+    height: 25px;
+    line-height: 26px;
+    color: @darkFontColor;
+    font-size: .8em;
+    position: relative;
+    padding-left: 12px;
+    box-sizing: border-box;
+    overflow: hidden;
+    .clearFloat();
+
+    &:hover {
+        background-color: darken(@lightBackColor, 30%, relative);
+
+        & > img {
+            visibility: visible;
+        }
+    }
+
+    & > span {
+        float: left;
+    }
+
+    & > img {
+        float: right;
+        height: 16px;
+        width: 16px;
+        padding: 4px 6px;
+        align-self: flex-end;
+        visibility: hidden;
+        cursor: pointer;
+
+        &:last-child {
+            padding-right: 13px;
+        }
+    }
+}
+
 :local(.contentItem) {
     width: 100%;
     height: 25px;
+    line-height: 25px;
     overflow: hidden;
     cursor: pointer;
     display: flex;
-    flex-wrap: nowrap;
+    color: @darkFontColor;
+    font-size: .9em;
+    font-style: italic;
+
+    &:local(.fixed) {
+        font-style: normal;
+    }
 
     &:local(.focused) {
         background-color: darken(@lightBackColor, 10%, relative) !important;
+
+        :local(.close) {
+            visibility: visible;
+        }
     }
 
     &:hover {
         background-color: darken(@lightBackColor, 30%, relative);
+
+        :local(.close) {
+            visibility: visible;
+        }
     }
 }
 
 :local(.close) {
     flex-grow: 0;
     flex-shrink: 0;
-    width: 25px;
     height: 25px;
-    line-break: 25px;
-    font-size: 1.1em;
-    color: @darkFontColor;
-
-    &:hover {
-        color: @fontColor;
-    }
+    font-size: 1.5em;
+    padding: 0 6px 0 12px;
+    color: @fontColor;
+    visibility: hidden;
 }
 
 :local(.fileIcon) {
@@ -60,20 +110,20 @@
     flex-shrink: 0;
     height: 15px;
     width: 15px;
-    padding: 5px;
+    padding: 5px 6px 5px 0;
 }
 
 :local(.fileName) {
     flex-grow: 0;
     flex-shrink: 0;
-    line-height: 25px;
-    padding: 5px;
 }
 
 :local(.fileFullName) {
+    color: darken(@darkFontColor, 20%, relative);
+    font-size: 10px;
+    padding-left: 6px;
     flex-grow: 1;
     flex-shrink: 1;
-    line-height: 25px;
     overflow: hidden;
     text-overflow: ellipsis;
 }

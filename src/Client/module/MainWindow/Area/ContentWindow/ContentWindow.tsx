@@ -102,7 +102,7 @@ export class ContentWindow extends ObservableComponent {
                     onChange={position => this._rightWidth.value = window.innerWidth - position + 'px'} />
                 <div className={less.right} style={{
                     display: windowList.rightWindows.length > 0 ? 'block' : 'none',
-                    flexBasis: this._rightWidth.value
+                    flexBasis: windowList.leftWindows.length > 0 ? this._rightWidth.value : '100%',
                 }}>
                     <WindowContainer position="right" />
                 </div>
