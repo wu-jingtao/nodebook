@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { oVar } from 'observable-variable';
+import { oVar, permanent_oArr, permanent_oVar } from 'observable-variable';
 
-import { permanent_oArr, permanent_oVar } from '../../../../global/Tools/PermanentVariable';
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { Splitter } from '../../../../global/Component/Splitter/Splitter';
 import { WindowContainer } from './WindowContainer';
@@ -15,7 +14,7 @@ const less = require('./ContentWindow.less');
 export const windowList: WindowList = {
     leftWindows: permanent_oArr('ui.ContentWindow.leftWindows'),
     rightWindows: permanent_oArr('ui.ContentWindow.rightWindows'),
-    focusedWindow: permanent_oVar('ui.ContentWindow.focusedWindow', 'null')
+    focusedWindow: permanent_oVar<any>('ui.ContentWindow.focusedWindow', { defaultValue: null })
 }
 
 //转换fixed的类型

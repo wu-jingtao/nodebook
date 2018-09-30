@@ -1,10 +1,9 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import { ObservableArray, ObservableVariable, oVar, watch } from 'observable-variable';
+import { ObservableArray, ObservableVariable, oVar, watch, permanent_oArr, permanent_oVar } from 'observable-variable';
+import throttle = require('lodash.throttle');
 
 import { ObservableComponent } from '../../Tools/ObservableComponent';
-import { permanent_oArr, permanent_oVar } from '../../Tools/PermanentVariable';
-import { throttle } from '../../Tools/Tools';
 import { Splitter } from '../Splitter/Splitter';
 import { FoldableContainer } from '../FoldableContainer/FoldableContainer';
 import { MultipleFoldableContainerPropsType, MultipleFoldableContainerItemPropsType, MultipleFoldableContainerSplitterPropsType } from './MultipleFoldableContainerPropsType';
@@ -78,13 +77,13 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
                 this._containerExpectHeight.set(index, 300);
 
             this._containerActualHeight.push(oVar(0));
-            this._containerFolded.push(permanent_oVar(`ui.MultipleFoldableContainer._containerFolded._${this.props.uniqueID}.${index}`, 'false'));
+            this._containerFolded.push(permanent_oVar(`ui.MultipleFoldableContainer._containerFolded._${this.props.uniqueID}.${index}`, { defaultValue: false }));
         }
     }
 
     componentDidMount() {
         //观察MultipleFoldableContainer DIV 大小的改变。目前tsd还没有ResizeObserver的定义
-        (new (window as any).ResizeObserver(throttle(this._calculateHeight, 5))).observe(this._ref[0]);
+        (new (window as any).ResizeObserver(throttle(this._calculateHeight, 17))).observe(this._ref[0]);
 
         watch([this._containerExpectHeight, ...this._containerFolded], throttle(this._calculateHeight, 1));
 

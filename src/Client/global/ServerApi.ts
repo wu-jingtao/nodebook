@@ -2,7 +2,6 @@ import md5 = require('blueimp-md5');
 import { ObservableVariable } from 'observable-variable';
 
 import { Get, Post } from './Tools/Ajax';
-import { expect } from './Tools/Tools';
 
 /**
  * 服务器端接口
@@ -151,3 +150,8 @@ export const ServerApi = {
         },
     }
 };
+
+//断言
+function expect(expect: any, tobe: any, exceptionMessage: string) {
+    if (expect !== tobe) throw new Error(exceptionMessage);
+}

@@ -1,8 +1,7 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import { ObservableVariable, oVar } from 'observable-variable';
+import { ObservableVariable, oVar, permanent_oVar } from 'observable-variable';
 
-import { permanent_oVar } from '../../Tools/PermanentVariable';
 import { ObservableComponent } from '../../Tools/ObservableComponent';
 import { ScrollBar } from '../ScrollBar/ScrollBar';
 import { FoldableContainerPropsType } from './FoldableContainerPropsType';
@@ -14,7 +13,7 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
     private readonly _titleBarFocused = oVar(false);
     private _isClicked = false; //用于判读是否被鼠标点击了
 
-    public readonly folded: ObservableVariable<boolean> = this.props.folded as any || permanent_oVar(`ui.FoldableContainer.${this.props.uniqueID}`, 'false');
+    public readonly folded: ObservableVariable<boolean> = this.props.folded as any || permanent_oVar(`ui.FoldableContainer.${this.props.uniqueID}`, { defaultValue: false });
 
     protected _titleBar_div: JQuery<HTMLDivElement>;
     protected _content_div: JQuery<HTMLDivElement>;
@@ -65,7 +64,7 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
         return (
             <div className={less.FoldableContainer}>
                 <div className={classnames(less.titleBar, { [less.titleBarFocused]: this._titleBarFocused.value }, this._titleBarClassName)}
-                    style={{...this._titleBarStyle}}
+                    style={{ ...this._titleBarStyle }}
                     ref={(e: any) => this._titleBar_div = e && $(e)}
                     onClick={this._titleBarOnClick}>
                     <i style={{ visibility: this.props.noFold ? 'hidden' : 'visible' }}

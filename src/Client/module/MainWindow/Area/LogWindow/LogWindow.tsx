@@ -1,23 +1,22 @@
 import * as React from 'react';
-import { ObservableVariable } from 'observable-variable';
+import { ObservableVariable, permanent_oVar } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { Splitter } from '../../../../global/Component/Splitter/Splitter';
-import { permanent_oVar } from '../../../../global/Tools/PermanentVariable';
 
 const less = require('./LogWindow.less');
 
 /**
  * 是否显示日志窗口
  */
-export const showLogWindow: ObservableVariable<boolean> = permanent_oVar('ui.LogWindow._showLogWindow', 'false');
+export const showLogWindow = permanent_oVar('ui.LogWindow._showLogWindow', { defaultValue: false });
 
 /**
  * 日志窗口
  */
 export class LogWindow extends ObservableComponent {
 
-    private readonly _height = permanent_oVar('ui.LogWindow._height', '200');   //日志窗口的高度
+    private readonly _height = permanent_oVar('ui.LogWindow._height', { defaultValue: 200 });   //日志窗口的高度
 
     componentDidMount() {
         this.watch(this._height, showLogWindow);

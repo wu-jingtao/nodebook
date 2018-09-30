@@ -1,6 +1,5 @@
 import * as React from 'react';
-
-import { throttle } from '../../Tools/Tools';
+import throttle = require('lodash.throttle');
 
 interface SplitterPropsType {
 
@@ -41,7 +40,7 @@ export class Splitter extends React.PureComponent<SplitterPropsType> {
             this._document.on(this._on_mousemove, throttle((e: JQuery.Event) => {
                 const position = (this.props.vertical ? e.clientY : e.clientX) as any;
                 this.props.onChange(position);
-            }, 5));
+            }, 17));
 
             this._document.one(this._off_mousemove, () => {
                 this._document.off(this._on_mousemove);

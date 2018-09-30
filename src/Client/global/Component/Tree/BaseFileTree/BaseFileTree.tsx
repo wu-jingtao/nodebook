@@ -1,10 +1,10 @@
 import { oMap } from 'observable-variable';
+import throttle = require('lodash.throttle');
 
 import { ServerApi } from '../../../ServerApi';
 import { showMessageBox } from '../../../../module/MessageBox/MessageBox';
 import { FileIconTree } from '../FileIconTree/FileIconTree';
 import { FileIconTreePropsType } from '../FileIconTree/FileIconTreePropsType';
-import { throttle } from '../../../Tools/Tools';
 
 /**
  * 基础文件树。实现了服务器端路径读取，缓存。

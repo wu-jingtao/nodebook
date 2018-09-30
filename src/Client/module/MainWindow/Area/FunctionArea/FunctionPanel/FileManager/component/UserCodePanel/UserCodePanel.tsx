@@ -69,8 +69,8 @@ export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldabl
         //确保拖拽文件到空白区域也可以上传文件
         this._content_div.on('dragover', e => {
             if (e.target === this._content_div[0]) {
-                const oe = e.originalEvent as DragEvent;
-                if (oe.dataTransfer.types.includes('editable_file_tree_drag') || oe.dataTransfer.types.includes('Files')) {
+                const dt = (e.originalEvent as DragEvent).dataTransfer as DataTransfer;
+                if (dt.types.includes('editable_file_tree_drag') || dt.types.includes('Files')) {
                     e.stopPropagation();
                     e.preventDefault();
                 }
@@ -82,10 +82,10 @@ export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldabl
                 e.stopPropagation();
                 e.preventDefault();
 
-                const oe = e.originalEvent as DragEvent;
+                const dt = (e.originalEvent as DragEvent).dataTransfer as DataTransfer;
 
-                if (oe.dataTransfer.files.length > 0)
-                    [...oe.dataTransfer.files].forEach(file => this._tree.uploadFile(file));
+                if (dt.files.length > 0)
+                    [...dt.files].forEach(file => this._tree.uploadFile(file));
                 else
                     this._tree.pasteDragItems(e.ctrlKey ? 'copy' : 'cut');
             }

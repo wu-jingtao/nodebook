@@ -1,8 +1,8 @@
 import { ObservableVariable, oVar } from "observable-variable";
+import throttle = require('lodash.throttle');
 
 import { ServerApi } from './ServerApi';
 import { showMessageBox } from "../module/MessageBox/MessageBox";
-import { throttle } from './Tools/Tools';
 
 /**
  * 系统设置

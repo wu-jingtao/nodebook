@@ -1,10 +1,10 @@
 import * as React from 'react';
+import throttle = require('lodash.throttle');
 
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
-import { throttle } from '../../../../../../../../global/Tools/Tools';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
@@ -70,20 +70,20 @@ export class RecyclePanel extends MultipleFoldableContainerItem<MultipleFoldable
         });
 
         this._content_div.on('dragover', e => {
-            const oe = e.originalEvent as DragEvent;
-
-            if (oe.dataTransfer.types.includes('editable_file_tree_drag')) {
+            const dt = (e.originalEvent as DragEvent).dataTransfer as DataTransfer;
+            
+            if (dt.types.includes('editable_file_tree_drag')) {
                 e.stopPropagation();
                 e.preventDefault();
             }
         });
 
         this._content_div.on('drop', e => {
-            const oe = e.originalEvent as DragEvent;
             e.stopPropagation();
             e.preventDefault();
 
-            if (oe.dataTransfer.getData('editable_file_tree_drag') !== '/user_data/recycle') {
+            const dt = (e.originalEvent as DragEvent).dataTransfer as DataTransfer;
+            if (dt.getData('editable_file_tree_drag') !== '/user_data/recycle') {
                 this._tree.deleteDragItems();
             }
         });

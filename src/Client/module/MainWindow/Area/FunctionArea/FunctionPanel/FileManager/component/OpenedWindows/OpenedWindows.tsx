@@ -39,7 +39,7 @@ export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>
     protected renderTitleBar(): JSX.Element {
         return (
             <div className={less.titleButtons}>
-                <img title="关闭全部" src="/static/res/img/buttons_icon/closeall_inverse.svg" onClick={this._closeAll} />
+                <img title="关闭全部窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg" onClick={this._closeAll} />
             </div>
         );
     }

@@ -38,7 +38,7 @@ export class BackupData extends BaseServiceModule {
     private _userPassword: ObservableVariable<string>;
 
     private _lastBackupTime: moment.Moment = moment();  //上一次备份的时间
-    private _timer: number;                             //计时器
+    private _timer: any;                                //计时器
 
     async onStart(): Promise<void> {
         const _systemSetting: SystemSetting = this.services.SystemSetting;
@@ -68,8 +68,8 @@ export class BackupData extends BaseServiceModule {
                 if (oldValue == 0) this._lastBackupTime = moment();
 
                 //计算时间差
-                const timeDiff = moment.duration(moment().add(newValue, 'days').diff(this._lastBackupTime)).valueOf();
-                this._timer = setTimeout(() => this._autoBackup(), timeDiff);
+                const timeDiff = moment.duration(moment().add(newValue, 'days').diff(this._lastBackupTime));
+                this._timer = setTimeout(() => this._autoBackup(), timeDiff.asMilliseconds());
             }
         }
 

@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { oVar, ObservableVariable } from 'observable-variable';
+import { oVar, ObservableVariable, permanent_oVar } from 'observable-variable';
 
 import { ObservableComponent } from '../../global/Tools/ObservableComponent';
-import { permanent_oVar } from '../../global/Tools/PermanentVariable';
 import { Container } from '../../global/Component/Container/Container';
 import { TextInput } from '../../global/Component/TextInput/TextInput';
 import { Button } from '../../global/Component/Button/Button';
@@ -22,10 +21,10 @@ export const logged = oVar(false);
  */
 export class LoginPage extends ObservableComponent {
 
-    private readonly _userName = permanent_oVar('ui.LoginPage._userName', '""');    //用户名
-    private readonly _password = oVar('');                                          //密码
-    private readonly _logging = oVar(true);                                         //是否正在登陆
-    private _timer: any;                                                            //定时更新令牌计时器
+    private readonly _userName = permanent_oVar('ui.LoginPage._userName', { defaultValue: '' });    //用户名
+    private readonly _password = oVar('');                                                          //密码
+    private readonly _logging = oVar(true);                                                         //是否正在登陆
+    private _timer: any;                                                                            //定时更新令牌计时器
 
     //登陆系统
     private async _login(): Promise<void> {

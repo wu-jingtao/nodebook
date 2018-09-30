@@ -1,5 +1,6 @@
+import { permanent_oSet } from 'observable-variable';
+
 import { Tree } from '../Tree';
-import { permanent_oSet } from '../../../Tools/PermanentVariable';
 import { MemoryTreePropsType } from './MemoryTreePropsType';
 
 /**

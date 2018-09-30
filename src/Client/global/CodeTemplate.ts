@@ -1,5 +1,3 @@
-import * as moment from 'moment';
-
 /**
  * 根据文件名生成对应的代码模板
  */
@@ -19,15 +17,15 @@ export function codeTemplate(filename: string) {
 }
 
 function default_file(filename: string) {
-    return `/* ${moment().format('YYYY-MM-DD HH:mm:ss')} */`;
+    return `/* ${(new Date).toLocaleDateString()} */`;
 }
 
 function bash(filename: string) {
-    return `# ${moment().format('YYYY-MM-DD HH:mm:ss')}`;
+    return `# ${(new Date).toLocaleDateString()}`;
 }
 
 function html(filename: string) {
-    return `<!-- ${moment().format('YYYY-MM-DD HH:mm:ss')} -->
+    return `<!-- ${(new Date).toLocaleDateString()} -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -51,7 +49,7 @@ function html(filename: string) {
 }
 
 function clientJs(filename: string) {
-    return `/* ${moment().format('YYYY-MM-DD HH:mm:ss')} */
+    return `/* ${(new Date).toLocaleDateString()} */
 
 /* 调用服务器端任务暴露出来的方法 */
 window.nodebook.invokeTask('/user_data/code/test.js', 'exportedFunctionName', {data: 123})
@@ -61,7 +59,7 @@ window.nodebook.invokeTask('/user_data/code/test.js', 'exportedFunctionName', {d
 }
 
 function ServerJs(filename: string) {
-    return `/* ${moment().format('YYYY-MM-DD HH:mm:ss')} */
+    return `/* ${(new Date).toLocaleDateString()} */
 
 const nodebook = require('/app/bin/Client/res/helper/server_helper.js');
 

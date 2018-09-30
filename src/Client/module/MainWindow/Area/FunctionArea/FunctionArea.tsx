@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { ObservableVariable } from 'observable-variable';
+import { ObservableVariable, permanent_oVar } from 'observable-variable';
 
 import { ObservableComponent } from "../../../../global/Tools/ObservableComponent";
 import { Splitter } from '../../../../global/Component/Splitter/Splitter';
-import { permanent_oVar } from '../../../../global/Tools/PermanentVariable';
 import { FileManager } from './FunctionPanel/FileManager/FileManager';
 import { ShortcutManager } from './FunctionPanel/ShortcutManager/ShortcutManager';
 import { TaskManager } from './FunctionPanel/TaskManager/TaskManager';
@@ -20,14 +19,14 @@ const less = require('./FunctionArea.less');
  *  null：      不显示功能区
  */
 export const displayType: ObservableVariable<'file' | 'task' | 'shortcut' | 'service' | null> =
-    permanent_oVar('ui.FunctionArea._displayType', '"file"');
+    permanent_oVar<any>('ui.FunctionArea._displayType', { defaultValue: 'file' });
 
 /**
  * 侧边栏，功能区按钮
  */
 export class FunctionArea extends ObservableComponent {
 
-    private readonly _width = permanent_oVar('ui.FunctionArea._width', '300');    //功能区的宽度
+    private readonly _width = permanent_oVar('ui.FunctionArea._width', { defaultValue: 300 });    //功能区的宽度
 
     componentDidMount() {
         this.watch(this._width, displayType);
