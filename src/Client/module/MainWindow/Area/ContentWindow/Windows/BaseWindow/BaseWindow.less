@@ -2,7 +2,7 @@
 
 :local(.title) {
     flex-grow: 0;
-    flex-shrink: 1;
+    flex-shrink: 0;
     height: 35px;
     min-width: 35px;
     background-color: @lightBackColor;
@@ -36,9 +36,10 @@
     font-style: normal;
     flex-grow: 0;
     flex-shrink: 0;
-    width: 35px;
-    height: 35px;
-    line-height: 35px;
+    width: 19px;
+    height: 19px;
+    line-height: 19px;
+    margin: 8px;
     color: @fontColor;
     visibility: hidden;
     text-align: center;
@@ -56,12 +57,10 @@
 
 :local(.titleText) {
     flex-grow: 0;
-    flex-shrink: 0;
-    //position: relative;
-    //top: -13px;
+    flex-shrink: 1;
+    text-overflow: ellipsis;
     height: 35px;
     line-height: 35px;
-    //display: inline-block;
     font-size: .95em;
 }
 
@@ -70,12 +69,12 @@
     flex-shrink: 0;
     height: 35px;
     overflow: hidden;
-}
 
-:local(.functionButtonItem) {
-    width: 19px;
-    height: 19px;
-    padding: 8px;
+    > img {
+        width: 21px;
+        height: 21px;
+        padding: 7px;
+    }
 }
 
 :local(.content) {

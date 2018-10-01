@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { BaseWindowContent } from '../BaseWindow/BaseWindowContent';
 
-const less = require('../SettingsWindow.less');
+const less = require('./SettingsWindow.less');
 
 export class SettingsWindowContent extends BaseWindowContent {
     

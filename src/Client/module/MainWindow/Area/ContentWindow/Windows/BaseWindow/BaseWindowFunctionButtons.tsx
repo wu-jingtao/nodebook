@@ -4,14 +4,14 @@ import { ObservableComponent } from '../../../../../../global/Tools/ObservableCo
 import { windowList, moveToOtherSide } from '../../ContentWindow';
 import { Window } from '../../ContentWindowTypes';
 
-const less = require('../WindowStyle.less');
+const less = require('./BaseWindow.less');
 
 /**
  * 功能按钮
  */
 export abstract class BaseWindowFunctionButtons extends ObservableComponent<{ window: Window, position: 'left' | 'right' }> {
 
-    protected abstract functionButtons: JSX.Element[];
+    protected abstract functionButtons: JSX.Element;
 
     componentDidMount() {
         this.watch(windowList.focusedWindow);
@@ -26,8 +26,7 @@ export abstract class BaseWindowFunctionButtons extends ObservableComponent<{ wi
                     windowList.focusedWindow.value.name === this.props.window.name ? 'block' : 'none'
             }}>
                 {this.functionButtons}
-                <img className={less.functionButtonItem}
-                    src={`/static/res/img/buttons_icon/${this.props.position === 'left' ? 'next' : 'previous'}-inverse.svg`}
+                <img src={`/static/res/img/buttons_icon/${this.props.position === 'left' ? 'next' : 'previous'}-inverse.svg`}
                     title={`移动到${this.props.position === 'left' ? '右' : '左'}侧显示`}
                     onClick={() => moveToOtherSide({ name: this.props.window.name, type: this.props.window.type, side: this.props.position })} />
             </div>

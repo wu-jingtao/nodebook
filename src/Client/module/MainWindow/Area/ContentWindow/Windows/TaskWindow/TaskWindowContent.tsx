@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { BaseWindowContent } from '../BaseWindow/BaseWindowContent';
 
-const less = require('../TaskWindow.less');
+const less = require('./TaskWindow.less');
 
 export class TaskWindowContent extends BaseWindowContent {
     

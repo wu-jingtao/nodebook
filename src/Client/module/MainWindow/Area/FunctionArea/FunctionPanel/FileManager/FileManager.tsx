@@ -27,8 +27,8 @@ export class FileManager extends ObservableComponent {
             <div id="FileManager" style={{ display: displayType.value === 'file' ? 'flex' : 'none' }}>
                 <div className={less.header}>资源管理器</div>
                 <ScrollBar className={less.top}>
-                    <UnsavedFilesPanel title="未保存的文件" uniqueID="_unsavedFilesPanel" noFold />
-                    <OpenedWindows title="打开的窗口" uniqueID="_openedWindows" noFold />
+                    <UnsavedFilesPanel title="未保存的文件" uniqueID="_unsavedFilesPanel" />
+                    <OpenedWindows title="打开的窗口" uniqueID="_openedWindows" />
                 </ScrollBar>
                 <FileBrowserPanel className={less.bottom} uniqueID="FileManager" />
             </div >

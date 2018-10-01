@@ -18,5 +18,12 @@
     flex-shrink: 1;
     height: 35px;
     display: flex;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    &::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+        background: transparent;
+    }
 }

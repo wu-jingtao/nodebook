@@ -4,7 +4,7 @@ import { ObservableComponent } from '../../../../../../global/Tools/ObservableCo
 import { Window } from '../../ContentWindowTypes';
 import { windowList } from '../../ContentWindow';
 
-const less = require('../BaseWindow.less');
+const less = require('./BaseWindow.less');
 
 export abstract class BaseWindowContent extends ObservableComponent<{ window: Window, position: 'left' | 'right' }> {
 

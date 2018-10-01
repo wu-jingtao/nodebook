@@ -21,6 +21,11 @@ export class WindowContainer extends ObservableComponent<{ position: 'left' | 'r
 
     private readonly _thisSide = this.props.position === 'left' ? windowList.leftWindows : windowList.rightWindows;
 
+    private readonly _scrollTitleBar = (e: React.WheelEvent) => {
+        e.stopPropagation();
+        e.currentTarget.scrollLeft += e.deltaY / 2;
+    };
+
     componentDidMount() {
         this.watch(this._thisSide);
     }
@@ -61,7 +66,7 @@ export class WindowContainer extends ObservableComponent<{ position: 'left' | 'r
         return (
             <div className={less.WindowContainer}>
                 <div className={less.titleBar}>
-                    <div className={less.tabs}>
+                    <div className={less.tabs} onWheel={this._scrollTitleBar}>
                         {titles}
                     </div>
                     {functionButtons}

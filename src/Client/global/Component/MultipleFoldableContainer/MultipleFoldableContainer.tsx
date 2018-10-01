@@ -42,7 +42,7 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
 
             this._containerExpectHeight.set(splitterIndex, Math.max(position - (this._ref.offset() as any).top - topHeight, 0));
         } else {
-            let bottomHeight = 25 * (this._containerActualHeight.length - splitterIndex + 1); //底部其他容器的高度
+            let bottomHeight = 25 * (this._containerActualHeight.length - splitterIndex - 1); //底部其他容器的高度
 
             for (let index = splitterIndex + 2; index < this._containerActualHeight.length; index++) {
                 bottomHeight += this._containerActualHeight[index].value;
@@ -85,7 +85,7 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
     UNSAFE_componentWillMount() {
         for (let index = 0; index < this.foldableContainers.length; index++) {
             if (!this._containerExpectHeight.has(index)) //配置期待高度
-                this._containerExpectHeight.set(index, 300);
+                this._containerExpectHeight.set(index, 100);
 
             this._containerActualHeight.push(oVar(0));
             this._containerFolded.push(permanent_oVar(`ui.MultipleFoldableContainer._containerFolded._${this.props.uniqueID}.${index}`, { defaultValue: false }));

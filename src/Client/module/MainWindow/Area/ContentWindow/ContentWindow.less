@@ -11,12 +11,15 @@
     flex-grow: 1;
     flex-shrink: 1;
     min-width: 10%;
+    max-width: 90%;
 }
 
 :local(.right) {
     flex-grow: 0;
     flex-shrink: 0;
     min-width: 10%;
+    //splitter宽1px
+    max-width: ~"calc(90% - 1px)";
 }
 
 :local(.splitter) {
