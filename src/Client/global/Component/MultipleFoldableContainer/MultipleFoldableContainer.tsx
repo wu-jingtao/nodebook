@@ -33,29 +33,38 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
 
     //拖拽分隔条改变容器高度
     private readonly _changeHeight = (splitterIndex: number, position: number) => {
-        let topHeight = 25 * (splitterIndex + 1);   //计算顶部其他容器的高度。25是标题栏高度
+        if (this.props.topFirst) {
+            let topHeight = 25 * (splitterIndex + 1);   //计算顶部其他容器的高度。25是标题栏高度
 
-        for (let index = 0; index < splitterIndex; index++) {
-            topHeight += this._containerActualHeight[index].value;
+            for (let index = 0; index < splitterIndex; index++) {
+                topHeight += this._containerActualHeight[index].value;
+            }
+
+            this._containerExpectHeight.set(splitterIndex, Math.max(position - (this._ref.offset() as any).top - topHeight, 0));
+        } else {
+            let bottomHeight = 25 * (this._containerActualHeight.length - splitterIndex + 1); //底部其他容器的高度
+
+            for (let index = splitterIndex + 2; index < this._containerActualHeight.length; index++) {
+                bottomHeight += this._containerActualHeight[index].value;
+            }
+
+            this._containerExpectHeight.set(splitterIndex + 1, Math.max((this._ref.offset() as any).top + this._ref.height() - position - bottomHeight, 0));
         }
-
-        this._containerExpectHeight.set(splitterIndex, Math.max(position - (this._ref.offset() as any).top - topHeight, 0));
     }
 
     //计算每个容器高度
     private readonly _calculateHeight = () => {
-        let remain = (this._ref.height() as any) - 25 * this._containerExpectHeight.length;    //剩下的可分配高度
-        let lastHeight: ObservableVariable<number> | undefined = undefined;     //最后一个未折叠容器的高度
+        let remain = (this._ref.height() as number) - 25 * this._containerExpectHeight.length;  //剩下的可分配高度
+        let lastHeight: ObservableVariable<number> | undefined = undefined;                     //最后一个未折叠容器的高度
 
-        //先分配排在上面的容器，最后剩下的部分全部留给最后一个未折叠的容器
-        for (let index = 0; index < this._containerExpectHeight.length; index++) {
+        for (let index = this.props.topFirst ? 0 : this._containerExpectHeight.length - 1;
+            this.props.topFirst ? index < this._containerExpectHeight.length : index > -1;
+            this.props.topFirst ? index++ : index--) {
             const expect = this._containerExpectHeight.get(index);
             const actual = this._containerActualHeight[index];
             const folded = this._containerFolded[index];
 
-            if (folded.value) {
-                actual.value = 0;
-            } else {
+            if (!folded.value && remain > 0) {
                 lastHeight = actual;
 
                 if (expect <= remain) {
@@ -65,9 +74,11 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
                     actual.value = remain;
                     remain -= remain;
                 }
-            }
+            } else
+                actual.value = 0;
         }
 
+        //最后剩下的部分全部留给最后一个未折叠的容器
         if (lastHeight) lastHeight.value += remain;
     };
 
@@ -83,7 +94,7 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
 
     componentDidMount() {
         //观察MultipleFoldableContainer DIV 大小的改变。目前tsd还没有ResizeObserver的定义
-        (new (window as any).ResizeObserver(throttle(this._calculateHeight, 17))).observe(this._ref[0]);
+        (new (window as any).ResizeObserver(throttle(this._calculateHeight, 10))).observe(this._ref[0]);
 
         watch([this._containerExpectHeight, ...this._containerFolded], throttle(this._calculateHeight, 1));
 

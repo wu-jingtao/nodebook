@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { oVar, permanent_oArr, permanent_oVar } from 'observable-variable';
+import { oVar, permanent_oArr, permanent_oVar, ObservableArray, watch } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { Splitter } from '../../../../global/Component/Splitter/Splitter';
@@ -8,18 +8,27 @@ import { WindowList, Window, OpenWindowArgs, CloseMoveWindowArgs } from './Conte
 
 const less = require('./ContentWindow.less');
 
+//WindowList初始化方法
+function init(value: Window[], save: () => void, oArr: ObservableArray<Window>): Window[] {
+    value.forEach(item => {
+        oVar(item, 'fixed');
+        watch([item.fixed], save);
+    });
+
+    oArr.on('add', item => watch([item.fixed], save));
+    oArr.on('update', item => watch([item.fixed], save));
+
+    return value;
+}
+
 /**
  * 打开的窗口列表
  */
 export const windowList: WindowList = {
-    leftWindows: permanent_oArr('ui.ContentWindow.leftWindows'),
-    rightWindows: permanent_oArr('ui.ContentWindow.rightWindows'),
-    focusedWindow: permanent_oVar<any>('ui.ContentWindow.focusedWindow', { defaultValue: null })
+    leftWindows: permanent_oArr('ui.ContentWindow.leftWindows', { init }),
+    rightWindows: permanent_oArr('ui.ContentWindow.rightWindows', { init }),
+    focusedWindow: permanent_oVar<any>('ui.ContentWindow.focusedWindow', { defaultValue: null, deepCompare: true })
 }
-
-//转换fixed的类型
-windowList.leftWindows.forEach(item => oVar(item, 'fixed'));
-windowList.rightWindows.forEach(item => oVar(item, 'fixed'));
 
 /**
  * 打开一个新的窗口

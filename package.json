@@ -105,7 +105,7 @@
         "moment": "^2.22.2",
         "node-pty": "^0.7.8",
         "nodemailer": "^4.6.8",
-        "observable-variable": "^0.2.3",
+        "observable-variable": "^0.2.10",
         "os-utils": "0.0.14",
         "pidusage": "^2.0.17",
         "request": "^2.88.0",

@@ -8,6 +8,11 @@ export interface MultipleFoldableContainerPropsType {
      */
     uniqueID: string;
 
+    /**
+     * 当可分配的空间不足是是否优先照顾排在上面的容器，默认false
+     */
+    topFirst?: boolean;
+
     className?: string;
 }
 

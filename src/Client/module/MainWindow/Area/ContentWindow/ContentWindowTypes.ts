@@ -50,7 +50,7 @@ export interface OpenWindowArgs {
     fixed?: boolean;
 
     /**
-     * 额外的参数供打开的窗口使用。
+     * 额外的参数供打开的窗口使用。注意，参数应当是可序列化的
      */
     args?: { [key: string]: any };
 }
