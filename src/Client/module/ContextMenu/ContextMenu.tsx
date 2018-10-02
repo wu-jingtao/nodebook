@@ -22,7 +22,7 @@ export function showContextMenu(options: ContextMenuOptions): void {
 export class ContextMenu extends ObservableComponent {
 
     componentDidMount() {
-        this.watch(data);
+        this.watch([data]);
         $(document).on('click._ContextMenu', () => {
             setTimeout(() => data.value = undefined, 5);
         });

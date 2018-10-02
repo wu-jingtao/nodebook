@@ -11,7 +11,7 @@ const less = require('./ShortcutManager.less');
 export class ShortcutManager extends ObservableComponent {
 
     componentDidMount() {
-        this.watch(displayType);
+        this.watch([displayType]);
     }
 
     render() {

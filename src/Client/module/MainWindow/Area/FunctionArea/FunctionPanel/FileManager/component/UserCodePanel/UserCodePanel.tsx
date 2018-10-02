@@ -1,13 +1,15 @@
 import * as React from 'react';
+import { oVar } from 'observable-variable';
 
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
-import { openWindow } from '../../../../../ContentWindow/ContentWindow';
 import { refreshRecycleRoot } from '../RecyclePanel/RecyclePanel';
 import { cachedFiles } from '../../UnsavedFiles';
+import { openWindow } from '../../../../../ContentWindow/WindowList';
+import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
 
 const less = require('./UserCodePanel.less');
 
@@ -106,7 +108,17 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
     }
 
     protected async _onOpenItem(): Promise<void> {
-        openWindow({ name: this._fullNameString, type: 'file' });
+        const args: CodeEditorWindowArgs = {
+            id: Math.random().toString(),
+            fixed: oVar(false),
+            name: this._name,
+            type: WindowType.code_editor,
+            args: {
+                path: this._fullNameString
+            }
+        };
+
+        openWindow(args);
     }
 
     /**

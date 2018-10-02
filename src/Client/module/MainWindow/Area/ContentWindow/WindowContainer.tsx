@@ -1,10 +1,10 @@
 import * as React from 'react';
+import * as classnames from 'classnames';
 
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
-import { windowList } from './ContentWindow';
-import { FileWindowContent } from './Windows/FileWindow/FileWindowContent';
-import { FileWindowTitle } from './Windows/FileWindow/FileWindowTitle';
-import { FileWindowFunctionButtons } from './Windows/FileWindow/FileWindowFunctionButtons';
+import { CodeEditorWindowContent } from './Windows/CodeEditorWindow/CodeEditorWindowContent';
+import { CodeEditorWindowTitle } from './Windows/CodeEditorWindow/CodeEditorWindowTitle';
+import { CodeEditorWindowFunctionButtons } from './Windows/CodeEditorWindow/CodeEditorWindowFunctionButtons';
 import { TaskWindowContent } from './Windows/TaskWindow/TaskWindowContent';
 import { TaskWindowTitle } from './Windows/TaskWindow/TaskWindowTitle';
 import { TaskWindowFunctionButtons } from './Windows/TaskWindow/TaskWindowFunctionButtons';
@@ -14,65 +14,72 @@ import { ServiceWindowFunctionButtons } from './Windows/ServiceWindow/ServiceWin
 import { SettingsWindowContent } from './Windows/SettingsWindow/SettingsWindowContent';
 import { SettingsWindowTitle } from './Windows/SettingsWindow/SettingsWindowTitle';
 import { SettingsWindowFunctionButtons } from './Windows/SettingsWindow/SettingsWindowFunctionButtons';
+import { windowList } from './WindowList';
+import { WindowType } from './ContentWindowTypes';
 
 const less = require('./WindowContainer.less');
 
-export class WindowContainer extends ObservableComponent<{ position: 'left' | 'right' }> {
+export class WindowContainer extends ObservableComponent<{ side: 'left' | 'right' }> {
 
-    private readonly _thisSide = this.props.position === 'left' ? windowList.leftWindows : windowList.rightWindows;
+    private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 
     private readonly _scrollTitleBar = (e: React.WheelEvent) => {
         e.stopPropagation();
         e.currentTarget.scrollLeft += e.deltaY / 2;
     };
 
+    //使得当前这边窗口获取到焦点
+    private readonly _focusThisSide = (e: React.MouseEvent) => {
+        if (e.button === 0) {
+            windowList.focusedSide.value = this.props.side;
+        }
+    };
+
     componentDidMount() {
-        this.watch(this._thisSide);
+        this.watch([this._thisSide.windowList, windowList.focusedSide]);
     }
 
     render() {
         const contents = [], titles = [], functionButtons = [];
 
-        for (const item of this._thisSide.value) {
-            const key = `${item.type}-${item.name}`;
-
+        for (const item of this._thisSide.windowList.value) {
             switch (item.type) {
-                case 'file':
-                    contents.push(<FileWindowContent key={key} window={item} position={this.props.position} />);
-                    titles.push(<FileWindowTitle key={key} window={item} position={this.props.position} />);
-                    functionButtons.push(<FileWindowFunctionButtons key={key} window={item} position={this.props.position} />);
+                case WindowType.code_editor:
+                    contents.push(<CodeEditorWindowContent key={item.id} args={item as any} side={this.props.side} />);
+                    titles.push(<CodeEditorWindowTitle key={item.id} args={item as any} side={this.props.side} />);
+                    functionButtons.push(<CodeEditorWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} />);
                     break;
 
-                case 'task':
-                    contents.push(<TaskWindowContent key={key} window={item} position={this.props.position} />);
-                    titles.push(<TaskWindowTitle key={key} window={item} position={this.props.position} />);
-                    functionButtons.push(<TaskWindowFunctionButtons key={key} window={item} position={this.props.position} />);
+                case WindowType.task:
+                    contents.push(<TaskWindowContent key={item.id} args={item as any} side={this.props.side} />);
+                    titles.push(<TaskWindowTitle key={item.id} args={item as any} side={this.props.side} />);
+                    functionButtons.push(<TaskWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} />);
                     break;
 
-                case 'service':
-                    contents.push(<ServiceWindowContent key={key} window={item} position={this.props.position} />);
-                    titles.push(<ServiceWindowTitle key={key} window={item} position={this.props.position} />);
-                    functionButtons.push(<ServiceWindowFunctionButtons key={key} window={item} position={this.props.position} />);
+                case WindowType.service:
+                    contents.push(<ServiceWindowContent key={item.id} args={item as any} side={this.props.side} />);
+                    titles.push(<ServiceWindowTitle key={item.id} args={item as any} side={this.props.side} />);
+                    functionButtons.push(<ServiceWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} />);
                     break;
 
-                case 'setting':
-                    contents.push(<SettingsWindowContent key={key} window={item} position={this.props.position} />);
-                    titles.push(<SettingsWindowTitle key={key} window={item} position={this.props.position} />);
-                    functionButtons.push(<SettingsWindowFunctionButtons key={key} window={item} position={this.props.position} />);
+                case WindowType.settings:
+                    contents.push(<SettingsWindowContent key={item.id} args={item as any} side={this.props.side} />);
+                    titles.push(<SettingsWindowTitle key={item.id} args={item as any} side={this.props.side} />);
+                    functionButtons.push(<SettingsWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} />);
                     break;
             }
         }
 
         return (
-            <div className={less.WindowContainer}>
-                <div className={less.titleBar}>
+            <div className={less.WindowContainer} onClick={this._focusThisSide}>
+                <div className={classnames(less.titleBar, { [less.titleBarFocused]: windowList.focusedSide.value === this.props.side })}>
                     <div className={less.tabs} onWheel={this._scrollTitleBar}>
                         {titles}
                     </div>
                     {functionButtons}
                 </div>
                 {contents}
-            </div>
+            </div >
         );
     }
 }

@@ -15,7 +15,7 @@ const less = require('./MainWindow.less');
 export class MainWindow extends ObservableComponent {
 
     componentDidMount() {
-        this.watch(logged);
+        this.watch([logged]);
     }
 
     render() {

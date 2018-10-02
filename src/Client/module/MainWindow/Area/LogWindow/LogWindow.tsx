@@ -19,7 +19,7 @@ export class LogWindow extends ObservableComponent {
     private readonly _height = permanent_oVar('ui.LogWindow._height', { defaultValue: 200 });   //日志窗口的高度
 
     componentDidMount() {
-        this.watch(this._height, showLogWindow);
+        this.watch([this._height, showLogWindow], 0);
     }
 
     render() {

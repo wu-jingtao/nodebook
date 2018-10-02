@@ -1,34 +1,34 @@
 import * as React from 'react';
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
-import { windowList, moveToOtherSide } from '../../ContentWindow';
-import { Window } from '../../ContentWindowTypes';
+import { WindowArgs } from '../../ContentWindowTypes';
+import { windowList, moveToOtherSide } from '../../WindowList';
 
 const less = require('./BaseWindow.less');
 
 /**
  * 功能按钮
  */
-export abstract class BaseWindowFunctionButtons extends ObservableComponent<{ window: Window, position: 'left' | 'right' }> {
+export abstract class BaseWindowFunctionButtons<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right' }> {
 
-    protected abstract functionButtons: JSX.Element;
+    private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
+
+    protected abstract _functionButtons: JSX.Element;
 
     componentDidMount() {
-        this.watch(windowList.focusedWindow);
+        this.watch([windowList.focusedSide, this._thisSide.displayOrder]);
     }
 
     render() {
         return (
             <div className={less.functionButtons} style={{
-                display: windowList.focusedWindow.value &&
-                    windowList.focusedWindow.value.side === this.props.position &&
-                    windowList.focusedWindow.value.type === this.props.window.type &&
-                    windowList.focusedWindow.value.name === this.props.window.name ? 'block' : 'none'
+                display: windowList.focusedSide.value === this.props.side &&
+                    this._thisSide.displayOrder.last === this.props.args.id ? 'block' : 'none'
             }}>
-                {this.functionButtons}
-                <img src={`/static/res/img/buttons_icon/${this.props.position === 'left' ? 'next' : 'previous'}-inverse.svg`}
-                    title={`移动到${this.props.position === 'left' ? '右' : '左'}侧显示`}
-                    onClick={() => moveToOtherSide({ name: this.props.window.name, type: this.props.window.type, side: this.props.position })} />
+                {this._functionButtons}
+                <img src={`/static/res/img/buttons_icon/${this.props.side === 'left' ? 'next' : 'previous'}-inverse.svg`}
+                    title={`移动到${this.props.side === 'left' ? '右' : '左'}侧显示`}
+                    onClick={() => moveToOtherSide(this.props.args.id, this.props.side)} />
             </div>
         );
     }

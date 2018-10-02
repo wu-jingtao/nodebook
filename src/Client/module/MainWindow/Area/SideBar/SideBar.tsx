@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import { ObservableVariable } from 'observable-variable';
+import { ObservableVariable, oVar } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { normalSettings } from '../../../../global/SystemSetting';
@@ -8,7 +8,8 @@ import { displayType } from '../FunctionArea/FunctionArea';
 import { cachedFiles } from '../FunctionArea/FunctionPanel/FileManager/UnsavedFiles';
 import { crashedServiceNumber } from '../FunctionArea/FunctionPanel/ServiceManager/ServiceManager';
 import { showLogWindow } from '../LogWindow/LogWindow';
-import { openWindow } from '../ContentWindow/ContentWindow';
+import { openWindow } from '../ContentWindow/WindowList';
+import { WindowType, SettingsWindowArgs } from '../ContentWindow/ContentWindowTypes';
 
 const less = require('./SideBar.less');
 
@@ -31,7 +32,8 @@ export class SideBar extends ObservableComponent {
      * 打开设置窗口
      */
     private readonly _openSettingWindow = () => {
-        openWindow({ name: '系统设置', type: 'setting', fixed: true });
+        const args: SettingsWindowArgs = { id: Math.random().toString(), name: '系统设置', type: WindowType.settings, fixed: oVar(true) };
+        openWindow(args);
     };
 
     /**
@@ -42,7 +44,7 @@ export class SideBar extends ObservableComponent {
     }
 
     componentDidMount() {
-        this.watch(this._showLogo, this._logoPadding, displayType, showLogWindow, cachedFiles, crashedServiceNumber);
+        this.watch([this._showLogo, this._logoPadding, displayType, showLogWindow, cachedFiles, crashedServiceNumber]);
     }
 
     render() {

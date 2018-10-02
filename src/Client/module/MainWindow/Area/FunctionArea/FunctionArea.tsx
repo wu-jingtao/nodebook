@@ -29,7 +29,7 @@ export class FunctionArea extends ObservableComponent {
     private readonly _width = permanent_oVar('ui.FunctionArea._width', { defaultValue: 300 });    //功能区的宽度
 
     componentDidMount() {
-        this.watch(this._width, displayType);
+        this.watch([this._width, displayType], 0);
     }
 
     render() {

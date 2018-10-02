@@ -16,7 +16,7 @@ export class InputFileName extends ObservableComponent<InputFileNamePropsType> {
     constructor(props: any, context: any) {
         super(props, context);
 
-        this.watch(this.props.name);
+        this.watch([this.props.name]);
 
         const originalName = this.props.name.value;
 

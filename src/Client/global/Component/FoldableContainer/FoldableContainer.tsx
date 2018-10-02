@@ -42,7 +42,7 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
     };
 
     componentDidMount() {
-        this.watch(this.folded, this._titleBarFocused);
+        this.watch([this.folded, this._titleBarFocused]);
 
         $(document).on(`click.FoldableContainer.${this.props.uniqueID}`, () => {
             setTimeout(() => {  //慢于_titleBarOnClick执行

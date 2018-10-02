@@ -79,7 +79,7 @@ export class MessageItem extends ObservableComponent<{ config: MessageBoxOptions
     }
 
     componentDidMount() {
-        this.watch(this._icon);
+        this.watch([this._icon]);
     }
 
     componentWillUnmount() {

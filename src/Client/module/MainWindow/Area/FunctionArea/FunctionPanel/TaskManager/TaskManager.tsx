@@ -11,7 +11,7 @@ const less = require('./TaskManager.less');
 export class TaskManager extends ObservableComponent {
 
     componentDidMount() {
-        this.watch(displayType);
+        this.watch([displayType]);
     }
 
     render() {

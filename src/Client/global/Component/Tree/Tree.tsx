@@ -74,7 +74,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
     protected readonly _loading = oSet<any>([]);
 
     UNSAFE_componentWillMount() {
-        this.watch(this._focusedItem, this._hoveredItem);
+        this.watch([this._focusedItem, this._hoveredItem]);
 
         this._treeList.set(this._fullNameString, this);
 

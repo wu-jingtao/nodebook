@@ -53,7 +53,7 @@ export class LoginPage extends ObservableComponent {
     }
 
     componentDidMount() {
-        this.watch(this._userName, this._password, this._logging, logged);
+        this.watch([this._userName, this._password, this._logging, logged]);
 
         //登录成功后每隔7分钟更新一次令牌
         logged.on('set', value => {

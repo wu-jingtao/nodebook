@@ -11,7 +11,8 @@ import { cachedFiles, removeCache, saveToServer } from '../../UnsavedFiles';
 import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { ContextMenuItemOptions } from '../../../../../../../ContextMenu/ContextMenuOptions';
-import { openWindow } from '../../../../../ContentWindow/ContentWindow';
+import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
+import { openWindow } from '../../../../../ContentWindow/WindowList';
 
 const less = require('./UnsavedFilesPanel.less');
 
@@ -60,7 +61,7 @@ export class UnsavedFilesPanel extends FoldableContainer<FoldableContainerPropsT
 
     componentDidMount() {
         super.componentDidMount();
-        this.watch(cachedFiles);
+        this.watch([cachedFiles]);
     }
 
     render() {
@@ -144,8 +145,20 @@ class ContentItem extends ObservableComponent<{ fullName: string }> {
         e.stopPropagation();
         e.preventDefault();
 
-        if (e.button === 0)
-            openWindow({ name: this.props.fullName, type: 'file' });
+        if (e.button === 0) {
+            const args: CodeEditorWindowArgs = {
+                id: Math.random().toString(),
+                name: this._name,
+                type: WindowType.code_editor,
+                fixed: oVar(false),
+                args: {
+                    path: this.props.fullName,
+                    diff: true
+                }
+            };
+
+            openWindow(args);
+        }
     };
 
     render() {

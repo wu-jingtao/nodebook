@@ -19,7 +19,7 @@ const less = require('./FileManager.less');
 export class FileManager extends ObservableComponent {
 
     componentDidMount() {
-        this.watch(displayType);
+        this.watch([displayType]);
     }
 
     render() {

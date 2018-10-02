@@ -17,7 +17,7 @@ export const crashedServiceNumber = oVar(0);
 export class ServiceManager extends ObservableComponent {
 
     componentDidMount() {
-        this.watch(displayType);
+        this.watch([displayType]);
     }
 
     render() {

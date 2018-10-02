@@ -12,7 +12,7 @@ const less = require('./UploadFile.less');
 export class UploadFile extends ObservableComponent<{ file: ObservableVariable<File | undefined> }> {
 
     componentDidMount() {
-        this.watch(this.props.file);
+        this.watch([this.props.file]);
     }
 
     render() {

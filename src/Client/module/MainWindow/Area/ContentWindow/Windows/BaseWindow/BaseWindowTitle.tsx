@@ -4,19 +4,23 @@ import { oVar, watch } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
 import { showContextMenu } from '../../../../../ContextMenu/ContextMenu';
-import { windowList, closeWindow, moveToOtherSide } from '../../ContentWindow';
-import { Window } from '../../ContentWindowTypes';
+import { WindowArgs } from '../../ContentWindowTypes';
+import { focusWindow, moveToOtherSide, closeWindow, windowList, closeOtherWindow } from '../../WindowList';
 
 const less = require('./BaseWindow.less');
 
 /**
  * 顶部选项卡标题栏
  */
-export abstract class BaseWindowTitle extends ObservableComponent<{ window: Window, position: 'left' | 'right' }> {
+export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right' }> {
+
+    private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 
     //是否获取到了焦点
     private readonly _focused = oVar(false);
+
     private _focused_unWatch: Function;
+
     private _ref: HTMLDivElement;
 
     /**
@@ -35,26 +39,23 @@ export abstract class BaseWindowTitle extends ObservableComponent<{ window: Wind
     protected abstract _prompt: string;
 
     //关闭窗口
-    private readonly close_window = (e?: React.MouseEvent) => {
-        if (e) {
-            if (e.button === 0) {   //确保是左键点击
-                e.stopPropagation();
-                closeWindow({ name: this.props.window.name, type: this.props.window.type, side: this.props.position });
-            }
-        } else
-            closeWindow({ name: this.props.window.name, type: this.props.window.type, side: this.props.position });
+    private readonly close_window = (e: React.MouseEvent) => {
+        if (e.button === 0) {   //确保是左键点击
+            e.stopPropagation();
+            closeWindow(this.props.args.id, this.props.side);
+        }
     };
 
     //使窗口获得焦点
     private focus_window = (e: React.MouseEvent) => {
         if (e.button === 0)
-            windowList.focusedWindow.value = { name: this.props.window.name, type: this.props.window.type, side: this.props.position };
+            focusWindow(this.props.args.id, this.props.side);
     };
 
     //固定窗口
     private fix_window = (e: React.MouseEvent) => {
         if (e.button === 0)
-            this.props.window.fixed.value = true;
+            this.props.args.fixed.value = true;
     };
 
     //右键菜单
@@ -65,14 +66,19 @@ export abstract class BaseWindowTitle extends ObservableComponent<{ window: Wind
                 position: { x: e.clientX, y: e.clientY },
                 items: [
                     [
-                        { name: '关闭窗口', callback: this.close_window },
+                        { name: '关闭窗口', callback: () => closeWindow(this.props.args.id, this.props.side) },
+                        { name: '关闭其他窗口', callback: () => closeOtherWindow(this.props.args.id, this.props.side) },
+                    ],
+                    [
                         {
-                            name: `${this.props.window.fixed.value ? '取消' : ''}固定窗口`,
-                            callback: () => this.props.window.fixed.value = !this.props.window.fixed.value
+                            name: `${this.props.args.fixed.value ? '取消' : ''}固定窗口`,
+                            callback: () => this.props.args.fixed.value = !this.props.args.fixed.value
                         },
+                    ],
+                    [
                         {
-                            name: `移动到${this.props.position === 'left' ? '右' : '左'}侧显示`,
-                            callback: () => moveToOtherSide({ name: this.props.window.name, type: this.props.window.type, side: this.props.position })
+                            name: `移动到${this.props.side === 'left' ? '右' : '左'}侧显示`,
+                            callback: () => moveToOtherSide(this.props.args.id, this.props.side)
                         }
                     ]
                 ]
@@ -81,16 +87,13 @@ export abstract class BaseWindowTitle extends ObservableComponent<{ window: Wind
     };
 
     componentDidMount() {
-        this.watch(this.props.window.fixed, this._focused);
+        this.watch([this.props.args.fixed, this._focused]);
 
         const check_focused = () => {   //检查是否处于焦点
-            this._focused.value = windowList.focusedWindow.value ?
-                windowList.focusedWindow.value.side === this.props.position &&
-                windowList.focusedWindow.value.type === this.props.window.type &&
-                windowList.focusedWindow.value.name === this.props.window.name : false;
+            this._focused.value = this._thisSide.displayOrder.last === this.props.args.id;
         };
 
-        this._focused_unWatch = watch([windowList.focusedWindow], check_focused);
+        this._focused_unWatch = watch([this._thisSide.displayOrder], check_focused);
         check_focused();
 
         //获取到焦点后，使选项卡滑动到可显示区域
@@ -119,7 +122,7 @@ export abstract class BaseWindowTitle extends ObservableComponent<{ window: Wind
         return (
             <div className={classnames(less.title, {
                 [less.titleFocus]: this._focused.value,
-                [less.titleFixed]: this.props.window.fixed.value
+                [less.titleFixed]: this.props.args.fixed.value
             })}
                 title={this._prompt}
                 onClick={this.focus_window}

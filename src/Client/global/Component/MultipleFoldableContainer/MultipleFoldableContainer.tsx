@@ -128,7 +128,7 @@ export abstract class MultipleFoldableContainerItem<T extends MultipleFoldableCo
 
     componentDidMount() {
         super.componentDidMount();
-        this.watch(this.props._height as any);
+        this.watch([this.props._height as any], 0);
     }
 
     render() {
@@ -140,7 +140,7 @@ export abstract class MultipleFoldableContainerItem<T extends MultipleFoldableCo
 class MultipleFoldableContainerSplitter extends ObservableComponent<MultipleFoldableContainerSplitterPropsType>{
 
     componentDidMount() {
-        this.watch(this.props.folded);
+        this.watch([this.props.folded]);
     }
 
     render() {

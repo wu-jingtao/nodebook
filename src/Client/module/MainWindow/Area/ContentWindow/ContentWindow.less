@@ -11,22 +11,20 @@
     flex-grow: 1;
     flex-shrink: 1;
     min-width: 10%;
-    max-width: 90%;
 }
 
 :local(.right) {
     flex-grow: 0;
     flex-shrink: 0;
     min-width: 10%;
-    //splitter宽1px
-    max-width: ~"calc(90% - 1px)";
+    border-left: @lightBackColor solid 1px;
+    box-sizing: border-box;
 }
 
 :local(.splitter) {
     flex-grow: 0;
     flex-shrink: 0;
-    width: 1px;
-    background-color: @lightBackColor;
+    width: 0;
     position: relative;
 
     &::before {
