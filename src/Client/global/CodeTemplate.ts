@@ -4,13 +4,13 @@
 export function codeTemplate(filename: string) {
     filename = filename.toLowerCase();
 
-    if (filename.endsWith('html'))
+    if (filename.endsWith('.html'))
         return html(filename);
-    else if (filename.endsWith('client.js'))
+    else if (filename.endsWith('.client.js'))
         return clientJs(filename);
-    else if (filename.endsWith('server.js'))
+    else if (filename.endsWith('.server.js'))
         return ServerJs(filename);
-    else if (filename.endsWith('sh'))
+    else if (filename.endsWith('.sh'))
         return bash(filename);
     else
         return default_file(filename);

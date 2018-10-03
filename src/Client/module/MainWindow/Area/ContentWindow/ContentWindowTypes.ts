@@ -1,4 +1,4 @@
-import { ObservableVariable, ObservableArray } from "observable-variable";
+import { ObservableVariable } from "observable-variable";
 
 /**
  * 窗口的类型

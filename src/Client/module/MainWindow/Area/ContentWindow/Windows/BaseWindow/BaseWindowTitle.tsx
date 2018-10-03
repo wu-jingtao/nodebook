@@ -1,6 +1,6 @@
 import * as React from 'react';
-import classnames = require('classnames');
 import { oVar, watch } from 'observable-variable';
+import classnames = require('classnames');
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
 import { showContextMenu } from '../../../../../ContextMenu/ContextMenu';
@@ -17,7 +17,7 @@ export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableCo
     private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 
     //是否获取到了焦点
-    private readonly _focused = oVar(false);
+    private readonly _focused = oVar(this._thisSide.displayOrder.last === this.props.args.id);
 
     private _focused_unWatch: Function;
 
@@ -89,12 +89,9 @@ export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableCo
     componentDidMount() {
         this.watch([this.props.args.fixed, this._focused]);
 
-        const check_focused = () => {   //检查是否处于焦点
+        this._focused_unWatch = watch([this._thisSide.displayOrder], () => {   //检查是否处于焦点
             this._focused.value = this._thisSide.displayOrder.last === this.props.args.id;
-        };
-
-        this._focused_unWatch = watch([this._thisSide.displayOrder], check_focused);
-        check_focused();
+        });
 
         //获取到焦点后，使选项卡滑动到可显示区域
         this._focused.on('set', value => {

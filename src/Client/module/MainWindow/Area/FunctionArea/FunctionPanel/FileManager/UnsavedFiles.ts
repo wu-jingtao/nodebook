@@ -89,8 +89,7 @@ export async function saveToServer(fullNameString: string): Promise<void> {
         if (value !== null) {
             const data = new Blob([value], { type: 'text/plain' });
             await ServerApi.file.uploadFile(data, fullNameString);
-            await db.removeItem(fullNameString);
-            cachedFiles.delete(fullNameString);
+            await removeCache(fullNameString);
         }
     } catch (err) {
         showMessageBox({

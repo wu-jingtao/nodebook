@@ -30,9 +30,8 @@ export class WindowContainer extends ObservableComponent<{ side: 'left' | 'right
 
     //使得当前这边窗口获取到焦点
     private readonly _focusThisSide = (e: React.MouseEvent) => {
-        if (e.button === 0) {
+        if (e.button === 0)
             windowList.focusedSide.value = this.props.side;
-        }
     };
 
     componentDidMount() {
@@ -79,7 +78,7 @@ export class WindowContainer extends ObservableComponent<{ side: 'left' | 'right
                     {functionButtons}
                 </div>
                 {contents}
-            </div >
+            </div>
         );
     }
 }

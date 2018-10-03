@@ -15,7 +15,7 @@ export class ObservableComponent<p = {}> extends React.Component<p> {
      */
     watch(args: ObservableVariable<any>[], throttle: number = 1) {
         this._unobserve.push(watch(args, throttle > 0 ?
-            _throttle(this.forceUpdate.bind(this), throttle) : this.forceUpdate.bind(this)));
+            _throttle(() => this.forceUpdate(), throttle) : () => this.forceUpdate()));
     }
 
     componentWillUnmount() {
