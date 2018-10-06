@@ -1,10 +1,13 @@
 import * as React from 'react';
 import { oVar, watch } from 'observable-variable';
 import classnames = require('classnames');
+import clipboard = require('copy-text-to-clipboard');
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
 import { showContextMenu } from '../../../../../ContextMenu/ContextMenu';
+import { ContextMenuItemOptions } from '../../../../../ContextMenu/ContextMenuOptions';
 import { WindowArgs } from '../../ContentWindowTypes';
+import { showMessageBox } from '../../../../../MessageBox/MessageBox';
 import { focusWindow, moveToOtherSide, closeWindow, windowList, closeOtherWindow } from '../../WindowList';
 
 const less = require('./BaseWindow.less');
@@ -12,14 +15,12 @@ const less = require('./BaseWindow.less');
 /**
  * 顶部选项卡标题栏
  */
-export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right' }> {
+export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right', state: { [key: string]: any } }> {
 
     private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 
     //是否获取到了焦点
     private readonly _focused = oVar(this._thisSide.displayOrder.last === this.props.args.id);
-
-    private _focused_unWatch: Function;
 
     private _ref: HTMLDivElement;
 
@@ -62,36 +63,51 @@ export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableCo
     private context_menu = (e: React.MouseEvent) => {
         if (e.button === 2) {
             e.preventDefault();
-            showContextMenu({
-                position: { x: e.clientX, y: e.clientY },
-                items: [
-                    [
-                        { name: '关闭窗口', callback: () => closeWindow(this.props.args.id, this.props.side) },
-                        { name: '关闭其他窗口', callback: () => closeOtherWindow(this.props.args.id, this.props.side) },
-                    ],
+
+            const items: ContextMenuItemOptions[][] = [
+                [
+                    { name: '关闭窗口', callback: () => closeWindow(this.props.args.id, this.props.side) },
+                    { name: '关闭其他窗口', callback: () => closeOtherWindow(this.props.args.id, this.props.side) },
+                ],
+                [
+                    {
+                        name: `${this.props.args.fixed.value ? '取消' : ''}固定窗口`,
+                        callback: () => this.props.args.fixed.value = !this.props.args.fixed.value
+                    },
+                    {
+                        name: `移动到${this.props.side === 'left' ? '右' : '左'}侧显示`,
+                        callback: () => moveToOtherSide(this.props.args.id, this.props.side)
+                    }
+                ]
+            ];
+
+            if (this.props.args.args && this.props.args.args.path)
+                items.push(
                     [
                         {
-                            name: `${this.props.args.fixed.value ? '取消' : ''}固定窗口`,
-                            callback: () => this.props.args.fixed.value = !this.props.args.fixed.value
-                        },
-                    ],
-                    [
-                        {
-                            name: `移动到${this.props.side === 'left' ? '右' : '左'}侧显示`,
-                            callback: () => moveToOtherSide(this.props.args.id, this.props.side)
+                            name: '复制绝对路径',
+                            callback: () => {
+                                if (!clipboard((this.props.args as any).args.path)) {
+                                    showMessageBox({
+                                        icon: 'message', title: '复制绝对路径失败，请手动复制',
+                                        content: (this.props.args as any).args.path, autoClose: 0
+                                    });
+                                }
+                            }
                         }
                     ]
-                ]
-            });
+                );
+                
+            showContextMenu({ position: { x: e.clientX, y: e.clientY }, items });
         }
     };
 
     componentDidMount() {
-        this.watch([this.props.args.fixed, this._focused]);
+        this.watch([this.props.args.fixed, this._focused, this.props.state.loading]);
 
-        this._focused_unWatch = watch([this._thisSide.displayOrder], () => {   //检查是否处于焦点
+        this._unobserve.push(watch([this._thisSide.displayOrder], () => {   //检查是否处于焦点
             this._focused.value = this._thisSide.displayOrder.last === this.props.args.id;
-        });
+        }));
 
         //获取到焦点后，使选项卡滑动到可显示区域
         this._focused.on('set', value => {
@@ -111,7 +127,6 @@ export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableCo
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        this._focused_unWatch();
         this._focused.off('set');
     }
 
@@ -126,7 +141,10 @@ export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableCo
                 onDoubleClick={this.fix_window}
                 onContextMenu={this.context_menu}
                 ref={(e: any) => this._ref = e}>
-                <img className={less.titleIcon} src={this._icon} />
+                {this.props.state.loading.value ?
+                    <i className={less.titleLoading} /> :
+                    <img className={less.titleIcon} src={this._icon} />
+                }
                 <span className={less.titleText}>{this._title}</span>
                 <div className={less.titleCloseButton} onClick={this.close_window}>×</div>
             </div>

@@ -7,11 +7,9 @@ import { WindowArgs } from '../../ContentWindowTypes';
 
 const less = require('./BaseWindow.less');
 
-export abstract class BaseWindowContent<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right' }> {
+export abstract class BaseWindowContent<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right', state: { [key: string]: any } }> {
 
     private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
-
-    private _unWatch: Function;
 
     /**
      * 要显示的内容
@@ -26,15 +24,10 @@ export abstract class BaseWindowContent<T extends WindowArgs> extends Observable
     componentDidMount() {
         this.watch([this._thisSide.displayOrder]);
 
-        this._unWatch = watch([this._thisSide.displayOrder, windowList.focusedSide], () => {
+        this._unobserve.push(watch([this._thisSide.displayOrder, windowList.focusedSide], () => {
             if (windowList.focusedSide.value === this.props.side && this._thisSide.displayOrder.last === this.props.args.id)
-                this._onFocused();
-        });
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        this._unWatch();
+                setTimeout(() => this._onFocused(), 100);
+        }));
     }
 
     render() {

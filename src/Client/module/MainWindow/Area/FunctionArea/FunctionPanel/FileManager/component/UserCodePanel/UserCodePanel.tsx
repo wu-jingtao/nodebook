@@ -7,9 +7,9 @@ import { EditableFileTreePropsType } from '../../../../../../../../global/Compon
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { refreshRecycleRoot } from '../RecyclePanel/RecyclePanel';
-import { cachedFiles } from '../../UnsavedFiles';
-import { openWindow } from '../../../../../ContentWindow/WindowList';
+import { openWindow, windowList, closeWindow } from '../../../../../ContentWindow/WindowList';
 import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
+import { unsavedFiles, editorData } from '../../../../../ContentWindow/FileCache';
 
 const less = require('./UserCodePanel.less');
 
@@ -56,7 +56,7 @@ export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldabl
             name="/user_data/code"
             memorable={this.props.uniqueID}
             ref={(e: any) => this._tree = e}
-            modifiedFiles={cachedFiles} />
+            modifiedFiles={unsavedFiles} />
     }
 
     componentDidMount() {
@@ -105,6 +105,64 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
     protected async _onDelete(): Promise<void> {
         await ServerApi.file.deleteCodeData(this._fullNameString);
         refreshRecycleRoot && refreshRecycleRoot();
+        this._closeWindow();
+        this._deleteUnsavedFile();
+    }
+
+    /**
+     * 关闭与文件相关的窗口
+     */
+    protected _closeWindow(): void {
+        const win: { id: string, side: 'left' | 'right' }[] = [];
+
+        for (const item of windowList.leftWindows.windowList.value) {
+            const itemPath: string | void = item.args && item.args.path;
+            if (itemPath) {
+                if (this._dataTree.subItem) {
+                    if (itemPath.startsWith(this._fullNameString))
+                        win.push({ id: item.id, side: 'left' });
+                } else {
+                    if (itemPath === this._fullNameString) {
+                        win.push({ id: item.id, side: 'left' });
+                        break;
+                    }
+                }
+            }
+        }
+
+        for (const item of windowList.rightWindows.windowList.value) {
+            const itemPath: string | void = item.args && item.args.path;
+            if (itemPath) {
+                if (this._dataTree.subItem) {
+                    if (itemPath.startsWith(this._fullNameString))
+                        win.push({ id: item.id, side: 'right' });
+                } else {
+                    if (itemPath === this._fullNameString) {
+                        win.push({ id: item.id, side: 'right' });
+                        break;
+                    }
+                }
+            }
+        }
+
+        win.forEach(({ id, side }) => closeWindow(id, side));
+    }
+
+    /**
+     * 删除未保存文件
+     */
+    protected _deleteUnsavedFile(): void {
+        for (const item of editorData.keys()) {
+            if (this._dataTree.subItem) {
+                if (item.startsWith(this._fullNameString))
+                    editorData.delete(item);
+            } else {
+                if (item === this._fullNameString) {
+                    editorData.delete(item);
+                    break;
+                }
+            }
+        }
     }
 
     protected async _onOpenItem(): Promise<void> {

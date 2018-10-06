@@ -8,7 +8,7 @@ import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
-import { cachedFiles } from '../../UnsavedFiles';
+import { unsavedFiles } from '../../../../../ContentWindow/FileCache';
 
 const less = require('./RecyclePanel.less');
 
@@ -54,7 +54,7 @@ export class RecyclePanel extends MultipleFoldableContainerItem<MultipleFoldable
             <RecycleTree
                 name="/user_data/recycle"
                 memorable={this.props.uniqueID}
-                modifiedFiles={cachedFiles}
+                modifiedFiles={unsavedFiles}
                 noCreate noRename noUpload noZip noPaste
                 ref={(e: any) => this._tree = e} />
         );
@@ -100,6 +100,7 @@ class RecycleTree extends EditableFileTree<EditableFileTreePropsType> {
     protected async _onDelete(): Promise<void> {
         await ServerApi.file.deleteRecycleData(this._fullNameString);
     }
+
 
     protected _onOpenItem(): Promise<void> {
         return new Promise((resolve, reject) => {

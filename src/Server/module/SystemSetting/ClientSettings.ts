@@ -11,4 +11,16 @@ SystemSetting.addSystemSetting('client.sidebar.showLogo', true, false, 'boolean'
 SystemSetting.addSystemSetting('client.sidebar.logoPadding', true, false, 'boolean');
 
 //在浏览器标题栏上显示的程序名称
-SystemSetting.addSystemSetting('client.programName', 'NodeBook', false, 'string');   
+SystemSetting.addSystemSetting('client.programName', 'NodeBook', false, 'string');
+
+//代码编辑器 显示行号
+SystemSetting.addSystemSetting('client.editor.lineNumbers', true, false, 'boolean');
+
+//代码编辑器 平滑滚动
+SystemSetting.addSystemSetting('client.editor.smoothScrolling', false, false, 'boolean');
+
+//代码编辑器 minimap
+SystemSetting.addSystemSetting('client.editor.minimap', true, false, 'boolean');
+
+//代码编辑器 字体大小
+SystemSetting.addSystemSetting('client.editor.fontSize', 14, false, 'number');

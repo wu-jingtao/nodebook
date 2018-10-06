@@ -7,7 +7,7 @@ import { FoldableContainerPropsType } from '../../../../../../../../global/Compo
 import { ObservableComponent } from '../../../../../../../../global/Tools/ObservableComponent';
 import { FileIcon } from '../../../../../../../../global/Component/FileIcon/FileIcon';
 import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
-import { cachedFiles, removeCache, saveToServer } from '../../UnsavedFiles';
+import { cachedFiles, removeCache, saveToServer } from '../../../../../../../../global/UnsavedFiles';
 import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { ContextMenuItemOptions } from '../../../../../../../ContextMenu/ContextMenuOptions';

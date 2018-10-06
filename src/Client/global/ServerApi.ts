@@ -59,8 +59,15 @@ export const ServerApi = {
      */
     file: {
         /**
-         * 列出某个目录中的子目录与文件
+         * 读取服务器端文件数据
          * @param path 传入的路径需对应服务器端全路径
+         */
+        async readFile(path: string): Promise<any> {
+            return await Get('/file/api/readFile', { path }, true);
+        },
+        /**
+         * 列出某个目录中的子目录与文件
+         * @param path 
          */
         async listDirectory(path: string): Promise<ReadonlyArray<{ name: string, isFile: boolean, modifyTime: number, size: number }>> {
             return await Post('/file/api/listDirectory', { path });

@@ -5,7 +5,7 @@ import { ObservableVariable, oVar } from 'observable-variable';
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { normalSettings } from '../../../../global/SystemSetting';
 import { displayType } from '../FunctionArea/FunctionArea';
-import { cachedFiles } from '../FunctionArea/FunctionPanel/FileManager/UnsavedFiles';
+import { cachedFiles } from '../../../../global/UnsavedFiles';
 import { crashedServiceNumber } from '../FunctionArea/FunctionPanel/ServiceManager/ServiceManager';
 import { showLogWindow } from '../LogWindow/LogWindow';
 import { openWindow } from '../ContentWindow/WindowList';

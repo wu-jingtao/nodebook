@@ -29,8 +29,8 @@ function Ajax(method: 'GET' | 'POST', url: string, data: any, setting: JQuery.Aj
     return promise;
 }
 
-export function Get(url: string, data?: { [key: string]: any }) {
-    return Ajax('GET', url, data);
+export function Get(url: string, data?: { [key: string]: any }, cache: boolean = false) {
+    return Ajax('GET', url, data, { cache });
 }
 
 export function Post(url: string, data?: { [key: string]: any }, file?: Blob, progress?: ObservableVariable<number>) {

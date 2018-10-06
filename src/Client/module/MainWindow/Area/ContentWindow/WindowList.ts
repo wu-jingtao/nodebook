@@ -54,7 +54,7 @@ export const windowList = {
  */
 export function focusWindow(id: string, side: 'left' | 'right'): void {
     const _focusedSide = side === 'left' ? windowList.leftWindows : windowList.rightWindows;
-    
+
     if (_focusedSide.displayOrder.last !== id) {
         _focusedSide.displayOrder.delete(id);
         _focusedSide.displayOrder.push(id);

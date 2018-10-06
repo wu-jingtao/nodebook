@@ -7,7 +7,7 @@ import _throttle = require('lodash.throttle');
  */
 export class ObservableComponent<p = {}> extends React.Component<p> {
 
-    private _unobserve: Function[] = [];
+    protected _unobserve: Function[] = [];
 
     /**
      * 观察指定 ObservableVariable 变量的变化，当其中某个的值发生改变后，重新渲染
