@@ -2,15 +2,15 @@ import * as React from 'react';
 import throttle = require('lodash.throttle');
 
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
-import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
-import { unsavedFiles } from '../../../../../ContentWindow/FileCache';
+import { unsavedFiles } from '../../../../../ContentWindow/Windows/EditorWindow/FileCache';
+import { UserCodeTree } from '../UserCodePanel/UserCodePanel';
 
-const less = require('./RecyclePanel.less');
+const less = require('../UserCodePanel/UserCodePanel.less');
 
 /**
  * 刷新回收站根目录
@@ -71,7 +71,7 @@ export class RecyclePanel extends MultipleFoldableContainerItem<MultipleFoldable
 
         this._content_div.on('dragover', e => {
             const dt = (e.originalEvent as DragEvent).dataTransfer as DataTransfer;
-            
+
             if (dt.types.includes('editable_file_tree_drag')) {
                 e.stopPropagation();
                 e.preventDefault();
@@ -95,20 +95,7 @@ export class RecyclePanel extends MultipleFoldableContainerItem<MultipleFoldable
     }
 }
 
-class RecycleTree extends EditableFileTree<EditableFileTreePropsType> {
-
-    protected async _onDelete(): Promise<void> {
-        await ServerApi.file.deleteRecycleData(this._fullNameString);
-    }
-
-
-    protected _onOpenItem(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve()
-            }, 1000);
-        });
-    }
+class RecycleTree extends UserCodeTree {
 
     componentDidMount() {
         if (this._isRoot) refreshRecycleRoot = throttle(() => this._root._refreshFolder(), 1000);
@@ -129,6 +116,7 @@ class RecycleTree extends EditableFileTree<EditableFileTreePropsType> {
             ok: {
                 callback: async () => {
                     try {
+                        this._root._closeWindow();
                         await ServerApi.file.cleanRecycle();
                         this._root._refreshFolder();
                     } catch (error) {

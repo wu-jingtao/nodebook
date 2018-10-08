@@ -49,6 +49,11 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
     protected readonly _dataTree: DataTree<D> = this.props._dataTree as any || { name: this._name, data: {}, subItem: oMap([]) };
 
     /**
+     * 判断当前节点是否是一个分支
+     */
+    protected readonly _isBranch = this._dataTree.subItem !== undefined;
+
+    /**
      * 打开的分支。值是全路径字符串。不要直接修改该属性，要打开某个分支请使用openOrCloseBranch()
      */
     protected readonly _openedBranch: ObservableSet<string> = this._root._openedBranch || oSet([]);
@@ -67,6 +72,11 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
      * 树每个节点的对象列表，key是每个节点的_fullNameString
      */
     protected readonly _treeList: Map<string, this> = this._root._treeList || new Map;
+
+    /**
+     * 当前节点的背景颜色
+     */
+    protected readonly _backgroundColor = oVar<string | undefined>(undefined);
 
     /**
      * 是否显示加载动画。如果数组长度大于1则显示
@@ -113,7 +123,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
                 this._openOrCloseBranch();
 
                 //触发打开事件
-                if (this._dataTree.subItem === undefined) {  //确保不是分支
+                if (!this._isBranch) {  //确保不是分支
                     if (!this._loading.has('_onOpenItem')) { //确保不重复打开
                         this._loading.add('_onOpenItem');
                         this._onOpenItem().then(() => {
@@ -169,13 +179,25 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
     };
 
     /**
+     * 渲染每一级树的背景色。
+     * 需要观察 _backgroundColor
+     */
+    private readonly _renderBackgroundColor = () => {
+        if (this._backgroundColor.value) {
+            return (
+                <div className={less.backgroundColor} style={{ backgroundColor: this._backgroundColor.value }} />
+            );
+        }
+    };
+
+    /**
      * 渲染每一级树的标题。
      * 需要观察 _loading, _openedBranch
      */
     private readonly _renderTreeTitle = () => {
         return (
             <div className={less.TreeTitle} style={{ marginLeft: 20 * this._fullName.length, width: `calc(100% - ${20 * this._fullName.length}px)` }}>
-                {this._dataTree.subItem && this._loading.size === 0 &&
+                {this._isBranch && this._loading.size === 0 &&
                     <i className={classnames(less.titleArrow, 'iconfont',
                         this._openedBranch.has(this._fullNameString) ? "icon-arrowdroprightdown" : "icon-arrow_right")} />}
                 {this._loading.size > 0 && <i className={less.titleLoading} />}
@@ -246,7 +268,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
      * 展开或关闭分支。isOpen，是打开还是关闭。如果不传递isOpen，那么现在如果是打开则关闭，如果是关闭则打开
      */
     protected async _openOrCloseBranch(isOpen?: boolean): Promise<void> {
-        if (this._dataTree.subItem) {   //确保是目录
+        if (this._isBranch) {   //确保是目录
             if (!this._loading.has('_onOpenBranch')) {  //确保并未处于正在打开或关闭的状态
                 this._loading.add('_onOpenBranch'); //表示正在打开
 
@@ -316,6 +338,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
 
         return (
             <div {...props}>
+                <ObservableComponentWrapper watch={[this._backgroundColor]} render={this._renderBackgroundColor} />
                 <ObservableComponentWrapper watch={[this._loading, this._openedBranch]} render={this._renderTreeTitle} />
                 {this._dataTree.subItem &&
                     <ObservableComponentWrapper watch={[this._dataTree.subItem, this._loading, this._openedBranch]} render={this._renderTreeBranch} />}

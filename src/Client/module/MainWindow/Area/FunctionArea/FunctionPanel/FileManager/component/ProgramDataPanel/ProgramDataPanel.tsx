@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { UserCodePanel, UserCodeTree } from '../UserCodePanel/UserCodePanel';
-import { unsavedFiles } from '../../../../../ContentWindow/FileCache';
 import { refreshRecycleRoot } from '../RecyclePanel/RecyclePanel';
+import { unsavedFiles } from '../../../../../ContentWindow/Windows/EditorWindow/FileCache';
 
 /**
  * 程序数据目录
@@ -19,7 +19,6 @@ export class ProgramDataPanel extends UserCodePanel {
 }
 
 class ProgramDataTree extends UserCodeTree {
-
     protected async _onDelete(): Promise<void> {
         await ServerApi.file.deleteProgramData(this._fullNameString);
         refreshRecycleRoot && refreshRecycleRoot();

@@ -5,6 +5,8 @@ import { ObservableVariable, watch } from 'observable-variable';
 import { normalSettings } from '../../../../../../global/SystemSetting';
 import { BaseWindowContent } from '../BaseWindow/BaseWindowContent';
 import { CodeEditorWindowArgs } from '../../ContentWindowTypes';
+import { closeWindow } from '../../WindowList';
+import { getCache } from './FileCache';
 
 
 //配置编辑器主题
@@ -40,7 +42,7 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
 
     componentDidMount() {
         super.componentDidMount();
-    
+
         if (this.props.args.args.diff) {
             this._editor = monaco.editor.createDiffEditor(this._editor_div, this._getOptions());
         } else {
@@ -50,6 +52,18 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
         this._unobserve.push(watch([this._lineNumbers, this._smoothScrolling, this._minimap, this._fontSize], () => {
             this._editor.updateOptions(this._getOptions());
         }));
+
+        getCache(this.props.args.args.path).then(cache => {
+            if (cache) {
+                if (this.props.args.args.diff)
+                    this._editor.setModel(cache);
+                else
+                    this._editor.setModel(cache.modified);
+
+                this._editor.onDidDispose(cache.dispose);
+            } else
+                closeWindow(this.props.args.id, this.props.side);
+        });
     }
 
     componentWillUnmount() {

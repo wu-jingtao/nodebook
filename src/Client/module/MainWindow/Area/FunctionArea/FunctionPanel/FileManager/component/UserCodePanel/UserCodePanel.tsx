@@ -6,10 +6,11 @@ import { EditableFileTree } from '../../../../../../../../global/Component/Tree/
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
+import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
 import { refreshRecycleRoot } from '../RecyclePanel/RecyclePanel';
 import { openWindow, windowList, closeWindow } from '../../../../../ContentWindow/WindowList';
 import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
-import { unsavedFiles, editorData } from '../../../../../ContentWindow/FileCache';
+import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/EditorWindow/FileCache';
 
 const less = require('./UserCodePanel.less');
 
@@ -102,11 +103,45 @@ export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldabl
 
 export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
 
+    constructor(props: any, context: any) {
+        super(props, context);
+
+        //随机颜色测试
+        if (!this._isBranch)
+            this._backgroundColor.value = '#' + ('00000' + (Math.random() * 0x1000000 << 0).toString(16)).slice(-6);
+
+        this._stateInfoContent.value = <span>{Math.random()}</span>
+    }
+
     protected async _onDelete(): Promise<void> {
         await ServerApi.file.deleteCodeData(this._fullNameString);
         refreshRecycleRoot && refreshRecycleRoot();
         this._closeWindow();
         this._deleteUnsavedFile();
+    }
+
+    protected async _onCut(): Promise<void> {
+        const _super_onCut = super._onCut.bind(this);
+
+        this._closeWindow();
+
+        for (const item of unsavedFiles.value) {
+            if (this._isBranch ? item.startsWith(this._fullNameString) : item === this._fullNameString) {
+                await new Promise((resolve, reject) => {
+                    showPopupWindow({
+                        title: '有未保存的文件',
+                        content: <span>文件'{this._fullNameString}'并未保存，剪切文件将会使得更改的内容被删除，是否继续？</span>,
+                        ok: {
+                            callback() {
+                                discardChange(item);
+                                _super_onCut().then(resolve).catch(reject);
+                            }
+                        },
+                        cancel: { callback: resolve }
+                    });
+                });
+            }
+        }
     }
 
     /**
@@ -118,7 +153,7 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
         for (const item of windowList.leftWindows.windowList.value) {
             const itemPath: string | void = item.args && item.args.path;
             if (itemPath) {
-                if (this._dataTree.subItem) {
+                if (this._isBranch) {
                     if (itemPath.startsWith(this._fullNameString))
                         win.push({ id: item.id, side: 'left' });
                 } else {
@@ -133,7 +168,7 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
         for (const item of windowList.rightWindows.windowList.value) {
             const itemPath: string | void = item.args && item.args.path;
             if (itemPath) {
-                if (this._dataTree.subItem) {
+                if (this._isBranch) {
                     if (itemPath.startsWith(this._fullNameString))
                         win.push({ id: item.id, side: 'right' });
                 } else {
@@ -152,13 +187,13 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
      * 删除未保存文件
      */
     protected _deleteUnsavedFile(): void {
-        for (const item of editorData.keys()) {
-            if (this._dataTree.subItem) {
+        for (const item of unsavedFiles.value) {
+            if (this._isBranch) {
                 if (item.startsWith(this._fullNameString))
-                    editorData.delete(item);
+                    discardChange(item);
             } else {
                 if (item === this._fullNameString) {
-                    editorData.delete(item);
+                    discardChange(item);
                     break;
                 }
             }
@@ -172,7 +207,8 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
             name: this._name,
             type: WindowType.code_editor,
             args: {
-                path: this._fullNameString
+                path: this._fullNameString,
+                readonly: this.props.noCreate   //对于回收站和类库
             }
         };
 

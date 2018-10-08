@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { oVar } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
 import { ScrollBar } from '../../../../../../global/Component/ScrollBar/ScrollBar';
@@ -10,6 +11,7 @@ import { ProgramDataPanel } from './component/ProgramDataPanel/ProgramDataPanel'
 import { RecyclePanel } from './component/RecyclePanel/RecyclePanel';
 import { UnsavedFilesPanel } from './component/UnsavedFilesPanel/UnsavedFilesPanel';
 import { OpenedWindows } from './component/OpenedWindows/OpenedWindows';
+import { LibraryPanel } from './component/LibraryPanel/LibraryPanel';
 
 const less = require('./FileManager.less');
 
@@ -31,7 +33,7 @@ export class FileManager extends ObservableComponent {
                     <OpenedWindows title="打开的窗口" uniqueID="_openedWindows" />
                 </ScrollBar>
                 <FileBrowserPanel className={less.bottom} uniqueID="FileManager" />
-            </div >
+            </div>
         );
     }
 }
@@ -40,6 +42,7 @@ class FileBrowserPanel extends MultipleFoldableContainer<MultipleFoldableContain
     protected foldableContainers: JSX.Element[] = [
         <UserCodePanel title="用户代码" uniqueID="_userCode" />,
         <ProgramDataPanel title="程序数据" uniqueID="_programData" />,
-        <RecyclePanel title="回收站" uniqueID="_recycle" />
+        <RecyclePanel title="回收站" uniqueID="_recycle" />,
+        <LibraryPanel title="类库" uniqueID="_library" folded={oVar(true)} />
     ];
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import { ObservableVariable, ObservableSet } from 'observable-variable';
+import { ObservableSet, oVar } from 'observable-variable';
 
 import { ObservableComponentWrapper } from '../../../Tools/ObservableComponent';
 import { FileIcon } from '../../FileIcon/FileIcon';
@@ -20,6 +20,11 @@ export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> ext
     protected readonly _modifiedFiles: ObservableSet<string> = this.props.modifiedFiles || this._root._modifiedFiles;
 
     /**
+     * 在文件路径后面要显示的内容
+     */
+    protected readonly _stateInfoContent = oVar<JSX.Element | undefined>(undefined);
+
+    /**
      * 渲染FileIconTree的内容
      */
     private _FileIconTree_render = () => {
@@ -33,21 +38,23 @@ export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> ext
         }
 
         return (
-            <>
+            <div className={less.FileIconTree}>
                 <FileIcon
                     className={less.icon}
                     filename={this._name}
-                    isFolder={this._dataTree.subItem !== undefined}
-                    opened={this._dataTree.subItem && this._openedBranch.has(this._fullNameString)}
+                    isFolder={this._isBranch}
+                    opened={this._isBranch && this._openedBranch.has(this._fullNameString)}
                     rootFolder={this._isRoot} />
                 <div className={classnames(less.filename, { [less.modified]: modified })}> {this._name}</div>
-            </>
+                <div className={less.stateInfoContent}>{this._stateInfoContent.value}</div>
+            </div>
         );
     };
 
     protected _renderItem() {
-        const watch: ObservableVariable<any>[] = [this._modifiedFiles];
-        if (this._dataTree.subItem) watch.push(this._openedBranch);
+        const watch = [this._modifiedFiles, this._stateInfoContent];
+
+        if (this._isBranch) watch.push(this._openedBranch);
 
         return <ObservableComponentWrapper watch={watch} render={this._FileIconTree_render} />
     }
