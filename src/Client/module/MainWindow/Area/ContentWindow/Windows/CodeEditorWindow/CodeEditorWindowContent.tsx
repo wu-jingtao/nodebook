@@ -6,12 +6,10 @@ import { normalSettings } from '../../../../../../global/SystemSetting';
 import { BaseWindowContent } from '../BaseWindow/BaseWindowContent';
 import { CodeEditorWindowArgs } from '../../ContentWindowTypes';
 import { closeWindow } from '../../WindowList';
-import { getCache } from './FileCache';
-
+import { getCache } from './CodeEditorFileCache';
 
 //配置编辑器主题
-const theme_monokai = require('./themes/Monokai.json');
-monaco.editor.defineTheme('Monokai', theme_monokai);
+monaco.editor.defineTheme('Monokai', require('./themes/Monokai.json'));
 monaco.editor.setTheme('Monokai');
 
 export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEditorWindowArgs> {

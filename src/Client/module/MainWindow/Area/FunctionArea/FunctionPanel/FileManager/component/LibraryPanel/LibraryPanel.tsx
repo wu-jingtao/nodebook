@@ -3,7 +3,7 @@ import * as React from 'react';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { UserCodeTree } from '../UserCodePanel/UserCodePanel';
-import { unsavedFiles } from '../../../../../ContentWindow/Windows/EditorWindow/FileCache';
+import { unsavedFiles } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 
 const less = require('../UserCodePanel/UserCodePanel.less');
 

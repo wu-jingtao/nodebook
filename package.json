@@ -75,6 +75,7 @@
         "lodash.isequal": "^4.5.0",
         "lodash.throttle": "^4.1.1",
         "monaco-editor": "^0.14.3",
+        "monaco-editor-webpack-plugin": "^1.5.4",
         "normalize.css": "^8.0.0",
         "react": "^16.5.2",
         "react-dom": "^16.5.2",

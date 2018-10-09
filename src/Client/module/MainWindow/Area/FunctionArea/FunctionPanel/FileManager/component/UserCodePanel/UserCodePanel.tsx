@@ -10,7 +10,7 @@ import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
 import { refreshRecycleRoot } from '../RecyclePanel/RecyclePanel';
 import { openWindow, windowList, closeWindow } from '../../../../../ContentWindow/WindowList';
 import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
-import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/EditorWindow/FileCache';
+import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 
 const less = require('./UserCodePanel.less');
 
@@ -130,7 +130,7 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
                 await new Promise((resolve, reject) => {
                     showPopupWindow({
                         title: '有未保存的文件',
-                        content: <span>文件'{this._fullNameString}'并未保存，剪切文件将会使得更改的内容被删除，是否继续？</span>,
+                        content: <span>文件'{this._fullNameString}'并未保存，剪切文件将会使得更改的内容被删除，是否继续?</span>,
                         ok: {
                             callback() {
                                 discardChange(item);

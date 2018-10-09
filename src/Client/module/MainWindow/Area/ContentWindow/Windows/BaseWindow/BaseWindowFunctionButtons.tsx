@@ -9,7 +9,7 @@ const less = require('./BaseWindow.less');
 /**
  * 功能按钮
  */
-export abstract class BaseWindowFunctionButtons<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right', state: { [key: string]: any } }> {
+export abstract class BaseWindowFunctionButtons<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right' }> {
 
     private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 

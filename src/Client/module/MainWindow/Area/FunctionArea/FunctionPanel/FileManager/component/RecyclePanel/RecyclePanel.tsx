@@ -7,7 +7,7 @@ import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
-import { unsavedFiles } from '../../../../../ContentWindow/Windows/EditorWindow/FileCache';
+import { unsavedFiles } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 import { UserCodeTree } from '../UserCodePanel/UserCodePanel';
 
 const less = require('../UserCodePanel/UserCodePanel.less');

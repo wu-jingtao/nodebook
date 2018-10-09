@@ -1,32 +1,26 @@
 import * as React from 'react';
 import { oVar } from 'observable-variable';
-import clipboard = require('copy-text-to-clipboard');
 
 import { FoldableContainer } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainer';
+import { processingItems } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
-import { ObservableComponent } from '../../../../../../../../global/Tools/ObservableComponent';
+import { ObservableComponent, ObservableComponentWrapper } from '../../../../../../../../global/Tools/ObservableComponent';
 import { FileIcon } from '../../../../../../../../global/Component/FileIcon/FileIcon';
 import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
-import { cachedFiles, removeCache, saveToServer } from '../../../../../../../../global/UnsavedFiles';
 import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
-import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
-import { ContextMenuItemOptions } from '../../../../../../../ContextMenu/ContextMenuOptions';
 import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
 import { openWindow } from '../../../../../ContentWindow/WindowList';
+import { unsavedFiles, saveToServer, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 
-const less = require('./UnsavedFilesPanel.less');
+const less = require('../OpenedWindows/OpenedWindows.less');
 
 /**
  * 未保存的文件列表
  */
 export class UnsavedFilesPanel extends FoldableContainer<FoldableContainerPropsType>  {
 
-    private readonly _contentItemsList: Map<string, ContentItem> = new Map();
-
     private readonly _saveAll = () => {
-        for (const item of this._contentItemsList.values()) {
-            item._menu_save();
-        }
+        unsavedFiles.forEach(item => saveToServer(item));
     };
 
     private readonly _undoAll = () => {
@@ -34,10 +28,8 @@ export class UnsavedFilesPanel extends FoldableContainer<FoldableContainerPropsT
             title: '放弃所有更改',
             content: <span>确认要放弃所有更改吗?</span>,
             ok: {
-                callback: () => {
-                    for (const item of this._contentItemsList.values()) {
-                        item._menu_undo();
-                    }
+                callback() {
+                    unsavedFiles.forEach(item => discardChange(item));
                 }
             }
         });
@@ -52,68 +44,34 @@ export class UnsavedFilesPanel extends FoldableContainer<FoldableContainerPropsT
         );
     }
 
-    protected renderContent(): JSX.Element {
-        return [...cachedFiles.values()].map(fullName => (
-            <ContentItem key={fullName} fullName={fullName}
-                ref={e => e ? this._contentItemsList.set(fullName, e) : this._contentItemsList.delete(fullName)} />
-        )) as any;
+    protected renderContent() {
+        return [...unsavedFiles.values()].map(path => <UnsavedFilesPanelItem key={path} path={path} />)
     }
 
     componentDidMount() {
         super.componentDidMount();
-        this.watch([cachedFiles]);
+        this.watch([unsavedFiles]);
     }
 
     render() {
-        this._titleBarStyle.display = cachedFiles.size === 0 ? 'none' : '';
+        this._titleBarStyle.display = unsavedFiles.size === 0 ? 'none' : '';
         return super.render();
     }
 }
 
-class ContentItem extends ObservableComponent<{ fullName: string }> {
+class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
 
-    private readonly _name = this.props.fullName.split('/').pop() as string;
+    //文件名称
+    private readonly _name = this.props.path.split('/').pop() as string;
 
-    /**
-     * 是否正在处理
-     */
-    private readonly _processing = oVar(false);
-
-    /**
-    * 复制当前文件的绝对路径
-    */
-    private readonly _menu_copyPath = () => {
-        if (!clipboard(this.props.fullName)) {
-            showMessageBox({ icon: 'message', title: '复制绝对路径失败，请手动复制', content: this.props.fullName, autoClose: 0 });
-        }
-    };
-
-    /**
-     * 保存到服务器
-     */
-    public readonly _menu_save = async () => {
-        if (this._processing.value === false) {
-            this._processing.value = true;
-            await saveToServer(this.props.fullName);
-            this._processing.value = false;
-        }
-    };
-
-    /**
-     * 取消保存
-     */
-    public readonly _menu_undo = async (e?: React.MouseEvent) => {
-        if (e) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
-
-        if (this._processing.value === false) {
-            this._processing.value = true;
-            await removeCache(this.props.fullName);
-            this._processing.value = false;
-        }
-    };
+    //取消保存按钮和加载动画
+    private readonly _undoAndLoading = (
+        <ObservableComponentWrapper watch={[processingItems]}
+            render={() => processingItems.has(this.props.path) ?
+                <i className={less.loading} /> :
+                <div className={less.close} title="放弃保存" onClick={() => discardChange(this.props.path)}>×</div>
+            } />
+    );
 
     /**
      * 右键菜单
@@ -123,18 +81,15 @@ class ContentItem extends ObservableComponent<{ fullName: string }> {
         e.preventDefault();
 
         if (e.button === 2) {
-            const menuItems: ContextMenuItemOptions[][] = [];
-
-            if (this._processing.value === false) {
-                menuItems.push([
-                    { name: '保存', callback: this._menu_save },
-                    { name: '放弃保存', callback: this._menu_undo }
-                ]);
-            }
-
-            menuItems.push([{ name: '复制绝对路径', callback: this._menu_copyPath }]);
-
-            showContextMenu({ position: { x: e.clientX, y: e.clientY }, items: menuItems });
+            showContextMenu({
+                position: { x: e.clientX, y: e.clientY },
+                items: [
+                    [
+                        { name: '保存', callback: () => saveToServer(this.props.path) },
+                        { name: '放弃保存', callback: () => discardChange(this.props.path) }
+                    ]
+                ]
+            });
         }
     }
 
@@ -152,7 +107,7 @@ class ContentItem extends ObservableComponent<{ fullName: string }> {
                 type: WindowType.code_editor,
                 fixed: oVar(false),
                 args: {
-                    path: this.props.fullName,
+                    path: this.props.path,
                     diff: true
                 }
             };
@@ -164,11 +119,10 @@ class ContentItem extends ObservableComponent<{ fullName: string }> {
     render() {
         return (
             <div className={less.contentItem} onClick={this._openEditor} onContextMenu={this._contextMenu}>
-                {this._processing.value ? <i className={less.loading} /> :
-                    <div className={less.undo} title="放弃保存" onClick={this._menu_undo}>×</div>}
-                <FileIcon className={less.fileIcon} filename={this._name} />
+                {this._undoAndLoading}
+                <FileIcon className={less.fileIcon} filename={this.props.path} />
                 <div className={less.fileName}>{this._name}</div>
-                <div className={less.fileFullName}>{this.props.fullName}</div>
+                <div className={less.fileFullName}>{this.props.path}</div>
             </div>
         );
     }

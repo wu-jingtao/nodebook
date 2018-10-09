@@ -3,6 +3,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanCSSPlugin = require("less-plugin-clean-css");
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
     mode: 'development',
@@ -28,6 +29,15 @@ module.exports = {
                         { loader: "less-loader", options: { sourceMap: true, plugins: [new CleanCSSPlugin({ advanced: true })] } }
                     ]
                 })
+            },
+            {
+                test: /\.css$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [
+                        { loader: "css-loader", options: { sourceMap: true } }
+                    ]
+                })
             }
         ]
     },
@@ -37,6 +47,7 @@ module.exports = {
             { from: 'src/Client/res/font', to: './res/font' },
         ]),
         new ExtractTextPlugin("index.css"),
-        new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/Client/module/IndexPage/index.html' })
+        new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/Client/module/IndexPage/index.html' }),
+        new MonacoWebpackPlugin()
     ]
 };

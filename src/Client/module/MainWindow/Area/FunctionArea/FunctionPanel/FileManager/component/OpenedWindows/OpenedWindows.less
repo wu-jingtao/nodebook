@@ -1,4 +1,5 @@
 @import "../../../../../../../../global/ThemeColor.less";
+@import "../../../../../../../../global/Component/Button/LoadingAnimation.less";
 
 :local(.titleButtons) {
     width: 100%;
@@ -103,6 +104,15 @@
     padding: 0 6px 0 12px;
     color: @fontColor;
     visibility: hidden;
+}
+
+:local(.loading) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    display: block;
+    .LoadingAnimation();
 }
 
 :local(.fileIcon) {

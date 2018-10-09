@@ -16,10 +16,8 @@ import { DeleteFiles } from './DeleteFiles/DeleteFiles';
 
 const less = require('./EditableFileTree.less');
 
-/**
- * 拖拽时在鼠标上显示的文字
- */
-export const dragText = $(`<i class="${less.EditableFileTree_dragText}"></i>`).appendTo(document.body);
+//拖拽时在鼠标上显示的文字
+const dragText = $(`<i class="${less.EditableFileTree_dragText}"></i>`).appendTo(document.body);
 
 /**
  * 正在处理中的文件或文件夹，value是_fullNameString

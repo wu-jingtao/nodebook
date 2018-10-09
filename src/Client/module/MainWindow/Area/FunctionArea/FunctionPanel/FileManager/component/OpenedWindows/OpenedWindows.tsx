@@ -1,15 +1,12 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import clipboard = require('copy-text-to-clipboard');
 
 import { FoldableContainer } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainer';
 import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
-import { ObservableComponent } from '../../../../../../../../global/Tools/ObservableComponent';
-import { getIconPath } from '../../../../../../../../global/Component/FileIcon/GetIconPath';
-import { dragText } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
-import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
+import { ObservableComponent, ObservableComponentWrapper } from '../../../../../../../../global/Tools/ObservableComponent';
+import { processingItems } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
+import { FileIcon } from '../../../../../../../../global/Component/FileIcon/FileIcon';
 import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
-import { ContextMenuItemOptions } from '../../../../../../../ContextMenu/ContextMenuOptions';
 import { windowList, closeAllWindow, closeWindow, closeOtherWindow, moveToOtherSide, focusWindow } from '../../../../../ContentWindow/WindowList';
 import { WindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
 
@@ -80,13 +77,36 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', arg
 
     private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 
+    //关闭窗口按钮
+    private readonly _closeWindow = (
+        <div className={less.close} title="关闭窗口"
+            onClick={() => closeWindow(this.props.args.id, this.props.side)}>×</div>
+    );
+
+    //关闭窗口按钮和加载动画
+    private readonly _closeAndLoading = (
+        this.props.args.args.path ?
+            <ObservableComponentWrapper watch={[processingItems]}
+                render={() => processingItems.has(this.props.args.args.path) ? <i className={less.loading} /> : this._closeWindow} /> :
+            this._closeWindow
+    );
+
     //窗口图标
-    private readonly _iconPath = '/static/res/img/file_icons/' + getIconPath(
+    private readonly _icon = <FileIcon className={less.fileIcon} filename={
         this.props.args.type === WindowType.task ? '.volt' : //闪电符号
             this.props.args.type === WindowType.service ? '.apib' : //圆圈三角形
                 this.props.args.type === WindowType.settings ? '.plist' : //齿轮
                     (this.props.args as any).args.path.split('/').pop()
-    );
+    } />
+
+    //文件名称
+    private readonly _fileName = (
+        <>
+            <div className={less.fileName}>{this.props.args.name}</div>
+            {this.props.args.args.path &&
+                <div className={less.fileFullName}>{this.props.args.args.path}</div>}
+        </>
+    )
 
     //右键菜单
     private readonly _contextMenu = (e: React.MouseEvent) => {
@@ -94,53 +114,32 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', arg
         e.preventDefault();
 
         if (e.button === 2) {
-            const items: ContextMenuItemOptions[][] = [
-                [
-                    { name: '关闭窗口', callback: () => closeWindow(this.props.args.id, this.props.side) },
-                    { name: '关闭其他窗口', callback: () => closeOtherWindow(this.props.args.id, this.props.side) },
-                ],
-                [
-                    {
-                        name: `移动到${this.props.side === 'left' ? '右' : '左'}侧显示`,
-                        callback: () => moveToOtherSide(this.props.args.id, this.props.side)
-                    },
-                ],
-            ];
-
-            if (this.props.args.args && this.props.args.args.path)
-                items.push(
+            showContextMenu({
+                position: { x: e.clientX, y: e.clientY },
+                items: [
+                    [
+                        { name: '关闭窗口', callback: () => closeWindow(this.props.args.id, this.props.side) },
+                        { name: '关闭其他窗口', callback: () => closeOtherWindow(this.props.args.id, this.props.side) },
+                    ],
                     [
                         {
-                            name: '复制绝对路径',
-                            callback: () => {
-                                if (!clipboard((this.props.args as any).args.path)) {
-                                    showMessageBox({
-                                        icon: 'message', title: '复制绝对路径失败，请手动复制',
-                                        content: (this.props.args as any).args.path, autoClose: 0
-                                    });
-                                }
-                            }
-                        }
-                    ]
-                );
-
-            showContextMenu({ position: { x: e.clientX, y: e.clientY }, items });
+                            name: `${this.props.args.fixed.value ? '取消' : ''}固定窗口`,
+                            callback: () => this.props.args.fixed.value = !this.props.args.fixed.value
+                        },
+                    ],
+                    [
+                        {
+                            name: `移动到${this.props.side === 'left' ? '右' : '左'}侧显示`,
+                            callback: () => moveToOtherSide(this.props.args.id, this.props.side)
+                        },
+                    ],
+                ]
+            });
         }
     }
 
-    //拖拽
-    private readonly _onDragStart = (e: React.DragEvent) => {
-        e.dataTransfer.effectAllowed = 'copy';
-
-        dragText.text((this.props.args as any).args.path);
-        e.dataTransfer.setDragImage(dragText[0], -20, 0);
-
-        //配置数据
-        e.dataTransfer.setData('text/plain', (this.props.args as any).args.path);
-    };
-
     componentDidMount() {
-        this.watch([this.props.args.fixed, windowList.focusedSide, this._thisSide.displayOrder]);
+        this.watch([this.props.args.fixed, this._thisSide.displayOrder, windowList.focusedSide]);
     }
 
     render() {
@@ -150,17 +149,12 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', arg
                     this._thisSide.displayOrder.last === this.props.args.id,
                 [less.fixed]: this.props.args.fixed.value
             })}
-                draggable={this.props.args.args && this.props.args.args.path ? true : false}
-                onDragStart={this._onDragStart}
                 onClick={() => focusWindow(this.props.args.id, this.props.side)}
                 onDoubleClick={() => this.props.args.fixed.value = true}
                 onContextMenu={this._contextMenu}>
-                <div className={less.close} title="关闭窗口"
-                    onClick={() => closeWindow(this.props.args.id, this.props.side)}>×</div>
-                <img className={less.fileIcon} src={this._iconPath} />
-                <div className={less.fileName}>{this.props.args.name}</div>
-                {this.props.args.args && this.props.args.args.path &&
-                    <div className={less.fileFullName}>{this.props.args.args.path}</div>}
+                {this._closeAndLoading}
+                {this._icon}
+                {this._fileName}
             </div>
         );
     }

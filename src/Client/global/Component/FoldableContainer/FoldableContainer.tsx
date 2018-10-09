@@ -24,8 +24,8 @@ export abstract class FoldableContainer<T extends FoldableContainerPropsType> ex
     protected _titleBarStyle: React.CSSProperties = {};
     protected _contentStyle: React.CSSProperties = {};
 
-    protected abstract renderTitleBar(): JSX.Element;
-    protected abstract renderContent(): JSX.Element;
+    protected abstract renderTitleBar(): React.ReactNode;
+    protected abstract renderContent(): React.ReactNode;
 
     constructor(props: any, context: any) {
         super(props, context);

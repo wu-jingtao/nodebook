@@ -5,11 +5,11 @@ import { ObservableVariable, oVar } from 'observable-variable';
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { normalSettings } from '../../../../global/SystemSetting';
 import { displayType } from '../FunctionArea/FunctionArea';
-import { cachedFiles } from '../../../../global/UnsavedFiles';
 import { crashedServiceNumber } from '../FunctionArea/FunctionPanel/ServiceManager/ServiceManager';
 import { showLogWindow } from '../LogWindow/LogWindow';
 import { openWindow } from '../ContentWindow/WindowList';
 import { WindowType, SettingsWindowArgs } from '../ContentWindow/ContentWindowTypes';
+import { unsavedFiles } from '../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 
 const less = require('./SideBar.less');
 
@@ -32,7 +32,7 @@ export class SideBar extends ObservableComponent {
      * 打开设置窗口
      */
     private readonly _openSettingWindow = () => {
-        const args: SettingsWindowArgs = { id: Math.random().toString(), name: '系统设置', type: WindowType.settings, fixed: oVar(true) };
+        const args: SettingsWindowArgs = { id: Math.random().toString(), name: '系统设置', type: WindowType.settings, fixed: oVar(true), args: {} };
         openWindow(args);
     };
 
@@ -44,7 +44,7 @@ export class SideBar extends ObservableComponent {
     }
 
     componentDidMount() {
-        this.watch([this._showLogo, this._logoPadding, displayType, showLogWindow, cachedFiles, crashedServiceNumber]);
+        this.watch([this._showLogo, this._logoPadding, displayType, showLogWindow, unsavedFiles, crashedServiceNumber]);
     }
 
     render() {
@@ -60,8 +60,8 @@ export class SideBar extends ObservableComponent {
                     <div className={classnames(less.icon, { selected: displayType.value === 'file' })}
                         onClick={() => this._changeFunctionArea('file')} title="资源管理器" >
                         <i className="iconfont icon-folder" />
-                        {cachedFiles.size > 0 &&
-                            <span className={classnames(less.iconNumber, 'blue')}>{Math.min(cachedFiles.size, 99)}</span>}
+                        {unsavedFiles.size > 0 &&
+                            <span className={classnames(less.iconNumber, 'blue')}>{Math.min(unsavedFiles.size, 99)}</span>}
                     </div>
                     <div className={classnames(less.icon, { selected: displayType.value === 'task' })}
                         onClick={() => this._changeFunctionArea('task')} title="任务管理器" >

@@ -1,9 +1,11 @@
 import * as React from 'react';
+import { oVar } from 'observable-variable';
 
-import { BaseWindowFunctionButtons } from '../BaseWindow/BaseWindowFunctionButtons';
+import { ObservableComponentWrapper } from '../../../../../../global/Tools/ObservableComponent';
 import { CodeEditorWindowArgs, HtmlViewerWindowArgs, WindowType } from '../../ContentWindowTypes';
 import { openWindow } from '../../WindowList';
-import { oVar } from 'observable-variable';
+import { BaseWindowFunctionButtons } from '../BaseWindow/BaseWindowFunctionButtons';
+import { unsavedFiles, saveToServer, refreshData } from './CodeEditorFileCache';
 
 export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<CodeEditorWindowArgs> {
 
@@ -21,10 +23,6 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
         openWindow(args);
     };
 
-    private readonly _refresh = () => {
-
-    };
-
     private readonly _runTask = () => {
 
     };
@@ -39,29 +37,29 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
 
     protected _functionButtons: JSX.Element = (
         <>
-            {this.props.args.name.endsWith('.html') &&
+            {this.props.args.args.path.endsWith('.html') &&
                 <img src={`/static/res/img/buttons_icon/Preview_inverse.svg`}
-                    title={`在HTML查看器中打开`}
-                    onClick={this._openHtmlViewer} />
+                    title={`在HTML查看器中打开`} onClick={this._openHtmlViewer} />
             }
-            {this.props.args.name.endsWith('.server.js') &&
+            {this.props.args.args.path.endsWith('.server.js') &&
                 <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
-                    title={`运行任务`}
-                    onClick={this._runTask} />
+                    title={`运行任务`} onClick={this._runTask} />
             }
-            {this.props.args.name.endsWith('.server.js') &&
+            {this.props.args.args.path.endsWith('.server.js') &&
                 <img src={`/static/res/img/buttons_icon/stop-inverse.svg`}
-                    title={`停止任务`}
-                    onClick={this._stopTask} />
+                    title={`停止任务`} onClick={this._stopTask} />
             }
-            {this.props.args.name.endsWith('.server.js') &&
+            {this.props.args.args.path.endsWith('.server.js') &&
                 <img src={`/static/res/img/buttons_icon/repl-inverse.svg`}
-                    title={`查看日志`}
-                    onClick={this._openLog} />
+                    title={`查看日志`} onClick={this._openLog} />
             }
+            <ObservableComponentWrapper watch={[unsavedFiles]} render={() => (
+                unsavedFiles.has(this.props.args.args.path) &&
+                <img src={`/static/res/img/buttons_icon/check-inverse.svg`}
+                    title={`保存更改`} onClick={() => saveToServer(this.props.args.args.path)} />
+            )} />
             <img src={`/static/res/img/buttons_icon/Refresh_inverse.svg`}
-                title={`刷新`}
-                onClick={this._refresh} />
+                title={`刷新`} onClick={() => refreshData(this.props.args.args.path)} />
         </>
     );
 }

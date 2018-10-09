@@ -7,7 +7,7 @@ import { WindowArgs } from '../../ContentWindowTypes';
 
 const less = require('./BaseWindow.less');
 
-export abstract class BaseWindowContent<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right', state: { [key: string]: any } }> {
+export abstract class BaseWindowContent<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right' }> {
 
     private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 
@@ -26,7 +26,7 @@ export abstract class BaseWindowContent<T extends WindowArgs> extends Observable
 
         this._unobserve.push(watch([this._thisSide.displayOrder, windowList.focusedSide], () => {
             if (windowList.focusedSide.value === this.props.side && this._thisSide.displayOrder.last === this.props.args.id)
-                setTimeout(() => this._onFocused(), 100);
+                setTimeout(() => this._onFocused(), 10);
         }));
     }
 
