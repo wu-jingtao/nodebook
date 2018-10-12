@@ -29,7 +29,7 @@ export class UserManager extends BaseServiceModule {
     private _loginCountdown: moment.Moment;             //超过最大重试次数之后下次最早可在什么时候登陆
     private _loginTimeout: any;                         //清除_maxRetry的倒计时器
 
-    private readonly _tokenList: [string, NodeJS.Timer][] = [];     //判断用户是否登陆的令牌，每个令牌的有效期只有10分钟。添加令牌使用unshift
+    private readonly _tokenList: [string, any][] = [];     //判断用户是否登陆的令牌，每个令牌的有效期只有10分钟。添加令牌使用unshift
 
     async onStart(): Promise<void> {
         this._mailService = this.services.MailService;

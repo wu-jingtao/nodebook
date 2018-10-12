@@ -126,7 +126,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
                 if (!this._isBranch) {  //确保不是分支
                     if (!this._loading.has('_onOpenItem')) { //确保不重复打开
                         this._loading.add('_onOpenItem');
-                        this._onOpenItem().then(() => {
+                        this._onOpenItem(e).then(() => {
                             this._loading.delete('_onOpenItem');
                         });
                     }
@@ -187,7 +187,8 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
             return (
                 <div className={less.backgroundColor} style={{ backgroundColor: this._backgroundColor.value }} />
             );
-        }
+        } else
+            return false;
     };
 
     /**
@@ -253,7 +254,7 @@ export abstract class Tree<P = {}, D = any> extends ObservableComponent<TreeProp
     /**
      * 当点击当前项后触发的打开事件
      */
-    protected abstract async _onOpenItem(): Promise<void>;
+    protected abstract async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void>;
 
     /**
      * 显示右键菜单

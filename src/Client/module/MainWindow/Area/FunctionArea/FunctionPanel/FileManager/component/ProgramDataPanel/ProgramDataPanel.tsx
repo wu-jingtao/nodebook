@@ -2,8 +2,9 @@ import * as React from 'react';
 
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { UserCodePanel, UserCodeTree } from '../UserCodePanel/UserCodePanel';
-import { refreshRecycleRoot } from '../RecyclePanel/RecyclePanel';
-import { unsavedFiles } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
+import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
+import { refreshRecycle } from '../RecyclePanel/refreshRecycle';
+import { closeWindowByPath } from '../../../../../ContentWindow/WindowList';
 
 /**
  * 程序数据目录
@@ -21,8 +22,8 @@ export class ProgramDataPanel extends UserCodePanel {
 class ProgramDataTree extends UserCodeTree {
     protected async _onDelete(): Promise<void> {
         await ServerApi.file.deleteProgramData(this._fullNameString);
-        refreshRecycleRoot && refreshRecycleRoot();
-        this._closeWindow();
-        this._deleteUnsavedFile();
+        refreshRecycle();
+        closeWindowByPath(this._fullNameString, this._isBranch);
+        discardChange(this._fullNameString, this._isBranch);
     }
 }

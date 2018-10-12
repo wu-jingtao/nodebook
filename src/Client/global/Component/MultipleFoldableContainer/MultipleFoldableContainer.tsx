@@ -88,13 +88,23 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
                 this._containerExpectHeight.set(index, 100);
 
             this._containerActualHeight.push(oVar(0));
-            this._containerFolded.push(permanent_oVar(`ui.MultipleFoldableContainer._containerFolded._${this.props.uniqueID}.${index}`, { defaultValue: false }));
+            this._containerFolded.push(
+                permanent_oVar(
+                    `ui.MultipleFoldableContainer._containerFolded._${this.props.uniqueID}.${index}`,
+                    {
+                        defaultValue: this.foldableContainers[index].props.folded ?
+                            this.foldableContainers[index].props.folded.value : false
+                    }
+                )
+            );
         }
     }
 
     componentDidMount() {
         //观察MultipleFoldableContainer DIV 大小的改变。目前tsd还没有ResizeObserver的定义
-        (new (window as any).ResizeObserver(throttle(this._calculateHeight, 10))).observe(this._ref[0]);
+        const observer: MutationObserver = new (window as any).ResizeObserver(throttle(this._calculateHeight, 10));
+        observer.observe(this._ref[0]);
+        this._unobserve.push(() => observer.disconnect());
 
         watch([this._containerExpectHeight, ...this._containerFolded], throttle(this._calculateHeight, 1));
 

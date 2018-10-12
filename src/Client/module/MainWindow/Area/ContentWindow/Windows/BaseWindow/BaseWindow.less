@@ -62,7 +62,9 @@
     width: 19px;
     height: 19px;
     padding: 8px 8px 8px 13px;
-    .LoadingAnimation();
+    position: relative;
+    top: -3px;
+    .LoadingAnimation(0.9em, 0.12em, @fontColor, fade(lighten(@darkFontColor, 10%, relative), 600%));
 }
 
 :local(.titleText) {
@@ -81,13 +83,16 @@
     overflow: hidden;
 
     > img {
-        width: 21px;
-        height: 21px;
-        padding: 7px;
+        width: 19px;
+        height: 19px;
+        padding: 8px;
     }
 }
 
 :local(.content) {
-    height: ~"calc(100% - 35px)";
-    width: 100%;
+    position: absolute;
+    top: 35px;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }

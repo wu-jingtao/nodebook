@@ -6,11 +6,11 @@ import { EditableFileTree } from '../../../../../../../../global/Component/Tree/
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
-import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
-import { refreshRecycleRoot } from '../RecyclePanel/RecyclePanel';
-import { openWindow, windowList, closeWindow } from '../../../../../ContentWindow/WindowList';
+import { openWindow, closeWindowByPath } from '../../../../../ContentWindow/WindowList';
 import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
 import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
+import { refreshRecycle } from '../RecyclePanel/refreshRecycle';
+import { checkUnsavedFile } from './DeleteUnsavedFiles';
 
 const less = require('./UserCodePanel.less');
 
@@ -103,104 +103,24 @@ export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldabl
 
 export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
 
-    constructor(props: any, context: any) {
-        super(props, context);
-
-        //随机颜色测试
-        if (!this._isBranch)
-            this._backgroundColor.value = '#' + ('00000' + (Math.random() * 0x1000000 << 0).toString(16)).slice(-6);
-
-        this._stateInfoContent.value = <span>{Math.random()}</span>
-    }
-
     protected async _onDelete(): Promise<void> {
-        await ServerApi.file.deleteCodeData(this._fullNameString);
-        refreshRecycleRoot && refreshRecycleRoot();
-        this._closeWindow();
-        this._deleteUnsavedFile();
-    }
-
-    protected async _onCut(): Promise<void> {
-        const _super_onCut = super._onCut.bind(this);
-
-        this._closeWindow();
-
-        for (const item of unsavedFiles.value) {
-            if (this._isBranch ? item.startsWith(this._fullNameString) : item === this._fullNameString) {
-                await new Promise((resolve, reject) => {
-                    showPopupWindow({
-                        title: '有未保存的文件',
-                        content: <span>文件'{this._fullNameString}'并未保存，剪切文件将会使得更改的内容被删除，是否继续?</span>,
-                        ok: {
-                            callback() {
-                                discardChange(item);
-                                _super_onCut().then(resolve).catch(reject);
-                            }
-                        },
-                        cancel: { callback: resolve }
-                    });
-                });
-            }
+        if (await checkUnsavedFile(this._fullNameString, 'delete', this._isBranch)) {
+            await ServerApi.file.deleteCodeData(this._fullNameString);
+            refreshRecycle();
+            closeWindowByPath(this._fullNameString, this._isBranch);
+            discardChange(this._fullNameString, this._isBranch);
         }
     }
 
-    /**
-     * 关闭与文件相关的窗口
-     */
-    protected _closeWindow(): void {
-        const win: { id: string, side: 'left' | 'right' }[] = [];
-
-        for (const item of windowList.leftWindows.windowList.value) {
-            const itemPath: string | void = item.args && item.args.path;
-            if (itemPath) {
-                if (this._isBranch) {
-                    if (itemPath.startsWith(this._fullNameString))
-                        win.push({ id: item.id, side: 'left' });
-                } else {
-                    if (itemPath === this._fullNameString) {
-                        win.push({ id: item.id, side: 'left' });
-                        break;
-                    }
-                }
-            }
-        }
-
-        for (const item of windowList.rightWindows.windowList.value) {
-            const itemPath: string | void = item.args && item.args.path;
-            if (itemPath) {
-                if (this._isBranch) {
-                    if (itemPath.startsWith(this._fullNameString))
-                        win.push({ id: item.id, side: 'right' });
-                } else {
-                    if (itemPath === this._fullNameString) {
-                        win.push({ id: item.id, side: 'right' });
-                        break;
-                    }
-                }
-            }
-        }
-
-        win.forEach(({ id, side }) => closeWindow(id, side));
-    }
-
-    /**
-     * 删除未保存文件
-     */
-    protected _deleteUnsavedFile(): void {
-        for (const item of unsavedFiles.value) {
-            if (this._isBranch) {
-                if (item.startsWith(this._fullNameString))
-                    discardChange(item);
-            } else {
-                if (item === this._fullNameString) {
-                    discardChange(item);
-                    break;
-                }
-            }
+    protected async _onCut(to: string): Promise<void> {
+        if (await checkUnsavedFile(this._fullNameString, 'cut', this._isBranch)) {
+            await super._onCut(to);
+            closeWindowByPath(this._fullNameString, this._isBranch);
+            discardChange(this._fullNameString, this._isBranch);
         }
     }
 
-    protected async _onOpenItem(): Promise<void> {
+    protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
         const args: CodeEditorWindowArgs = {
             id: Math.random().toString(),
             fixed: oVar(false),
@@ -212,7 +132,7 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
             }
         };
 
-        openWindow(args);
+        openWindow(args, e.altKey ? 'right' : undefined);
     }
 
     /**

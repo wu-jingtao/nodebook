@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { watch } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
 import { windowList } from '../../WindowList';
@@ -16,18 +15,8 @@ export abstract class BaseWindowContent<T extends WindowArgs> extends Observable
      */
     protected abstract _content: JSX.Element;
 
-    /**
-     * 获取到焦点后触发的事件
-     */
-    protected abstract _onFocused(): void;
-
     componentDidMount() {
         this.watch([this._thisSide.displayOrder]);
-
-        this._unobserve.push(watch([this._thisSide.displayOrder, windowList.focusedSide], () => {
-            if (windowList.focusedSide.value === this.props.side && this._thisSide.displayOrder.last === this.props.args.id)
-                setTimeout(() => this._onFocused(), 10);
-        }));
     }
 
     render() {

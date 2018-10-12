@@ -9,6 +9,4 @@ export class ServiceWindowContent extends BaseWindowContent<ServiceWindowArgs> {
 
     protected _content: JSX.Element;
 
-    protected _onFocused(): void {
-    }
 }

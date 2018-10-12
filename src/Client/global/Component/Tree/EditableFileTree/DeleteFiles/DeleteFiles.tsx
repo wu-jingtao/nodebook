@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import { FileIcon } from '../../../FileIcon/FileIcon';
-import { EditableFileTree } from '../EditableFileTree';
 
 const less = require('./DeleteFiles.less');
 

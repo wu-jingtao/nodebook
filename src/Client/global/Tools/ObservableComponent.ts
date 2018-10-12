@@ -7,6 +7,9 @@ import _throttle = require('lodash.throttle');
  */
 export class ObservableComponent<p = {}> extends React.Component<p> {
 
+    //判断当前元素是否已经卸载了，避免在unmounted component时触发forceUpdate
+    private _isUnmounted = false;
+
     protected _unobserve: Function[] = [];
 
     /**
@@ -14,11 +17,15 @@ export class ObservableComponent<p = {}> extends React.Component<p> {
      * @param throttle 规定在多长时间之内最多渲染一次，默认1
      */
     watch(args: ObservableVariable<any>[], throttle: number = 1) {
-        this._unobserve.push(watch(args, throttle > 0 ?
-            _throttle(() => this.forceUpdate(), throttle) : () => this.forceUpdate()));
+        this._unobserve.push(
+            watch(args, throttle > 0 ?
+                _throttle(() => { if (!this._isUnmounted) this.forceUpdate(); }, throttle) :
+                () => this.forceUpdate()
+            ));
     }
 
     componentWillUnmount() {
+        this._isUnmounted = true;
         this._unobserve.forEach(item => item());
     }
 

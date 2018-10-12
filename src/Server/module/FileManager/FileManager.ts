@@ -42,6 +42,7 @@ export class FileManager extends BaseServiceModule {
         await fs.ensureDir(FilePath._userDataBackupDir);
         await fs.ensureDir(FilePath._recycleDir);
         await fs.ensureDir(FilePath._databaseDir);
+        await fs.ensureDir(FilePath._libraryDir);
 
         //复制程序图标
         await fs.copy(node_path.join(FilePath._appClientFileDir, './res/img/logo'), FilePath._logoDir, { overwrite: false });

@@ -12,6 +12,7 @@ import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/C
 import { openWindow } from '../../../../../ContentWindow/WindowList';
 import { unsavedFiles, saveToServer, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 
+const less_deleteFiles = require('../../../../../../../../global/Component/Tree/EditableFileTree/DeleteFiles/DeleteFiles.less');
 const less = require('../OpenedWindows/OpenedWindows.less');
 
 /**
@@ -19,11 +20,13 @@ const less = require('../OpenedWindows/OpenedWindows.less');
  */
 export class UnsavedFilesPanel extends FoldableContainer<FoldableContainerPropsType>  {
 
-    private readonly _saveAll = () => {
+    private readonly _saveAll = (e: React.MouseEvent) => {
+        e.stopPropagation();
         unsavedFiles.forEach(item => saveToServer(item));
     };
 
-    private readonly _undoAll = () => {
+    private readonly _undoAll = (e: React.MouseEvent) => {
+        e.stopPropagation();
         showPopupWindow({
             title: '放弃所有更改',
             content: <span>确认要放弃所有更改吗?</span>,
@@ -64,12 +67,28 @@ class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
     //文件名称
     private readonly _name = this.props.path.split('/').pop() as string;
 
+    //显示放弃保存提示窗口
+    private readonly _showPromptWindow = (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        showPopupWindow({
+            title: '确认要放弃保存吗?',
+            content: (
+                <div className={less_deleteFiles.DeleteFiles}>
+                    <FileIcon className={less_deleteFiles.icon} filename={this.props.path.split('/').pop() as any} />
+                    <input className={less_deleteFiles.filename} readOnly value={this.props.path} />
+                </div>
+            ),
+            ok: { callback: () => discardChange(this.props.path) }
+        });
+    };
+
     //取消保存按钮和加载动画
     private readonly _undoAndLoading = (
         <ObservableComponentWrapper watch={[processingItems]}
             render={() => processingItems.has(this.props.path) ?
                 <i className={less.loading} /> :
-                <div className={less.close} title="放弃保存" onClick={() => discardChange(this.props.path)}>×</div>
+                <div className={less.close} title="放弃保存" onClick={this._showPromptWindow}>×</div>
             } />
     );
 
@@ -91,7 +110,7 @@ class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
                 ]
             });
         }
-    }
+    };
 
     /**
      * 打开代码编辑器

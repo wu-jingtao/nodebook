@@ -7,8 +7,7 @@ const less = require('./SettingsWindow.less');
 
 export class SettingsWindowContent extends BaseWindowContent<SettingsWindowArgs> {
     protected _content: JSX.Element;
-    protected _onFocused(): void {
-    }
+ 
     
 
 }

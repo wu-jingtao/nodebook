@@ -20,7 +20,8 @@ export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>
     protected renderTitleBar(): JSX.Element {
         return (
             <div className={less.titleButtons}>
-                <img title="关闭全部窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg" onClick={() => closeAllWindow()} />
+                <img title="关闭全部窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg"
+                    onClick={e => { e.stopPropagation(); closeAllWindow(); }} />
             </div>
         );
     }
@@ -34,7 +35,8 @@ export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>
                     {windowList.rightWindows.windowList.length > 0 &&
                         <div className={less.windowSideTitle}>
                             <span>左侧</span>
-                            <img title="关闭左侧窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg" onClick={() => closeAllWindow('left')} />
+                            <img title="关闭左侧窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg"
+                                onClick={e => { e.stopPropagation(); closeAllWindow('left'); }} />
                         </div>
                     }
                     {windowList.leftWindows.windowList.map(item => <OpenedWindowItem key={item.id} args={item} side="left" />)}
@@ -49,7 +51,8 @@ export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>
                         windowList.leftWindows.windowList.length > 0 &&
                         <div className={less.windowSideTitle}>
                             <span>右侧</span>
-                            <img title="关闭右侧窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg" onClick={() => closeAllWindow('right')} />
+                            <img title="关闭右侧窗口" src="/static/res/img/buttons_icon/closeall_inverse.svg"
+                                onClick={e => { e.stopPropagation(); closeAllWindow('right'); }} />
                         </div>
                     }
                     {windowList.rightWindows.windowList.map(item => <OpenedWindowItem key={item.id} args={item} side="right" />)}
@@ -80,7 +83,7 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', arg
     //关闭窗口按钮
     private readonly _closeWindow = (
         <div className={less.close} title="关闭窗口"
-            onClick={() => closeWindow(this.props.args.id, this.props.side)}>×</div>
+            onClick={e => { e.stopPropagation(); closeWindow(this.props.args.id, this.props.side); }}>×</div>
     );
 
     //关闭窗口按钮和加载动画

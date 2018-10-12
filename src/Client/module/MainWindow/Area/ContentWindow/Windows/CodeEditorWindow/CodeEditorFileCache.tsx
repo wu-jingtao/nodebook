@@ -2,12 +2,16 @@ import * as React from 'react';
 import * as localforage from 'localforage';
 import * as monaco from 'monaco-editor';
 import { ObservableVariable, oVar, oSet } from 'observable-variable';
-import throttle = require('lodash.throttle');
+import debounce = require('lodash.debounce');
 
 import { ServerApi } from '../../../../../../global/ServerApi';
+import { FileIcon } from '../../../../../../global/Component/FileIcon/FileIcon';
 import { checkIsBusy, processingItems } from '../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { showMessageBox } from '../../../../../MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../../PopupWindow/PopupWindow';
+
+const less_deleteFiles = require('../../../../../../global/Component/Tree/EditableFileTree/DeleteFiles/DeleteFiles.less');
+const less_userCodePanel = require('../../../FunctionArea/FunctionPanel/FileManager/component/UserCodePanel/UserCodePanel.less');
 
 //文件缓存数据库
 const originalFilesCache = localforage.createInstance({ name: 'originalFilesCache' });
@@ -56,7 +60,7 @@ export async function getCache(path: string) {
                     original = monaco.editor.createModel(data as string, undefined, monaco.Uri.parse(`original:/${path}`));
                 }
 
-                modified.onDidChangeContent(throttle(async () => {
+                modified.onDidChangeContent(debounce(async () => {
                     const md = modified.getValue(), or = original.getValue();
                     if (md !== or) {
                         try {
@@ -111,19 +115,26 @@ export async function getCache(path: string) {
 
 /**
  * 擦除文件更改
+ * @param descendants 是否包含后代，这个主要是针对于文件夹
  */
-export async function discardChange(path: string) {
-    const cache = cacheList.get(path);
+export async function discardChange(path: string, descendants?: boolean) {
+    for (const item of unsavedFiles.value) {
+        if (descendants ? item.startsWith(path) : item === path) {
+            const cache = cacheList.get(item);
 
-    if (cache)
-        cache.modified.setValue(cache.original.getValue());
-    else {
-        try {
-            await originalFilesCache.removeItem(path);
-            await unsavedFilesCache.removeItem(path);
-            unsavedFiles.delete(path);
-        } catch (err) {
-            showMessageBox({ icon: 'error', title: '删除文件缓存失败', content: `文件：${path}。${err.message}` });
+            if (cache)
+                cache.modified.setValue(cache.original.getValue());
+            else {
+                try {
+                    await originalFilesCache.removeItem(item);
+                    await unsavedFilesCache.removeItem(item);
+                    unsavedFiles.delete(item);
+                } catch (err) {
+                    showMessageBox({ icon: 'error', title: '删除文件缓存失败', content: `文件：${item}。${err.message}` });
+                }
+            }
+
+            if (!descendants) break;
         }
     }
 }
@@ -156,7 +167,15 @@ export function refreshData(path: string) {
         if (unsavedFiles.has(path)) {
             showPopupWindow({
                 title: '有未保存的文件',
-                content: <span>文件'{path}'并未保存，刷新将会使得更改的内容被删除，是否继续?</span>,
+                content: (
+                    <>
+                        <div className={less_userCodePanel.DeleteUnsavedFiles}>文件并未保存，刷新将会使得更改的内容被删除，是否继续?</div>
+                        <div className={less_deleteFiles.DeleteFiles}>
+                            <FileIcon className={less_deleteFiles.icon} filename={path.split('/').pop() as any} />
+                            <input className={less_deleteFiles.filename} readOnly value={path} />
+                        </div>
+                    </>
+                ),
                 ok: { callback: loadData }
             });
         } else

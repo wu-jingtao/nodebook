@@ -1,5 +1,5 @@
 import { oMap } from 'observable-variable';
-import throttle = require('lodash.throttle');
+import debounce = require('lodash.debounce');
 
 import { ServerApi } from '../../../ServerApi';
 import { showMessageBox } from '../../../../module/MessageBox/MessageBox';
@@ -20,7 +20,7 @@ export abstract class BaseFileTree<P extends FileIconTreePropsType> extends File
      * 保存目录数据
      */
     private readonly _saveFolderData: () => void = this._root._saveFolderData ||
-        throttle(() => { localStorage.setItem(`ui.BaseFileTree.${this.props.memorable}`, JSON.stringify(this._dataTree)) }, 1000);
+        debounce(() => { localStorage.setItem(`ui.BaseFileTree.${this.props.memorable}`, JSON.stringify(this._dataTree)) }, 1000);
 
     /**
      * 从服务器端加载当前节点的目录数据。刷新失败返回false

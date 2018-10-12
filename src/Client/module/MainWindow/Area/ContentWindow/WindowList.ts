@@ -90,7 +90,7 @@ export function openWindow(args: WindowArgs, side?: 'left' | 'right'): void {
         } else
             _focusedSide.windowList.push(args);
 
-        focusWindow(args.id, _side);
+        focusWindow(args.id, _side)
     }
 }
 
@@ -132,6 +132,44 @@ export function closeOtherWindow(id: string, side: 'left' | 'right'): void {
     const _thisSide = side === 'left' ? windowList.leftWindows : windowList.rightWindows;
     const _otherWindows = _thisSide.windowList.filter(item => item.id !== id);
     _otherWindows.forEach(item => closeWindow(item.id, side));
+}
+
+/**
+ * 根据 WindowArgs.args.path 来关闭窗口
+ * @param descendants 是否包含后代，这个主要是针对于文件夹
+ */
+export function closeWindowByPath(path: string, descendants?: boolean): void {
+    const win: { id: string, side: 'left' | 'right' }[] = [];
+
+    for (const item of windowList.leftWindows.windowList.value) {
+        if (item.args.path) {
+            if (descendants) {
+                if (item.args.path.startsWith(path))
+                    win.push({ id: item.id, side: 'left' });
+            } else {
+                if (item.args.path === path) {
+                    win.push({ id: item.id, side: 'left' });
+                    break;
+                }
+            }
+        }
+    }
+
+    for (const item of windowList.rightWindows.windowList.value) {
+        if (item.args.path) {
+            if (descendants) {
+                if (item.args.path.startsWith(path))
+                    win.push({ id: item.id, side: 'right' });
+            } else {
+                if (item.args.path === path) {
+                    win.push({ id: item.id, side: 'right' });
+                    break;
+                }
+            }
+        }
+    }
+
+    win.forEach(({ id, side }) => closeWindow(id, side));
 }
 
 /**

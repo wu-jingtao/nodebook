@@ -18,7 +18,7 @@ SystemSetting.addSystemSetting('task.logMaxSaveDays', 30, false, 'number');     
 export class LogManager extends BaseServiceModule {
 
     private readonly _loggerList: Map<string, TaskLogger> = new Map();  //日志列表，key：任务文件路径
-    private _cleanTimeoutLogs: NodeJS.Timer;                            //清理超过最大保存日期的日志
+    private _cleanTimeoutLogs: any;                            //清理超过最大保存日期的日志
 
     private _logMaxLength: ObservableVariable<number>;
     private _logMaxSaveDays: ObservableVariable<number>;
