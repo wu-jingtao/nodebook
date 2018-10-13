@@ -69,7 +69,7 @@ export const ServerApi = {
          * 列出某个目录中的子目录与文件
          * @param path 
          */
-        async listDirectory(path: string): Promise<ReadonlyArray<{ name: string, isFile: boolean, modifyTime: number, size: number }>> {
+        async listDirectory(path: string): Promise<ReadonlyArray<{ name: string, isFile: boolean, isBinary: boolean, modifyTime: number, size: number }>> {
             return await Post('/file/api/listDirectory', { path });
         },
         /**

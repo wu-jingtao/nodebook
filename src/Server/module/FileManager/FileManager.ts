@@ -1,9 +1,11 @@
+import * as util from 'util';
 import * as fs from 'fs-extra';
 import * as node_path from 'path';
 import * as moment from 'moment';
 import * as archiver from 'archiver';
 import * as unzipper from 'unzipper';
 import { BaseServiceModule } from "service-starter";
+const isBinaryFile: (path: string) => Promise<boolean> = util.promisify(require('isbinaryfile'));
 
 import * as FilePath from '../../FilePath';
 
@@ -51,14 +53,19 @@ export class FileManager extends BaseServiceModule {
     /**
      * 列出某个目录中的子目录与文件。注意，只允许查看 '_userCodeDir' 、'_programDataDir' 、'_recycleDir' 与 '_libraryDir' 这四个目录下的内容
      */
-    async listDirectory(path: string): Promise<{ name: string, isFile: boolean, modifyTime: number, size: number }[]> {
+    async listDirectory(path: string): Promise<{ name: string, isFile: boolean, isBinary: boolean, modifyTime: number, size: number }[]> {
         FileManager._pathStartWith(path, [FilePath._userCodeDir, FilePath._programDataDir, FilePath._recycleDir, FilePath._libraryDir]);
         const result = [];
 
         for (const name of await fs.promises.readdir(path)) {
-            const stats = await fs.promises.stat(node_path.join(path, name));
-            if (stats.isFile() || stats.isDirectory())
-                result.push({ name, isFile: stats.isFile(), modifyTime: stats.mtimeMs, size: stats.size });
+            const itemPath = node_path.join(path, name);
+            const stats = await fs.promises.stat(itemPath);
+
+            if (stats.isFile() || stats.isDirectory()) {
+                const isFile = stats.isFile();
+                const isBinary = isFile && await isBinaryFile(itemPath);
+                result.push({ name, isFile, isBinary, modifyTime: stats.mtimeMs, size: stats.size });
+            }
         }
 
         return result;

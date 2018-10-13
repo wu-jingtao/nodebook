@@ -121,18 +121,20 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
     }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
-        const args: CodeEditorWindowArgs = {
-            id: Math.random().toString(),
-            fixed: oVar(false),
-            name: this._name,
-            type: WindowType.code_editor,
-            args: {
-                path: this._fullNameString,
-                readonly: this.props.noCreate   //对于回收站和类库
-            }
-        };
+        if (!this._dataTree.data.isBinary) {
+            const args: CodeEditorWindowArgs = {
+                id: Math.random().toString(),
+                fixed: oVar(false),
+                name: this._name,
+                type: WindowType.code_editor,
+                args: {
+                    path: this._fullNameString,
+                    readonly: this.props.noCreate   //对于回收站和类库
+                }
+            };
 
-        openWindow(args, e.altKey ? 'right' : undefined);
+            openWindow(args, e.altKey ? 'right' : undefined);
+        }
     }
 
     /**

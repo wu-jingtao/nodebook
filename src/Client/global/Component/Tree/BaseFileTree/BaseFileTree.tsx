@@ -9,7 +9,7 @@ import { FileIconTreePropsType } from '../FileIconTree/FileIconTreePropsType';
 /**
  * 基础文件树。实现了服务器端路径读取，缓存。
  */
-export abstract class BaseFileTree<P extends FileIconTreePropsType> extends FileIconTree<P, { size: number, modifyTime: number }> {
+export abstract class BaseFileTree<P extends FileIconTreePropsType> extends FileIconTree<P, { size: number, isBinary: boolean, modifyTime: number }> {
 
     /**
      * 是否在服务器端加载过了。value是_fullNameString
@@ -33,9 +33,13 @@ export abstract class BaseFileTree<P extends FileIconTreePropsType> extends File
                 const data = await ServerApi.file.listDirectory(this._fullNameString);
 
                 //清除不存在的
-                for (const { name, subItem } of this._dataTree.subItem.values()) {
-                    if (data.findIndex(item => item.name === name && item.isFile === (subItem === undefined)) === -1)
-                        this._dataTree.subItem.delete(name);
+                for (const sub of this._dataTree.subItem.values()) {
+                    if (data.findIndex(item =>
+                        item.name === sub.name &&
+                        item.isFile === (sub.subItem === undefined) &&
+                        item.isBinary === sub.data.isBinary
+                    ) === -1)
+                        this._dataTree.subItem.delete(sub.name);
                 }
 
                 //插入新的
@@ -43,7 +47,7 @@ export abstract class BaseFileTree<P extends FileIconTreePropsType> extends File
                     if (!this._dataTree.subItem.has(item.name)) {
                         this._dataTree.subItem.set(item.name, {
                             name: item.name,
-                            data: { size: item.size, modifyTime: item.modifyTime },
+                            data: { size: item.size, isBinary: item.isBinary, modifyTime: item.modifyTime },
                             subItem: item.isFile ? undefined : oMap([])
                         });
                     }
@@ -78,7 +82,7 @@ export abstract class BaseFileTree<P extends FileIconTreePropsType> extends File
         //读取目录数据
         if (this._isRoot && this.props.memorable !== undefined) {
             (this._dataTree as any) = JSON.parse(localStorage.getItem(`ui.BaseFileTree.${this.props.memorable}`) ||
-                `{"name":"${this._name}","data":{"size":0,"modifyTime":0},"subItem":[]}`);
+                `{"name":"${this._name}","data":{"size":0,"isBinary":false,"modifyTime":0},"subItem":[]}`);
         }
 
         //添加保存数据监听器

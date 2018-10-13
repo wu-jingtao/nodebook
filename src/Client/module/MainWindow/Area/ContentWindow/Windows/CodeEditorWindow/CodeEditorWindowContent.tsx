@@ -10,10 +10,10 @@ import { BaseWindowContent } from '../BaseWindow/BaseWindowContent';
 import { CodeEditorWindowArgs } from '../../ContentWindowTypes';
 import { closeWindow } from '../../WindowList';
 import { getCache, saveToServer } from './CodeEditorFileCache';
+import { setTheme } from './Themes/SetTheme';
 
 //配置编辑器主题
-monaco.editor.defineTheme('Monokai', require('./themes/Monokai.json'));
-monaco.editor.setTheme('Monokai');
+setTheme('monokai');
 
 //阻止键盘默认行为
 $(document).on('keydown', e => {
