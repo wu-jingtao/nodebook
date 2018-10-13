@@ -32,16 +32,19 @@ function html(filename: string) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="/file/data/library/jquery/dist/jquery.min.js"></script>
+    <script src="/static/res/helper/jquery.min.js"></script>
     <script src="/static/res/helper/client_helper.js"></script>
     <title>${filename}</title>
 </head>
 <body>
     <!-- 
+        <script src="/static/res/helper/lodash.min.js"></script>
+        
         <script src="/file/data/code/用户代码目录下的文件.js"></script>
         <script src="/file/data/programData/程序数据目录下的文件.js"></script>
         <script src="/file/data/recycle/回收站目录下的文件.js"></script>
         <script src="/file/data/library/类库目录下的文件.js"></script>
+        <script src="/file/api/readFile?path=文件的文件路径.js"></script>
     -->
 </body>
 </html>
@@ -49,17 +52,19 @@ function html(filename: string) {
 }
 
 function clientJs(filename: string) {
-    return `/* ${(new Date).toLocaleDateString()} */
+    return `"use strict";
+/* ${(new Date).toLocaleDateString()} */
 
 /* 调用服务器端任务暴露出来的方法 */
-window.nodebook.invokeTask('/user_data/code/test.js', 'exportedFunctionName', {data: 123})
+nodebook.invokeTask('/user_data/code/test.js', 'exportedFunctionName', {data: 123})
     .then((jsonData) => {})
     .catch((err) => {})
 `;
 }
 
 function ServerJs(filename: string) {
-    return `/* ${(new Date).toLocaleDateString()} */
+    return `"use strict";
+/* ${(new Date).toLocaleDateString()} */
 
 const nodebook = require('/app/bin/Client/res/helper/server_helper.js');
 
@@ -69,7 +74,7 @@ nodebook.invokeTask('/user_data/code/test.js', 'exportedFunctionName', {data: 12
     .catch((err) => {})
 
 /* 暴露出一个方法供外界调用 */
-nodebook.export('functionName', async (data) => { 
+nodebook.exportFunction('functionName', async (data) => { 
     
 });
 `;

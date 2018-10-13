@@ -89,6 +89,6 @@ exports.invokeTask = (taskFilePath, functionName, data) => {
  * @param {string} functionName 方法名称
  * @param {(data:any)=>Promise<any>} callback 要导出的方法
  */
-exports.export = (functionName, callback) => {
+exports.exportFunction = (functionName, callback) => {
     exportFunctionList.set(functionName, callback);
 }

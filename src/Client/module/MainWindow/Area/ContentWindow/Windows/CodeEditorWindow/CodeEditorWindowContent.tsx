@@ -8,18 +8,44 @@ import { processingItems } from '../../../../../../global/Component/Tree/Editabl
 import { normalSettings } from '../../../../../../global/SystemSetting';
 import { BaseWindowContent } from '../BaseWindow/BaseWindowContent';
 import { CodeEditorWindowArgs } from '../../ContentWindowTypes';
-import { closeWindow } from '../../WindowList';
 import { getCache, saveToServer } from './CodeEditorFileCache';
-import { setTheme } from './Themes/SetTheme';
+import { closeWindow } from '../../WindowList';
+
+//#region 编辑器全局配置
 
 //配置编辑器主题
-setTheme('monokai');
+monaco.editor.defineTheme('nodebook', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [{ token: '', "background": "#272822", "foreground": "#F8F8F2" }],
+    colors: {
+        "editor.foreground": "#F8F8F2",
+        "editor.background": "#272822",
+        "editor.selectionBackground": "#49483E",
+        "editor.lineHighlightBackground": "#3E3D32",
+        "editorCursor.foreground": "#F8F8F0",
+        "editorWhitespace.foreground": "#3B3A32",
+        "editorIndentGuide.activeBackground": "#9D550F",
+        "editor.selectionHighlightBorder": "#222218"
+    }
+});
+
+monaco.editor.setTheme('nodebook');
 
 //阻止键盘默认行为
 $(document).on('keydown', e => {
     if (e.ctrlKey && e.key === 's')
         e.preventDefault();
 });
+
+//加载tsd
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../../../node_modules/@types/jquery/index.d.ts'), 'jquery');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../../../node_modules/@types/node/index.d.ts'), 'node');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../../../node_modules/@types/node/inspector.d.ts'), 'node/inspector');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../res/helper/client_helper.d.ts'), 'client_helper.js');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../res/helper/server_helper.d.ts'), '/app/bin/Client/res/helper/server_helper.js');
+
+//#endregion
 
 export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEditorWindowArgs> {
 
@@ -45,15 +71,60 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
         };
     }
 
+    //键盘快捷键
+    private _setKeyboardShortcut(ed: monaco.editor.IStandaloneCodeEditor) {
+        ed.addAction({
+            id: '格式化代码', label: '格式化代码',
+            keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.US_QUOTE], //alt+'
+            precondition: 'editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly',
+            run: (ed) => { ed.getAction('editor.action.formatDocument').run() }
+        });
+
+        ed.addAction({
+            id: '代码提示', label: '代码提示',
+            keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.US_SLASH], //alt+/
+            precondition: 'editorHasCompletionItemProvider && editorTextFocus && !editorReadonly',
+            run: (ed) => { ed.getAction('editor.action.triggerSuggest').run() }
+        });
+
+        ed.addAction({
+            id: '块注释', label: '块注释',
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.US_SLASH],
+            precondition: 'editorTextFocus && !editorReadonly',
+            run: (ed) => { ed.getAction('editor.action.blockComment').run() }
+        });
+
+        ed.addAction({
+            id: '前插入行', label: '前插入行',
+            keybindings: [monaco.KeyMod.Shift | monaco.KeyCode.Enter],
+            precondition: 'editorTextFocus && !editorReadonly',
+            run: (ed) => { ed.getAction('editor.action.insertLineBefore').run() }
+        });
+
+        ed.addAction({
+            id: '后插入行', label: '后插入行',
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+            precondition: 'editorTextFocus && !editorReadonly',
+            run: (ed) => { ed.getAction('editor.action.insertLineAfter').run() }
+        });
+
+        ed.addAction({
+            id: '删除行', label: '删除行',
+            keybindings: [monaco.KeyMod.Shift | monaco.KeyCode.Delete],
+            precondition: 'editorTextFocus && !editorReadonly',
+            run: (ed) => { ed.getAction('editor.action.deleteLines').run() }
+        });
+
+        ed.addAction({
+            id: '保存修改', label: '保存修改',
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S],
+            precondition: 'editorTextFocus && !editorReadonly',
+            run: () => { saveToServer(this.props.args.args.path) }
+        });
+    }
+
     componentDidMount() {
         super.componentDidMount();
-
-        //Ctrl+S 保存数据
-        const saveData = (e: monaco.IKeyboardEvent) => {
-            if (e.ctrlKey && e.keyCode === monaco.KeyCode.KEY_S) {
-                saveToServer(this.props.args.args.path);
-            }
-        };
 
         //创建编辑器
         if (this.props.args.args.diff) {
@@ -62,7 +133,7 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
                 readOnly: this.props.args.args.readonly
             });
 
-            editor.getModifiedEditor().onKeyDown(saveData);
+            this._setKeyboardShortcut(editor.getModifiedEditor());
 
             this._editor = editor;
         } else {
@@ -71,7 +142,7 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
                 readOnly: this.props.args.args.readonly
             });
 
-            editor.onKeyDown(saveData);
+            this._setKeyboardShortcut(editor);
 
             this._editor = editor;
         }

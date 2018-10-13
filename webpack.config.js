@@ -28,10 +28,7 @@ module.exports = env => {
                         { loader: "less-loader", options: { sourceMap: !isProduction, plugins: [new CleanCSSPlugin({ advanced: true })] } }
                     ]
                 },
-                {
-                    test: /\.css$/,
-                    use: ['style-loader', 'css-loader']
-                }
+                { test: /\.css$/, use: ['style-loader', 'css-loader'] }
             ]
         },
         plugins: [

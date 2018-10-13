@@ -33,13 +33,13 @@ export const ServerApi = {
          * 获取所有普通设置项
          */
         async getAllNormalKey(): Promise<ReadonlyArray<{ key: string, value: any }>> {
-            return await Get('/setting/getAllNormalKey');
+            return JSON.parse(await Get('/setting/getAllNormalKey'));
         },
         /**
          * 获取所有私密设置。除了密码
          */
         async getAllSecretKey(): Promise<ReadonlyArray<{ key: string, value: any }>> {
-            return await Get('/setting/getAllSecretKey');
+            return JSON.parse(await Get('/setting/getAllSecretKey'));
         },
         /**
          * 更改普通设置项
@@ -70,7 +70,7 @@ export const ServerApi = {
          * @param path 
          */
         async listDirectory(path: string): Promise<ReadonlyArray<{ name: string, isFile: boolean, isBinary: boolean, modifyTime: number, size: number }>> {
-            return await Post('/file/api/listDirectory', { path });
+            return JSON.parse(await Post('/file/api/listDirectory', { path }));
         },
         /**
          * 创建目录

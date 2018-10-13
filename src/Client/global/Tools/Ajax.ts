@@ -6,11 +6,12 @@ import { ObservableVariable } from "observable-variable";
 function Ajax(method: 'GET' | 'POST', url: string, data: any, setting: JQuery.AjaxSettings = {}) {
     let ajax: JQuery.jqXHR<any> = undefined as any;
 
-    const promise: { abort: () => void } & Promise<any> = new Promise((resolve, reject) => {
+    const promise: { abort: () => void } & Promise<string> = new Promise((resolve, reject) => {
         ajax = jQuery.ajax({
             url,
             type: method,
             data,
+            dataType: 'text',   //避免jquery执行js文件
             cache: false,
             timeout: 1000 * 60 * 2,
             error(jqXHR) {
