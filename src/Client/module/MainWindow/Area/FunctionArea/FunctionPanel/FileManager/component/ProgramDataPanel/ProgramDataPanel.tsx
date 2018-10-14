@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { UserCodePanel, UserCodeTree } from '../UserCodePanel/UserCodePanel';
 import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
-import { refreshRecycle } from '../RecyclePanel/refreshRecycle';
+import { refreshRecycle } from '../RecyclePanel/RefreshRecycle';
 import { closeWindowByPath } from '../../../../../ContentWindow/WindowList';
 
 /**

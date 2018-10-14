@@ -10,7 +10,7 @@ import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
 import { unsavedFiles } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 import { closeWindowByPath } from '../../../../../ContentWindow/WindowList';
 import { UserCodeTree } from '../UserCodePanel/UserCodePanel';
-import { _setRefreshRecycle } from './refreshRecycle';
+import { _setRefreshRecycle } from './RefreshRecycle';
 
 const less = require('../UserCodePanel/UserCodePanel.less');
 

@@ -9,7 +9,7 @@ import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../
 import { openWindow, closeWindowByPath } from '../../../../../ContentWindow/WindowList';
 import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
 import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
-import { refreshRecycle } from '../RecyclePanel/refreshRecycle';
+import { refreshRecycle } from '../RecyclePanel/RefreshRecycle';
 import { checkUnsavedFile } from './DeleteUnsavedFiles';
 
 const less = require('./UserCodePanel.less');
