@@ -477,7 +477,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      */
     protected readonly _menu_download = () => {
         if (!this._isBranch && checkIsBusy(this._fullNameString))
-            window.open(`/file/api/readFile?path=${this._fullNameString}`);
+            window.open(`/file/api/readFile?download=true&path=${this._fullNameString}`);
     };
 
     /**

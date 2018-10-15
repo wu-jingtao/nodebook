@@ -7,17 +7,10 @@ import { CodeEditorWindowArgs } from '../../ContentWindowTypes';
  * 顶部选项卡标题栏
  */
 export class CodeEditorWindowTitle extends BaseWindowTitle<CodeEditorWindowArgs> {
-    protected _icon: string;
-    protected _title: string;
-    protected _prompt: string;
 
-    constructor(props: any, context: any) {
-        super(props, context);
-
-        this._prompt = this.props.args.args.path;
-        this._title = this.props.args.name;
-        this._icon = `/static/res/img/file_icons/${getIconPath(this._title)}`;
-    }
+    protected _title = this.props.args.name;
+    protected _prompt = this.props.args.args.path;
+    protected _icon = `/static/res/img/file_icons/${getIconPath(this._title)}`;
 
     componentDidMount() {
         super.componentDidMount();
@@ -43,7 +36,5 @@ export class CodeEditorWindowTitle extends BaseWindowTitle<CodeEditorWindowArgs>
             processingItems.off('add', _watch_processingItems_add);
             processingItems.off('remove', _watch_processingItems_remove);
         });
-
-        this._loading.value = true; //测试
     }
 }

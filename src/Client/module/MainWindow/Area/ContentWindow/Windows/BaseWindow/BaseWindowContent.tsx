@@ -6,7 +6,7 @@ import { WindowArgs } from '../../ContentWindowTypes';
 
 const less = require('./BaseWindow.less');
 
-export abstract class BaseWindowContent<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right' }> {
+export abstract class BaseWindowContent<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right', communicator: { [key: string]: any } }> {
 
     private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 

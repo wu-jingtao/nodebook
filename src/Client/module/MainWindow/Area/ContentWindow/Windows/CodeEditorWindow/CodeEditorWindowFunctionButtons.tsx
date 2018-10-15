@@ -12,7 +12,7 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
     private readonly _openHtmlViewer = () => {
         const args: HtmlViewerWindowArgs = {
             id: Math.random().toString(),
-            name: `(查看) ${this.props.args.name}`,
+            name: this.props.args.name,
             fixed: oVar(false),
             type: WindowType.html_viewer,
             args: {

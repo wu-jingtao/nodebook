@@ -1,11 +1,13 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import { oVar } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { CodeEditorWindowContent } from './Windows/CodeEditorWindow/CodeEditorWindowContent';
 import { CodeEditorWindowTitle } from './Windows/CodeEditorWindow/CodeEditorWindowTitle';
 import { CodeEditorWindowFunctionButtons } from './Windows/CodeEditorWindow/CodeEditorWindowFunctionButtons';
+import { HtmlViewerWindowContent } from './Windows/HtmlViewerWindow/HtmlViewerWindowContent';
+import { HtmlViewerWindowTitle } from './Windows/HtmlViewerWindow/HtmlViewerWindowTitle';
+import { HtmlViewerWindowFunctionButtons } from './Windows/HtmlViewerWindow/HtmlViewerWindowFunctionButtons';
 import { TaskWindowContent } from './Windows/TaskWindow/TaskWindowContent';
 import { TaskWindowTitle } from './Windows/TaskWindow/TaskWindowTitle';
 import { TaskWindowFunctionButtons } from './Windows/TaskWindow/TaskWindowFunctionButtons';
@@ -43,31 +45,37 @@ export class WindowContainer extends ObservableComponent<{ side: 'left' | 'right
         const contents = [], titles = [], functionButtons = [];
 
         for (const item of this._thisSide.windowList.value) {
-            const state = { loading: oVar(false) };
+            const communicator = {};
 
             switch (item.type) {
                 case WindowType.code_editor:
-                    contents.push(<CodeEditorWindowContent key={item.id} args={item as any} side={this.props.side} />);
-                    titles.push(<CodeEditorWindowTitle key={item.id} args={item as any} side={this.props.side} />);
-                    functionButtons.push(<CodeEditorWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} />);
+                    contents.push(<CodeEditorWindowContent key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    titles.push(<CodeEditorWindowTitle key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    functionButtons.push(<CodeEditorWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    break;
+
+                case WindowType.html_viewer:
+                    contents.push(<HtmlViewerWindowContent key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    titles.push(<HtmlViewerWindowTitle key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    functionButtons.push(<HtmlViewerWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
                     break;
 
                 case WindowType.task:
-                    contents.push(<TaskWindowContent key={item.id} args={item as any} side={this.props.side} />);
-                    titles.push(<TaskWindowTitle key={item.id} args={item as any} side={this.props.side} />);
-                    functionButtons.push(<TaskWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} />);
+                    contents.push(<TaskWindowContent key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    titles.push(<TaskWindowTitle key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    functionButtons.push(<TaskWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
                     break;
 
                 case WindowType.service:
-                    contents.push(<ServiceWindowContent key={item.id} args={item as any} side={this.props.side} />);
-                    titles.push(<ServiceWindowTitle key={item.id} args={item as any} side={this.props.side} />);
-                    functionButtons.push(<ServiceWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} />);
+                    contents.push(<ServiceWindowContent key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    titles.push(<ServiceWindowTitle key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    functionButtons.push(<ServiceWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
                     break;
 
                 case WindowType.settings:
-                    contents.push(<SettingsWindowContent key={item.id} args={item as any} side={this.props.side} />);
-                    titles.push(<SettingsWindowTitle key={item.id} args={item as any} side={this.props.side} />);
-                    functionButtons.push(<SettingsWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} />);
+                    contents.push(<SettingsWindowContent key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    titles.push(<SettingsWindowTitle key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    functionButtons.push(<SettingsWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
                     break;
             }
         }

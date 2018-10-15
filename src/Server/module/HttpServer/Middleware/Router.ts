@@ -217,11 +217,14 @@ function File(router: koa_router, httpServer: HttpServer) {
     /**
      * 这个相当于上面那4个的汇总，上面的主要是方便用户使用，这个主要是方便程序内部使用
      * @param path 传入的路径需对应服务器端全路径
+     * @param {boolean} download 是否让浏览器下载。默认false
      */
     router_etag.get(_prefix_api + '/readFile', async (ctx) => {
         ctx.body = await _fileManager.readFile(ctx.request.query.path);
+
         //确保浏览器会弹出下载框
-        ctx.set('Content-Disposition', `attachment;filename=${node_path.basename(ctx.body.path)}`);
+        if (ctx.request.query.download === 'true')
+            ctx.set('Content-Disposition', `attachment;filename=${node_path.basename(ctx.body.path)}`);
     });
 
     /**

@@ -191,6 +191,12 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
                     this._editor.setModel(cache.modified);
 
                 this._editor.onDidDispose(cache.dispose);
+
+                //当编辑器内容发生改变后，使窗口固定
+                const unWatch = cache.modified.onDidChangeContent(() => {
+                    this.props.args.fixed.value = true;
+                    unWatch.dispose();
+                });
             } else
                 closeWindow(this.props.args.id, this.props.side);
         });
