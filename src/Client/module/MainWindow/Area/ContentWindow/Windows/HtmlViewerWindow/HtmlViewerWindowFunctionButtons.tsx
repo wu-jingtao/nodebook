@@ -3,7 +3,6 @@ import * as React from 'react';
 import { BaseWindowFunctionButtons } from '../BaseWindow/BaseWindowFunctionButtons';
 import { HtmlViewerWindowArgs } from '../../ContentWindowTypes';
 
-
 export class HtmlViewerWindowFunctionButtons extends BaseWindowFunctionButtons<HtmlViewerWindowArgs> {
 
     //在新的浏览器窗口中打开
