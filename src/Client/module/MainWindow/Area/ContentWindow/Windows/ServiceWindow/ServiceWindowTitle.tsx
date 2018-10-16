@@ -6,6 +6,5 @@ import { ServiceWindowArgs } from '../../ContentWindowTypes';
  */
 export class ServiceWindowTitle extends BaseWindowTitle<ServiceWindowArgs> {
     protected _icon: string;
-    protected _title: string;
     protected _prompt: string;
 }

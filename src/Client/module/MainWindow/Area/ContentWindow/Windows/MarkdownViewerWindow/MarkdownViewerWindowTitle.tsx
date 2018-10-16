@@ -1,15 +1,12 @@
-import { getIconPath } from '../../../../../../global/Component/FileIcon/GetIconPath';
 import { processingItems } from '../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
+import { getIconPath } from '../../../../../../global/Component/FileIcon/GetIconPath';
 import { BaseWindowTitle } from '../BaseWindow/BaseWindowTitle';
-import { CodeEditorWindowArgs } from '../../ContentWindowTypes';
+import { MarkdownViewerWindowArgs } from '../../ContentWindowTypes';
 
-/**
- * 顶部选项卡标题栏
- */
-export class CodeEditorWindowTitle extends BaseWindowTitle<CodeEditorWindowArgs> {
-
+export class MarkdownViewerWindowTitle extends BaseWindowTitle<MarkdownViewerWindowArgs> {
+    
     protected _prompt = this.props.args.args.path;
-    protected _icon = `/static/res/img/file_icons/${getIconPath(this.props.args.name)}`;
+    protected _icon = `/static/res/img/file_icons/${getIconPath('.md')}`;
 
     componentDidMount() {
         super.componentDidMount();

@@ -98,11 +98,20 @@ export function openWindow(args: WindowArgs, side?: 'left' | 'right'): void {
  * 关闭指定窗口
  */
 export function closeWindow(id: string, side: 'left' | 'right'): void {
-    const _focusedSide = side === 'left' ? windowList.leftWindows : windowList.rightWindows;
-    const _closeIndex = _focusedSide.windowList.findIndex(item => item.id === id);
+    const _thisSide = side === 'left' ? windowList.leftWindows : windowList.rightWindows;
+    const _closeIndex = _thisSide.windowList.findIndex(item => item.id === id);
+    
     if (_closeIndex !== -1) {
-        _focusedSide.windowList.splice(_closeIndex, 1);
-        _focusedSide.displayOrder.delete(id);
+        _thisSide.windowList.splice(_closeIndex, 1);
+        _thisSide.displayOrder.delete(id);
+
+        if (_thisSide.windowList.length === 0) {
+            const _otherSide = side === 'left' ? windowList.rightWindows : windowList.leftWindows;
+            if (_otherSide.windowList.length > 0)
+                windowList.focusedSide.value = side === 'left' ? 'right' : 'left';
+            else
+                windowList.focusedSide.value = null;
+        }
     }
 }
 

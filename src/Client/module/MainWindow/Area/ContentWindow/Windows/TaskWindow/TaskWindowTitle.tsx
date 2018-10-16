@@ -6,6 +6,5 @@ import { TaskWindowArgs } from '../../ContentWindowTypes';
  */
 export class TaskWindowTitle extends BaseWindowTitle<TaskWindowArgs> {
     protected _icon: string;
-    protected _title: string;
     protected _prompt: string;
 }

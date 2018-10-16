@@ -76,6 +76,17 @@ export interface HtmlViewerWindowArgs extends FileWindowArgs {
 
 export interface MarkdownViewerWindowArgs extends FileWindowArgs {
     type: WindowType.markdown_viewer;
+
+    args: {
+        /**
+         * 文件的绝对路径
+         */
+        path: string,
+        /**
+         * 是否是只读
+         */
+        readonly?: boolean
+    }
 }
 
 export interface ImageViewerWindowArgs extends FileWindowArgs {

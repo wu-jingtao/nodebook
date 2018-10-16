@@ -17,7 +17,8 @@ export class HtmlViewerWindowFunctionButtons extends BaseWindowFunctionButtons<H
 
     protected _functionButtons = (
         <>
-            <img src={`/static/res/img/buttons_icon/Preview_inverse.svg`}
+            <img src={`/static/res/img/buttons_icon/browser.svg`}
+                style={{ width: '21px', height: '21px', padding: '7px' }}
                 title={`在新的浏览器窗口中打开`} onClick={this._openInBrowserWindow} />
             <img src={`/static/res/img/buttons_icon/Refresh_inverse.svg`}
                 title={`刷新`} onClick={this._refresh} />

@@ -7,7 +7,7 @@ import { EditableFileTreePropsType } from '../../../../../../../../global/Compon
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { openWindow, closeWindowByPath } from '../../../../../ContentWindow/WindowList';
-import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
+import { CodeEditorWindowArgs, WindowType, WindowArgs, MarkdownViewerWindowArgs } from '../../../../../ContentWindow/ContentWindowTypes';
 import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 import { refreshRecycle } from '../RecyclePanel/RefreshRecycle';
 import { checkUnsavedFile } from './DeleteUnsavedFiles';
@@ -121,19 +121,40 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
     }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
-        if (!this._dataTree.data.isBinary) {
-            const args: CodeEditorWindowArgs = {
-                id: Math.random().toString(),
-                fixed: oVar(false),
-                name: this._name,
-                type: WindowType.code_editor,
-                args: {
-                    path: this._fullNameString,
-                    readonly: this.props.noCreate   //对于回收站和类库
-                }
-            };
+        if (!this._dataTree.data.isBinary) {    //不是二进制文件就是用编辑器打开
+            let winArgs: WindowArgs;
 
-            openWindow(args, e.altKey ? 'right' : undefined);
+            if (this._fullNameString.endsWith('.md')) {
+                const args: MarkdownViewerWindowArgs = {
+                    id: Math.random().toString(),
+                    fixed: oVar(false),
+                    name: `(查看) ${this._name}`,
+                    type: WindowType.markdown_viewer,
+                    args: {
+                        path: this._fullNameString,
+                        readonly: this.props.noCreate   //对于回收站和类库
+                    }
+                };
+
+                winArgs = args;
+            } else {
+                const args: CodeEditorWindowArgs = {
+                    id: Math.random().toString(),
+                    fixed: oVar(false),
+                    name: this._name,
+                    type: WindowType.code_editor,
+                    args: {
+                        path: this._fullNameString,
+                        readonly: this.props.noCreate   //对于回收站和类库
+                    }
+                };
+
+                winArgs = args;
+            }
+
+            openWindow(winArgs, e.altKey ? 'right' : undefined);
+        } else {
+
         }
     }
 

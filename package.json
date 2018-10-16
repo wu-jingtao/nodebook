@@ -82,6 +82,7 @@
         "raw-loader": "^0.5.1",
         "react": "^16.5.2",
         "react-dom": "^16.5.2",
+        "react-markdown": "^4.0.3",
         "style-loader": "^0.23.1",
         "ts-loader": "^5.2.1",
         "ts-node": "^7.0.1",

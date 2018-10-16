@@ -16,6 +16,9 @@ export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableCo
 
     private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 
+    //要显示的标题
+    private readonly _title = this.props.args.name;
+    
     //是否获取到了焦点
     private readonly _focused = oVar(this._thisSide.displayOrder.last === this.props.args.id);
 
@@ -25,11 +28,6 @@ export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableCo
      * 图标的文件路径
      */
     protected abstract _icon: string;
-
-    /**
-     * 要显示的标题
-     */
-    protected abstract _title: string;
 
     /**
      * 鼠标移动到标题上时显示的提示文字

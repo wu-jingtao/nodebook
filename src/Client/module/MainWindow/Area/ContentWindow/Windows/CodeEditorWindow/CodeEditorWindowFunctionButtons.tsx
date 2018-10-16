@@ -2,7 +2,7 @@ import * as React from 'react';
 import { oVar } from 'observable-variable';
 
 import { ObservableComponentWrapper } from '../../../../../../global/Tools/ObservableComponent';
-import { CodeEditorWindowArgs, HtmlViewerWindowArgs, WindowType } from '../../ContentWindowTypes';
+import { CodeEditorWindowArgs, HtmlViewerWindowArgs, WindowType, MarkdownViewerWindowArgs } from '../../ContentWindowTypes';
 import { openWindow } from '../../WindowList';
 import { BaseWindowFunctionButtons } from '../BaseWindow/BaseWindowFunctionButtons';
 import { unsavedFiles, saveToServer, refreshData } from './CodeEditorFileCache';
@@ -12,7 +12,7 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
     private readonly _openHtmlViewer = () => {
         const args: HtmlViewerWindowArgs = {
             id: Math.random().toString(),
-            name: this.props.args.name,
+            name: `(查看) ${this.props.args.name}`,
             fixed: oVar(false),
             type: WindowType.html_viewer,
             args: {
@@ -21,6 +21,18 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
         };
 
         openWindow(args);
+    };
+
+    private readonly _openMarkdownViewer = () => {
+        const args: MarkdownViewerWindowArgs = {
+            id: Math.random().toString(),
+            fixed: oVar(false),
+            name: `(查看) ${this.props.args.name}`,
+            type: WindowType.markdown_viewer,
+            args: this.props.args.args
+        };
+        
+        openWindow(args, this.props.side === 'left' ? 'right' : 'left');
     };
 
     private readonly _runTask = () => {
@@ -40,6 +52,10 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
             {this.props.args.args.path.endsWith('.html') &&
                 <img src={`/static/res/img/buttons_icon/Preview_inverse.svg`}
                     title={`在HTML查看器中打开`} onClick={this._openHtmlViewer} />
+            }
+            {this.props.args.args.path.endsWith('.md') &&
+                <img src={`/static/res/img/buttons_icon/Preview_inverse.svg`}
+                    title={`在Markdown查看器中打开`} onClick={this._openMarkdownViewer} />
             }
             {this.props.args.args.path.endsWith('.server.js') &&
                 <img src={`/static/res/img/buttons_icon/start-inverse.svg`}

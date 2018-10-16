@@ -29,15 +29,4 @@ export class HtmlViewerWindowContent extends BaseWindowContent<HtmlViewerWindowA
             }
         };
     }
-
-    componentDidMount() {
-        super.componentDidMount();
-
-        //每隔1秒检查一次窗口的标题
-        const timer = setInterval(() => {
-            this.props.communicator.title.value = (this._ref_iframe.contentDocument as Document).title;
-        }, 1000);
-
-        this._unobserve.push(() => clearInterval(timer));
-    }
 }

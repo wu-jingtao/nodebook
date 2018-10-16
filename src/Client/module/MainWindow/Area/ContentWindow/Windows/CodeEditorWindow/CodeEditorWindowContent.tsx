@@ -116,6 +116,13 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
         });
 
         ed.addAction({
+            id: '向下复制此行', label: '向下复制此行',
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_D],
+            precondition: 'editorTextFocus && !editorReadonly',
+            run: (ed) => { ed.getAction('editor.action.copyLinesDownAction').run() }
+        });
+
+        ed.addAction({
             id: '保存修改', label: '保存修改',
             keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S],
             precondition: 'editorTextFocus && !editorReadonly',

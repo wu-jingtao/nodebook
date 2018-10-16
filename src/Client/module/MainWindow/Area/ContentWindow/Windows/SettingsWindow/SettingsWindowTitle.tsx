@@ -6,6 +6,5 @@ import { SettingsWindowArgs } from '../../ContentWindowTypes';
  */
 export class SettingsWindowTitle extends BaseWindowTitle<SettingsWindowArgs> {
     protected _icon: string;
-    protected _title: string;
     protected _prompt: string;
 }
