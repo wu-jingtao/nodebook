@@ -74,7 +74,7 @@ export class MessageItem extends ObservableComponent<{ config: MessageBoxOptions
             }} />
         }
 
-        if (autoClose > 0 && buttons == null && progress == null)
+        if (autoClose > 0 && progress == null)
             this._timer = setTimeout(() => closeMessageBox(this.props.messageId), autoClose * 1000);
     }
 

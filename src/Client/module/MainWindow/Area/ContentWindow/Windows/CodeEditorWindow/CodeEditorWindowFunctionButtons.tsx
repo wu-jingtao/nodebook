@@ -2,7 +2,7 @@ import * as React from 'react';
 import { oVar } from 'observable-variable';
 
 import { ObservableComponentWrapper } from '../../../../../../global/Tools/ObservableComponent';
-import { CodeEditorWindowArgs, HtmlViewerWindowArgs, WindowType, MarkdownViewerWindowArgs } from '../../ContentWindowTypes';
+import { CodeEditorWindowArgs, HtmlViewerWindowArgs, WindowType, MarkdownViewerWindowArgs, ImageViewerWindowArgs } from '../../ContentWindowTypes';
 import { openWindow } from '../../WindowList';
 import { BaseWindowFunctionButtons } from '../BaseWindow/BaseWindowFunctionButtons';
 import { unsavedFiles, saveToServer, refreshData } from './CodeEditorFileCache';
@@ -31,7 +31,19 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
             type: WindowType.markdown_viewer,
             args: this.props.args.args
         };
-        
+
+        openWindow(args, this.props.side === 'left' ? 'right' : 'left');
+    };
+
+    private readonly _openImageViewer = () => {
+        const args: ImageViewerWindowArgs = {
+            id: Math.random().toString(),
+            fixed: oVar(false),
+            name: `(查看) ${this.props.args.name}`,
+            type: WindowType.image_viewer,
+            args: this.props.args.args
+        };
+
         openWindow(args, this.props.side === 'left' ? 'right' : 'left');
     };
 
@@ -56,6 +68,10 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
             {this.props.args.args.path.endsWith('.md') &&
                 <img src={`/static/res/img/buttons_icon/Preview_inverse.svg`}
                     title={`在Markdown查看器中打开`} onClick={this._openMarkdownViewer} />
+            }
+            {this.props.args.args.path.endsWith('.svg') &&
+                <img src={`/static/res/img/buttons_icon/Preview_inverse.svg`}
+                    title={`在Image查看器中打开`} onClick={this._openImageViewer} />
             }
             {this.props.args.args.path.endsWith('.server.js') &&
                 <img src={`/static/res/img/buttons_icon/start-inverse.svg`}

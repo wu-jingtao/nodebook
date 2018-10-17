@@ -11,6 +11,9 @@ import { HtmlViewerWindowFunctionButtons } from './Windows/HtmlViewerWindow/Html
 import { MarkdownViewerWindowContent } from './Windows/MarkdownViewerWindow/MarkdownViewerWindowContent';
 import { MarkdownViewerWindowTitle } from './Windows/MarkdownViewerWindow/MarkdownViewerWindowTitle';
 import { MarkdownViewerWindowFunctionButtons } from './Windows/MarkdownViewerWindow/MarkdownViewerWindowFunctionButtons';
+import { ImageViewerWindowContent } from './Windows/ImageViewerWindow/ImageViewerWindowContent';
+import { ImageViewerWindowTitle } from './Windows/ImageViewerWindow/ImageViewerWindowTitle';
+import { ImageViewerWindowFunctionButtons } from './Windows/ImageViewerWindow/ImageViewerWindowFunctionButtons';
 import { TaskWindowContent } from './Windows/TaskWindow/TaskWindowContent';
 import { TaskWindowTitle } from './Windows/TaskWindow/TaskWindowTitle';
 import { TaskWindowFunctionButtons } from './Windows/TaskWindow/TaskWindowFunctionButtons';
@@ -67,6 +70,12 @@ export class WindowContainer extends ObservableComponent<{ side: 'left' | 'right
                     contents.push(<MarkdownViewerWindowContent key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
                     titles.push(<MarkdownViewerWindowTitle key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
                     functionButtons.push(<MarkdownViewerWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    break;
+
+                case WindowType.image_viewer:
+                    contents.push(<ImageViewerWindowContent key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    titles.push(<ImageViewerWindowTitle key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    functionButtons.push(<ImageViewerWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
                     break;
 
                 case WindowType.task:
