@@ -8,7 +8,7 @@ import { MultipleFoldableContainerItem } from '../../../../../../../../global/Co
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { openWindow, closeWindowByPath } from '../../../../../ContentWindow/WindowList';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
-import { CodeEditorWindowArgs, WindowType, WindowArgs, MarkdownViewerWindowArgs, ImageViewerWindowArgs } from '../../../../../ContentWindow/ContentWindowTypes';
+import { CodeEditorWindowArgs, WindowType, WindowArgs, MarkdownViewerWindowArgs, ImageViewerWindowArgs, VideoPlayerWindowArgs } from '../../../../../ContentWindow/ContentWindowTypes';
 import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 import { refreshRecycle } from '../RecyclePanel/RefreshRecycle';
 import { checkUnsavedFile } from './DeleteUnsavedFiles';
@@ -122,12 +122,22 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
     }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
-        if (/.(jpg|jpeg|jpe|jif|jfif|jfi|webp|gif|png|apng|svg|svgz|xbm|bmp|dib|ico)$/.test(this._name)) {
+        if (/.(jpg|jpeg|jpe|jif|jfif|jfi|webp|gif|png|apng|svg|svgz|xbm|bmp|dib|ico)$/i.test(this._name)) {
             const winArgs: ImageViewerWindowArgs = {
                 id: Math.random().toString(),
                 fixed: oVar(false),
                 name: `(查看) ${this._name}`,
                 type: WindowType.image_viewer,
+                args: { path: this._fullNameString }
+            };
+
+            openWindow(winArgs, e.altKey ? 'right' : undefined);
+        } else if (/.(wav|mpeg|mp3|mp4|webm|aac|aacp|ogg|flac|rm|rmvb|3gp|avi|mpg|mov|mkv)$/i.test(this._name)) {
+            const winArgs: VideoPlayerWindowArgs = {
+                id: Math.random().toString(),
+                fixed: oVar(false),
+                name: `(查看) ${this._name}`,
+                type: WindowType.video_player,
                 args: { path: this._fullNameString }
             };
 

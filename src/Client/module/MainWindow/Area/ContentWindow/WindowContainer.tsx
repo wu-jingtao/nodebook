@@ -14,6 +14,9 @@ import { MarkdownViewerWindowFunctionButtons } from './Windows/MarkdownViewerWin
 import { ImageViewerWindowContent } from './Windows/ImageViewerWindow/ImageViewerWindowContent';
 import { ImageViewerWindowTitle } from './Windows/ImageViewerWindow/ImageViewerWindowTitle';
 import { ImageViewerWindowFunctionButtons } from './Windows/ImageViewerWindow/ImageViewerWindowFunctionButtons';
+import { VideoPlayerWindowContent } from './Windows/VideoPlayerWindow/VideoPlayerWindowContent';
+import { VideoPlayerWindowTitle } from './Windows/VideoPlayerWindow/VideoPlayerWindowTitle';
+import { VideoPlayerWindowFunctionButtons } from './Windows/VideoPlayerWindow/VideoPlayerWindowFunctionButtons';
 import { TaskWindowContent } from './Windows/TaskWindow/TaskWindowContent';
 import { TaskWindowTitle } from './Windows/TaskWindow/TaskWindowTitle';
 import { TaskWindowFunctionButtons } from './Windows/TaskWindow/TaskWindowFunctionButtons';
@@ -76,6 +79,12 @@ export class WindowContainer extends ObservableComponent<{ side: 'left' | 'right
                     contents.push(<ImageViewerWindowContent key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
                     titles.push(<ImageViewerWindowTitle key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
                     functionButtons.push(<ImageViewerWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    break;
+
+                case WindowType.video_player:
+                    contents.push(<VideoPlayerWindowContent key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    titles.push(<VideoPlayerWindowTitle key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
+                    functionButtons.push(<VideoPlayerWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} communicator={communicator} />);
                     break;
 
                 case WindowType.task:
