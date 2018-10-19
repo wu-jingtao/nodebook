@@ -8,7 +8,7 @@ import { MultipleFoldableContainerItem } from '../../../../../../../../global/Co
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { openWindow, closeWindowByPath } from '../../../../../ContentWindow/WindowList';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
-import { CodeEditorWindowArgs, WindowType, WindowArgs, MarkdownViewerWindowArgs, ImageViewerWindowArgs, VideoPlayerWindowArgs } from '../../../../../ContentWindow/ContentWindowTypes';
+import { CodeEditorWindowArgs, WindowType, WindowArgs, MarkdownViewerWindowArgs, ImageViewerWindowArgs, VideoPlayerWindowArgs, PDFViewerWindowArgs } from '../../../../../ContentWindow/ContentWindowTypes';
 import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 import { refreshRecycle } from '../RecyclePanel/RefreshRecycle';
 import { checkUnsavedFile } from './DeleteUnsavedFiles';
@@ -122,7 +122,17 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
     }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
-        if (/.(jpg|jpeg|jpe|jif|jfif|jfi|webp|gif|png|apng|svg|svgz|xbm|bmp|dib|ico)$/i.test(this._name)) {
+        if (this._name.endsWith('.pdf')) {
+            const winArgs: PDFViewerWindowArgs = {
+                id: Math.random().toString(),
+                fixed: oVar(false),
+                name: `(查看) ${this._name}`,
+                type: WindowType.pdf_viewer,
+                args: { path: this._fullNameString }
+            };
+
+            openWindow(winArgs, e.altKey ? 'right' : undefined);
+        } else if (/.(jpg|jpeg|jpe|jif|jfif|jfi|webp|gif|png|apng|svg|svgz|xbm|bmp|dib|ico)$/i.test(this._name)) {
             const winArgs: ImageViewerWindowArgs = {
                 id: Math.random().toString(),
                 fixed: oVar(false),

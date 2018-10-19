@@ -25,8 +25,8 @@ export class ImageViewerWindowContent extends BaseWindowContent<ImageViewerWindo
 
     //图片加载完成
     private readonly _loaded = () => {
-        if (this.props.communicator.loading)
-            this.props.communicator.loading.value = false;
+        if (this._communicator.loading)
+            this._communicator.loading.value = false;
     };
 
     //图片开始拖拽
@@ -88,8 +88,8 @@ export class ImageViewerWindowContent extends BaseWindowContent<ImageViewerWindo
         super(props, context);
 
         //刷新图片
-        this.props.communicator.refresh = () => {
-            this.props.communicator.loading.value = true;
+        this._communicator.refresh = () => {
+            this._communicator.loading.value = true;
             this._img_href.value = `/file/api/readFile?path=${this.props.args.args.path}&_=${Math.random()}`;
         };
     }

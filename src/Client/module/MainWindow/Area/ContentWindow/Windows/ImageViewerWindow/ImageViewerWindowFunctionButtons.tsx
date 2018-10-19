@@ -14,7 +14,7 @@ export class ImageViewerWindowFunctionButtons extends BaseWindowFunctionButtons<
 
     //刷新图片
     private readonly _refresh = () => {
-        this.props.communicator.refresh();
+        this._communicator.refresh();
     };
 
     //svg文件打开编辑器

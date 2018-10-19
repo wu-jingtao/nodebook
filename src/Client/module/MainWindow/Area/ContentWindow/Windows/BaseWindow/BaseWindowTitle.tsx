@@ -12,17 +12,22 @@ const less = require('./BaseWindow.less');
 /**
  * 顶部选项卡标题栏
  */
-export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right', communicator: { [key: string]: any } }> {
+export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableComponent<{ args: T, side: 'left' | 'right', _communicator: { [key: string]: any } }> {
 
     private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 
     //要显示的标题
     private readonly _title = this.props.args.name;
-    
+
     //是否获取到了焦点
     private readonly _focused = oVar(this._thisSide.displayOrder.last === this.props.args.id);
 
     private _ref: HTMLDivElement;
+
+    /**
+     * 窗口组件间通信对象
+     */
+    protected readonly _communicator = this.props._communicator;
 
     /**
      * 图标的文件路径

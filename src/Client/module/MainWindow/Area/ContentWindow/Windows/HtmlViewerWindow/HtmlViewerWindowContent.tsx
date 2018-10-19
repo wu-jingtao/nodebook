@@ -12,7 +12,7 @@ export class HtmlViewerWindowContent extends BaseWindowContent<HtmlViewerWindowA
     protected _content = (
         <iframe className={less.iframe}
             src={'/file/api/readFile?path=' + this.props.args.args.path}
-            onLoad={() => this.props.communicator.loading.value = false}
+            onLoad={() => this._communicator.loading.value = false}
             ref={(e: any) => this._ref_iframe = e} />
     );
 
@@ -20,10 +20,10 @@ export class HtmlViewerWindowContent extends BaseWindowContent<HtmlViewerWindowA
         super(props, context);
 
         //刷新
-        this.props.communicator.refresh = () => {
+        this._communicator.refresh = () => {
             if (this._ref_iframe) {
                 if (this._ref_iframe.contentWindow) {
-                    this.props.communicator.loading.value = true;
+                    this._communicator.loading.value = true;
                     this._ref_iframe.contentWindow.location.reload();
                 }
             }

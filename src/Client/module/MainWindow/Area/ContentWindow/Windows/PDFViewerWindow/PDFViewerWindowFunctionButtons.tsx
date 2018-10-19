@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 import { BaseWindowFunctionButtons } from '../BaseWindow/BaseWindowFunctionButtons';
-import { HtmlViewerWindowArgs } from '../../ContentWindowTypes';
+import { PDFViewerWindowArgs } from '../../ContentWindowTypes';
 
-export class HtmlViewerWindowFunctionButtons extends BaseWindowFunctionButtons<HtmlViewerWindowArgs> {
+export class PDFViewerWindowFunctionButtons extends BaseWindowFunctionButtons<PDFViewerWindowArgs> {
 
     //在新的浏览器窗口中打开
     private readonly _openInBrowserWindow = () => {

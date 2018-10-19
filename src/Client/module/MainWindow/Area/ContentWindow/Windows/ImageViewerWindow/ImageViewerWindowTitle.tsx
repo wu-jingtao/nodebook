@@ -10,7 +10,7 @@ export class ImageViewerWindowTitle extends BaseWindowTitle<ImageViewerWindowArg
     constructor(props: any, context: any) {
         super(props, context);
 
-        this.props.communicator.loading = this._loading;
+        this._communicator.loading = this._loading;
         this._loading.value = true;
     }
 }

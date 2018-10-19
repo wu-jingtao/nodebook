@@ -8,6 +8,7 @@ export enum WindowType {
     'html_viewer',      //html查看器
     'markdown_viewer',  //markdown查看器
     'image_viewer',     //图片查看器
+    'pdf_viewer',       //PDF查看器
     'video_player',     //音频视频播放器
     'task',             //任务状态管理器
     'service',          //服务状态管理器
@@ -87,6 +88,10 @@ export interface MarkdownViewerWindowArgs extends FileWindowArgs {
          */
         readonly?: boolean
     }
+}
+
+export interface PDFViewerWindowArgs extends FileWindowArgs {
+    type: WindowType.pdf_viewer;
 }
 
 export interface ImageViewerWindowArgs extends FileWindowArgs {

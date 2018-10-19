@@ -21,7 +21,7 @@ export class VideoPlayerWindowContent extends BaseWindowContent<VideoPlayerWindo
         super(props, context);
 
         //刷新
-        this.props.communicator.refresh = () => {
+        this._communicator.refresh = () => {
             if (this._ref_video)
                 this._ref_video.load();
         };

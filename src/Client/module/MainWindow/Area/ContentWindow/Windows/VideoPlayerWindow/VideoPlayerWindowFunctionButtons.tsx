@@ -12,7 +12,7 @@ export class VideoPlayerWindowFunctionButtons extends BaseWindowFunctionButtons<
 
     //刷新
     private readonly _refresh = () => {
-        this.props.communicator.refresh();
+        this._communicator.refresh();
     };
 
     protected _functionButtons = (
