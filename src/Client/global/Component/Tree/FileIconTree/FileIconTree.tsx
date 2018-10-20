@@ -22,7 +22,17 @@ export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> ext
     /**
      * 在文件路径后面要显示的内容
      */
-    protected readonly _stateInfoContent = oVar<JSX.Element | undefined>(undefined);
+    protected readonly _fileIcon_stateInfoContent = oVar<JSX.Element | undefined>(undefined);
+
+    /**
+     * 文件图标对应的文件名，默认是this._name
+     */
+    protected readonly _fileIcon_filename = oVar(this._name);
+
+    /**
+     * 要显示的正文内容
+     */
+    protected readonly _fileIcon_displayContent = oVar(<>{this._name}</>);
 
     /**
      * 渲染FileIconTree的内容
@@ -41,18 +51,18 @@ export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> ext
             <div className={less.FileIconTree}>
                 <FileIcon
                     className={less.icon}
-                    filename={this._name}
+                    filename={this._fileIcon_filename.value}
                     isFolder={this._isBranch}
                     opened={this._isBranch && this._openedBranch.has(this._fullNameString)}
                     rootFolder={this._isRoot} />
-                <div className={classnames(less.filename, { [less.modified]: modified })}> {this._name}</div>
-                <div className={less.stateInfoContent}>{this._stateInfoContent.value}</div>
+                <div className={classnames(less.filename, { [less.modified]: modified })}>{this._fileIcon_displayContent.value}</div>
+                <div className={less.stateInfoContent}>{this._fileIcon_stateInfoContent.value}</div>
             </div>
         );
     };
 
     protected _renderItem() {
-        const watch = [this._modifiedFiles, this._stateInfoContent];
+        const watch = [this._modifiedFiles, this._fileIcon_stateInfoContent, this._fileIcon_filename, this._fileIcon_displayContent];
 
         if (this._isBranch) watch.push(this._openedBranch);
 

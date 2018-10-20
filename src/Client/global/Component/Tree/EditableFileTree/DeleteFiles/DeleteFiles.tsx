@@ -11,7 +11,7 @@ export const DeleteFiles: React.StatelessComponent<{ items: { name: string, full
     return (
         <div className={less.DeleteFiles}>
             {props.items.map(item =>
-                <React.Fragment key={item.name}>
+                <React.Fragment key={item.fullName}>
                     <FileIcon className={less.icon} filename={item.name} isFolder={item.isDirectory} />
                     <input className={less.filename} readOnly value={item.fullName} />
                 </React.Fragment>

@@ -15,7 +15,7 @@ const less = require('./OpenedWindows.less');
 /**
  * 打开的窗口
  */
-export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType>  {
+export class OpenedWindows extends FoldableContainer<FoldableContainerPropsType> {
 
     protected renderTitleBar(): JSX.Element {
         return (

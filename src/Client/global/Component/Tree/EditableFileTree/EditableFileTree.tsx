@@ -17,7 +17,7 @@ import { DeleteFiles } from './DeleteFiles/DeleteFiles';
 const less = require('./EditableFileTree.less');
 
 //拖拽时在鼠标上显示的文字
-const dragText = $(`<i class="${less.EditableFileTree_dragText}"></i>`).appendTo(document.body);
+export const dragText = $(`<i class="${less.EditableFileTree_dragText}"></i>`).appendTo(document.body);
 
 /**
  * 正在处理中的文件或文件夹，value是_fullNameString
@@ -257,12 +257,14 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      * 删除文件或目录。不允许删除根
      */
     protected readonly _menu_delete = () => {
-        if (!this._focusedItem.has(this)) {
-            this._focusedItem.clear();
-            this._focusedItem.add(this);
-        }
+        if (!this._isRoot) {
+            if (!this._focusedItem.has(this)) {
+                this._focusedItem.clear();
+                this._focusedItem.add(this);
+            }
 
-        this._prepareDelete([...this._focusedItem.values()]);
+            this._prepareDelete([...this._focusedItem.values()]);
+        }
     }
 
     /**

@@ -24,3 +24,6 @@ SystemSetting.addSystemSetting('client.editor.minimap', true, false, 'boolean');
 
 //代码编辑器 字体大小
 SystemSetting.addSystemSetting('client.editor.fontSize', 14, false, 'number');
+
+//用户快捷方式数据
+SystemSetting.addSystemSetting('client.shortcut', '[]', false, 'string');

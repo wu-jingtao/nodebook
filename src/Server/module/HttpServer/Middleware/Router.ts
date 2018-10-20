@@ -28,6 +28,8 @@ import { SystemSettingTable } from '../../Database/SystemSettingTable';
 import { FormParser } from './FormParser';
 import { LoginCheck } from './LoginCheck';
 
+const encodeURI: (val: string) => string = require('encodeurl');
+
 /**
  * 路由控制
  */
@@ -224,7 +226,7 @@ function File(router: koa_router, httpServer: HttpServer) {
 
         //确保浏览器会弹出下载框
         if (ctx.request.query.download === 'true')
-            ctx.set('Content-Disposition', `attachment;filename=${node_path.basename(ctx.body.path)}`);
+            ctx.set('Content-Disposition', `attachment;filename*=UTF-8''${encodeURI(node_path.basename(ctx.body.path))}`);
     });
 
     /**
@@ -234,7 +236,7 @@ function File(router: koa_router, httpServer: HttpServer) {
     router.get(_prefix_api + '/zipDownloadData', async (ctx: any) => {
         ctx.compress = false;   //确保不会被 koa-compress 压缩
         ctx.body = await _fileManager.zipDownloadData(ctx.request.query.path);
-        ctx.set('Content-Disposition', `attachment;filename=${node_path.basename(ctx.request.query.path)}.zip`);
+        ctx.set('Content-Disposition', `attachment;filename*=UTF-8''${encodeURI(node_path.basename(ctx.request.query.path))}.zip`);
     });
 
     router.use(router_etag.routes(), router_etag.allowedMethods());
