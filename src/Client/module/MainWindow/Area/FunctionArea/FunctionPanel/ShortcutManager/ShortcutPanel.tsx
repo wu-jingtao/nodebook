@@ -11,13 +11,27 @@ export class ShortcutPanel extends FoldableContainer<FoldableContainerPropsType>
 
     private _tree: ShortcutTree;
 
+    private readonly _createShortcut = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        this._tree.createShortcut();
+    };
+
+    private readonly _createDirectory = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        this._tree.createDirectory();
+    };
+
+    private readonly _closeAllBranch = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        this._tree.closeAllBranch();
+    };
+
     protected renderTitleBar(): JSX.Element {
         return (
             <div className={less.titleButtons}>
-                <img title="新建快捷方式" src="/static/res/img/buttons_icon/add_inverse.svg"
-                    onClick={() => this._tree.createShortcut()} />
-                <img title="新建文件夹" src="/static/res/img/buttons_icon/AddFolder_inverse.svg"
-                    onClick={() => this._tree.createDirectory()} />
+                <img title="新建快捷方式" src="/static/res/img/buttons_icon/add_inverse.svg" onClick={this._createShortcut} />
+                <img title="新建文件夹" src="/static/res/img/buttons_icon/AddFolder_inverse.svg" onClick={this._createDirectory} />
+                <img title="全部折叠" src="/static/res/img/buttons_icon/CollapseAll_inverse.svg" onClick={this._closeAllBranch} />
             </div>
         );
     }
