@@ -66,12 +66,12 @@ export class TaskLogger {
             for (let i = this._logList.length - 1; i > -1; i--) {
                 const element = this._logList[i];
                 if (element.date > date)
-                    result.unshift(element);
+                    result.push(element);
                 else
                     break;
             }
 
-            return result;
+            return result.reverse();
         }
     }
 

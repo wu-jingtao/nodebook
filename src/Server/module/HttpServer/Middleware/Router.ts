@@ -603,7 +603,7 @@ function Task(router: koa_router, httpServer: HttpServer) {
     });
 
     /**
-     * 删除某个正在运行的任务
+     * 终止某个正在运行的任务
      * @param path
      */
     router.post(_prefix + '/destroyTask', ctx => {

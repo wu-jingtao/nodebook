@@ -3,9 +3,9 @@ import * as classnames from 'classnames';
 import { ObservableSet, oVar } from 'observable-variable';
 
 import { ObservableComponentWrapper } from '../../../Tools/ObservableComponent';
-import { FileIcon } from '../../FileIcon/FileIcon';
 import { MemoryTree } from '../MemoryTree/MemoryTree';
 import { FileIconTreePropsType } from './FileIconTreePropsType';
+import { getIconPath } from '../../FileIcon/GetIconPath';
 
 const less = require('./FileIconTree.less');
 
@@ -25,9 +25,10 @@ export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> ext
     protected readonly _fileIcon_stateInfoContent = oVar<JSX.Element | undefined>(undefined);
 
     /**
-     * 文件图标对应的文件名，默认是this._name
+     * 文件图标的URL
      */
-    protected readonly _fileIcon_filename = oVar(this._name);
+    protected readonly _fileIcon_url = oVar('/static/res/img/file_icons/' +
+        getIconPath(this._name, this._isBranch, this._isBranch && this._openedBranch.has(this._fullNameString), this._isRoot));
 
     /**
      * 要显示的正文内容
@@ -49,12 +50,7 @@ export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> ext
 
         return (
             <div className={less.FileIconTree}>
-                <FileIcon
-                    className={less.icon}
-                    filename={this._fileIcon_filename.value}
-                    isFolder={this._isBranch}
-                    opened={this._isBranch && this._openedBranch.has(this._fullNameString)}
-                    rootFolder={this._isRoot} />
+                <img className={less.icon} src={this._fileIcon_url.value} />
                 <div className={classnames(less.filename, { [less.modified]: modified })}>{this._fileIcon_displayContent.value}</div>
                 <div className={less.stateInfoContent}>{this._fileIcon_stateInfoContent.value}</div>
             </div>
@@ -62,7 +58,7 @@ export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> ext
     };
 
     protected _renderItem() {
-        const watch = [this._modifiedFiles, this._fileIcon_stateInfoContent, this._fileIcon_filename, this._fileIcon_displayContent];
+        const watch = [this._modifiedFiles, this._fileIcon_stateInfoContent, this._fileIcon_url, this._fileIcon_displayContent];
 
         if (this._isBranch) watch.push(this._openedBranch);
 

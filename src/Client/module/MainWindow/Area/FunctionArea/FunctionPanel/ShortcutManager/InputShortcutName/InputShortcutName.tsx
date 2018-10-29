@@ -5,6 +5,7 @@ import { ObservableComponent } from '../../../../../../../global/Tools/Observabl
 import { FileIcon } from '../../../../../../../global/Component/FileIcon/FileIcon';
 import { TextInput } from '../../../../../../../global/Component/TextInput/TextInput';
 import { InputShortcutNamePropsType } from './InputShortcutNamePropsType';
+import { selectFile } from '../SelectFile/SelectFile';
 
 const less = require('./InputShortcutName.less');
 
@@ -12,6 +13,11 @@ const less = require('./InputShortcutName.less');
  * 输入快捷方式名称
  */
 export class InputShortcutName extends ObservableComponent<InputShortcutNamePropsType> {
+
+    private readonly _selectFile = async () => {
+        const path = await selectFile(new RegExp(''), this.props.filePath.value);
+        if (path) this.props.filePath.value = path;
+    };
 
     constructor(props: any, context: any) {
         super(props, context);
@@ -23,7 +29,7 @@ export class InputShortcutName extends ObservableComponent<InputShortcutNameProp
         this.props.filePath.on('beforeSet', value => {
             if (value === '')
                 this.props.errorTip.set(0, '文件路径不能为空');
-            else if (!/^(\/user_data\/code\/|\/user_data\/node_modules\/|\/user_data\/recycle\/|\/program_data\/).*?[^\/]$/.test(value))
+            else if (!/^(\/user_data\/code\/).*?[^\/]$/.test(value))
                 this.props.errorTip.set(0, '文件路径错误');
             else
                 this.props.errorTip.set(0, '');
@@ -43,10 +49,7 @@ export class InputShortcutName extends ObservableComponent<InputShortcutNameProp
 
     render() {
         return (
-            <div className={classnames(less.InputShortcutName, {
-                [less.error]: this.props.errorTip.some(item => item.length > 0),
-                [less.isShortcut]: !this.props.isDirectory
-            })}>
+            <div className={classnames(less.InputShortcutName, { [less.error]: this.props.errorTip.some(item => item.length > 0) })}>
                 {this.props.isDirectory ?
                     (<>
                         <FileIcon className={less.icon} isFolder filename={this.props.name.value} />
@@ -54,9 +57,10 @@ export class InputShortcutName extends ObservableComponent<InputShortcutNameProp
                     </>) :
                     (<>
                         <FileIcon className={less.icon} filename={this.props.filePath.value} />
-                        <TextInput className={less.input} placeholder="请输入对应文件的绝对路径" type="text" value={this.props.filePath} autoFocus />
+                        <TextInput className={classnames(less.input, less.input_filePath)} placeholder="请输入对应文件的绝对路径" type="text" value={this.props.filePath} autoFocus />
+                        <div className={less.selectFile} onClick={this._selectFile}>选择文件</div>
                         <div className={less.shortcutName}>快捷方式名称</div>
-                        <TextInput className={less.input} placeholder={this.props.filePath.value.split('/').pop()} type="text" value={this.props.name} />
+                        <TextInput className={classnames(less.input, less.input_shortcutName)} placeholder={this.props.filePath.value.split('/').pop()} type="text" value={this.props.name} />
                     </>)
                 }
                 {this.props.errorTip.map((item, index) =>

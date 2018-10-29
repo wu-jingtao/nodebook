@@ -19,7 +19,7 @@ process.on('message', msg => {
                     .then(data => {
                         process.send({
                             type: 'response', id: msg.id,
-                            responseData: `{"data":"${JSON.stringify(data)}"}`
+                            responseData: JSON.stringify({ data })
                         });
                     })
                     .catch(err => {

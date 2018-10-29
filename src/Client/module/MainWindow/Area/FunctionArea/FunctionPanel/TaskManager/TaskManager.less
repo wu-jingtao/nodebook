@@ -5,3 +5,34 @@
     height: 100%;
     position: relative;
 }
+
+:local(.titleButtons) {
+    width: 100%;
+    height: 23px;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    color: @darkFontColor;
+
+    & > img {
+        height: 16px;
+        width: 16px;
+        padding: 4px 6px;
+
+        &:last-child {
+            padding-right: 12px;
+        }
+
+        &:active {
+            transform: scale(1.2);
+        }
+    }
+}
+
+:local(.shortcutFilePath) {
+    color: darken(@darkFontColor, 20%, relative);
+    font-size: 10px;
+    padding-left: 10px;
+    opacity: .7;
+}

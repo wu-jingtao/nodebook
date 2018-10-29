@@ -45,12 +45,29 @@
     color: @darkFontColor;
 }
 
-:local(.isShortcut) {
-    :local(.icon) {
-        padding: 0 10px 0 66px;
+:local(.selectFile) {
+    width: 75px;
+    height: 30px;
+    line-height: 32px;
+    font-size: .9em;
+    text-align: center;
+    background-color: @lightBackColor;
+    color: @darkFontColor;
+
+    &:hover {
+        background-color: darken(@lightBackColor, 20%, relative);
+        color: lighten(@darkFontColor, 10%, relative);
     }
 
-    :local(.input) {
-        width: ~"calc(100% - 96px)";
+    &:active {
+        background-color: darken(@lightBackColor, 30%, relative);
     }
+}
+
+:local(.input_filePath) {
+    width: ~"calc(100% - 115px)";
+}
+
+:local(.input_shortcutName) {
+    width: ~"calc(100% - 96px)";
 }

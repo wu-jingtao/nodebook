@@ -140,8 +140,8 @@ class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
             <div className={less.contentItem} onClick={this._openEditor} onContextMenu={this._contextMenu}>
                 {this._undoAndLoading}
                 <FileIcon className={less.fileIcon} filename={this.props.path} />
-                <div className={less.fileName}>{this._name}</div>
-                <div className={less.fileFullName}>{this.props.path}</div>
+                <div className={`${less.fileName} ${less.fileModified}`}>{this._name}</div>
+                <div className={`${less.fileFullName} ${less.fileModified}`}>{this.props.path}</div>
             </div>
         );
     }

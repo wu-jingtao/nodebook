@@ -27,3 +27,6 @@ SystemSetting.addSystemSetting('client.editor.fontSize', 14, false, 'number');
 
 //用户快捷方式数据
 SystemSetting.addSystemSetting('client.shortcut', '[]', false, 'string');
+
+//刷新任务列表时间间隔
+SystemSetting.addSystemSetting('client.task.listRefreshInterval', 30 * 1000, false, 'number');

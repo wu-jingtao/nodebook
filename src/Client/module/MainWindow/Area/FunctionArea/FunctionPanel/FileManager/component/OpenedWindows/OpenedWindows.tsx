@@ -9,6 +9,7 @@ import { FileIcon } from '../../../../../../../../global/Component/FileIcon/File
 import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
 import { windowList, closeAllWindow, closeWindow, closeOtherWindow, moveToOtherSide, focusWindow } from '../../../../../ContentWindow/WindowList';
 import { WindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
+import { unsavedFiles } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 
 const less = require('./OpenedWindows.less');
 
@@ -103,13 +104,17 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', arg
     } />
 
     //文件名称
-    private readonly _fileName = (
-        <>
-            <div className={less.fileName}>{this.props.args.name}</div>
-            {this.props.args.args.path &&
-                <div className={less.fileFullName}>{this.props.args.args.path}</div>}
-        </>
-    )
+    private readonly _fileName = <ObservableComponentWrapper watch={[unsavedFiles]} render={() => {
+        const modified = unsavedFiles.has(this.props.args.args.path);
+
+        return (
+            <>
+                <div className={classnames(less.fileName, { [less.fileModified]: modified })}>{this.props.args.name}</div>
+                {this.props.args.args.path &&
+                    <div className={classnames(less.fileFullName, { [less.fileModified]: modified })}>{this.props.args.args.path}</div>}
+            </>
+        );
+    }} />
 
     //右键菜单
     private readonly _contextMenu = (e: React.MouseEvent) => {

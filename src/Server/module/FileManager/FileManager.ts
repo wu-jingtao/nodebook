@@ -40,6 +40,7 @@ export class FileManager extends BaseServiceModule {
 
     async onStart(): Promise<void> {
         //创建程序需要用到的目录
+        await fs.ensureDir(FilePath._opensslKeyDir);
         await fs.ensureDir(FilePath._userCodeDir);
         await fs.ensureDir(FilePath._userDataBackupDir);
         await fs.ensureDir(FilePath._recycleDir);

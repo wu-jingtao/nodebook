@@ -8,6 +8,7 @@ import { FileIconTreePropsType } from "../../../../../../global/Component/Tree/F
 import { processingItems, checkIsBusy, dragText } from "../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree";
 import { DeleteFiles } from '../../../../../../global/Component/Tree/EditableFileTree/DeleteFiles/DeleteFiles';
 import { normalSettings } from "../../../../../../global/SystemSetting";
+import { getIconPath } from '../../../../../../global/Component/FileIcon/GetIconPath';
 import { ContextMenuItemOptions } from "../../../../../ContextMenu/ContextMenuOptions";
 import { showMessageBox } from "../../../../../MessageBox/MessageBox";
 import { showPopupWindow } from "../../../../../PopupWindow/PopupWindow";
@@ -118,7 +119,7 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
             const errorTip = oArr(['', '']);
 
             showPopupWindow({
-                title: '新建文件夹',
+                title: '重命名',
                 content: (
                     <InputShortcutName
                         isRename
@@ -341,9 +342,9 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
             });
         }
 
-        //文件图标对已经对应的文件名
+        //文件图标以及对应的文件名
         if (!this._isBranch) {
-            this._fileIcon_filename.value = this._dataTree.data.path;
+            this._fileIcon_url.value = '/static/res/img/file_icons/' + getIconPath(this._dataTree.data.path);
             this._fileIcon_displayContent.value = (
                 <>
                     <span>{this._name}</span>
@@ -353,8 +354,7 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
         }
     }
 
-    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>):
-        React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
         return {
             ...parentProps,
             draggable: this._isRoot ? false : true,

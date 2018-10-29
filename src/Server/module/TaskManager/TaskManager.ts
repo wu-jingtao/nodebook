@@ -41,14 +41,8 @@ export class TaskManager extends BaseServiceModule {
         if (!this._taskList.has(taskFilePath)) {    //确保要创建的任务并未处于运行状态
             LogManager._checkPath(taskFilePath);
 
-            const child = child_process.fork(taskFilePath, [], {
-                cwd: FilePath._programDataDir,
-                uid: 6000,
-                gid: 6000
-            });
-
+            const child = child_process.fork(taskFilePath, [], { cwd: FilePath._programDataDir, execArgv: [], stdio: ['pipe', 'pipe', 'pipe', 'ipc'] });
             const logger = this._logManager.createTaskLogger(taskFilePath);
-            logger.status.value = 'running';
 
             child.stdout.on('data', chunk => logger.addLog(false, chunk.toString()));
             child.stderr.on('data', chunk => logger.addLog(true, chunk.toString()));
@@ -85,6 +79,7 @@ export class TaskManager extends BaseServiceModule {
             });
 
             this._taskList.set(taskFilePath, { process: child, invokeCallback });
+            logger.status.value = 'running';
         }
     }
 
@@ -121,8 +116,8 @@ export class TaskManager extends BaseServiceModule {
                         totalMemory: os.totalmem(),                                         //内存总量
                         freeMemory: os.freemem(),                                           //剩余内存大小
                         uptime: os.uptime(),                                                //系统运行了多久了
-                        userDataDir: await diskusage_check(FilePath._userDataDir),       //查看用户数据目录还有多少可用空间
-                        programDataDir: await diskusage_check(FilePath._programDataDir)  //查看程序数据目录还有多少可用空间。这两个目录如果位于同一个分区下则大小一样
+                        userDataDir: await diskusage_check(FilePath._userDataDir),          //查看用户数据目录还有多少可用空间
+                        programDataDir: await diskusage_check(FilePath._programDataDir)     //查看程序数据目录还有多少可用空间。这两个目录如果位于同一个分区下则大小一样
                     });
                 } catch (error) { reject(error); }
             });
@@ -189,7 +184,7 @@ interface MessageType {
         /**
          * 向任务中发送时为空
          */
-        taskFilePath: string; 
+        taskFilePath: string;
         functionName: string;
         data: string;
     }

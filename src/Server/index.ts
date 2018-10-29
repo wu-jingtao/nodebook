@@ -17,7 +17,7 @@ class SubprocessCommunicator extends BaseServiceModule {
 
     async onStart(): Promise<void> {
         if (this._isDebug)  //启动时就自动进入调试模式
-            this._process = child_process.spawn('node', ['--inspect-brk=0.0.0.0:9229', path.resolve(__dirname, './Nodebook_Subprocess.js')], { stdio: [0, 1, 2, 'ipc'] });
+            this._process = child_process.fork(path.resolve(__dirname, './Nodebook_Subprocess.js'), [], { execArgv: ['--inspect-brk=0.0.0.0:9229'] });
         else
             this._process = child_process.fork(path.resolve(__dirname, './Nodebook_Subprocess.js'));
 

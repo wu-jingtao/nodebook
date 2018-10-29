@@ -1,8 +1,6 @@
 # 镜像地址：https://github.com/mx601595686/my-docker-image/tree/master/nodejs
 FROM registry.cn-hangzhou.aliyuncs.com/wujingtao/node:latest
 
-ENV NODEBOOK_VERSION="0.0.1"
-
 # 如果容器还缺少curl，那么还需要安装curl(注意curl版本必须大于7.4 不然没有--unix-socket参数)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     dos2unix \
@@ -11,19 +9,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # 创建存放 用户数据目录 以及 任务数据目录
 VOLUME [ "/user_data", "/program_data" ]
-
-# 创建存放openssl key目录
-# 程序第一次启动时会生成临时的秘钥，如果自己有秘钥的话可以通过挂载的方式设置秘钥
-# 如果私钥有密码的话，需要将密码放置到password.txt中
-# key：         /key/privkey.pem
-# cert：        /key/cert.pem
-# password：    /key/password.txt
-RUN mkdir -m 700 /key && \
-# 创建 nodebook-task 账户，在执行用户程序的时候都是这个账户
-    groupadd -g 6000 nodebook-task && \
-    useradd -c nodebook-task -d /program_data -g nodebook-task -M -s /usr/sbin/nologin -u 6000 nodebook-task && \
-# 使得用户程序可以修改 /program_data 目录
-    chown nodebook-task:nodebook-task /program_data
 
 WORKDIR /app
 

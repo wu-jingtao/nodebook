@@ -657,8 +657,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
         ];
     }
 
-    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>)
-        : React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
         return {
             ...parentProps,
             draggable: this._root.props.noCopyCut || this._isRoot ? false : true,
