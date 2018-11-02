@@ -63,7 +63,7 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
                 ),
                 ok: {
                     callback: () => {
-                        if (errorTip.every(item => item.length === 0)) {
+                        if (filePath.value.length > 0 && errorTip.every(item => item.length === 0)) {
                             const name = shortcutName.value || filePath.value.split('/').pop() as string;
                             (this._dataTree.subItem as any).set(name, {
                                 name, data: { path: filePath.value }

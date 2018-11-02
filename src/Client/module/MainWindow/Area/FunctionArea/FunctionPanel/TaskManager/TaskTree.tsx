@@ -1,57 +1,12 @@
 import * as React from 'react';
 import { ObservableVariable, watch } from 'observable-variable';
 
-import { ServerApi } from '../../../../../../global/ServerApi';
 import { FileIconTree } from '../../../../../../global/Component/Tree/FileIconTree/FileIconTree';
 import { FileIconTreePropsType } from '../../../../../../global/Component/Tree/FileIconTree/FileIconTreePropsType';
 import { ContextMenuItemOptions } from '../../../../../ContextMenu/ContextMenuOptions';
-import { showMessageBox } from '../../../../../MessageBox/MessageBox';
-import { taskList } from './TaskManager';
+import { taskList, _processingTask, stopTask, restartTask, startTask } from './TaskList';
 
 export class TaskTree extends FileIconTree<FileIconTreePropsType, { status: ObservableVariable<"running" | "stop" | "crashed"> }> {
-
-    //表示整个任务列表是否正在处理中
-    public processing = this._root._loading;
-
-    //启动任务
-    private readonly _startTask = async () => {
-        if (this._dataTree.data.status.value !== 'running') {
-            if (!this._loading.has('_startTask')) {
-                try {
-                    this._loading.add('_startTask');
-                    await ServerApi.task.createTask(this._name);
-                    this._dataTree.data.status.value = await ServerApi.task.getTaskStatus(this._name) || 'stop';
-                } catch (error) {
-                    showMessageBox({ icon: 'error', title: '启动任务失败', content: error.message });
-                } finally {
-                    this._loading.delete('_startTask');
-                }
-            }
-        }
-    };
-
-    //停止任务
-    private readonly _stopTask = async () => {
-        if (this._dataTree.data.status.value === 'running') {
-            if (!this._loading.has('_stopTask')) {
-                try {
-                    this._loading.add('_stopTask');
-                    await ServerApi.task.destroyTask(this._name);
-                    this._dataTree.data.status.value = await ServerApi.task.getTaskStatus(this._name) || 'stop';
-                } catch (error) {
-                    showMessageBox({ icon: 'error', title: '停止任务失败', content: error.message });
-                } finally {
-                    this._loading.delete('_stopTask');
-                }
-            }
-        }
-    };
-
-    //重启任务
-    private readonly _restartTask = async () => {
-        await this._stopTask();
-        await this._startTask();
-    };
 
     constructor(props: any, context: any) {
         super(props, context);
@@ -89,13 +44,14 @@ export class TaskTree extends FileIconTree<FileIconTreePropsType, { status: Obse
             this._unobserve.push(watch([this._dataTree.data.status], setIconAndText));
             setIconAndText();
         }
-    }
 
-    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) {
-        return parentProps;
+        this._unobserve.push(watch([_processingTask], () => {
+            if (_processingTask.includes(this._name))
+                this._loading.add('_processing');
+            else
+                this._loading.delete('_processing');
+        }));
     }
-
-    protected async _onOpenBranch(): Promise<false | void> { }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
 
@@ -107,11 +63,14 @@ export class TaskTree extends FileIconTree<FileIconTreePropsType, { status: Obse
         else {
             return [
                 [
-                    this._dataTree.data.status.value === 'running' && { name: '停止', callback: this._stopTask },
-                    this._dataTree.data.status.value === 'running' && { name: '重启', callback: this._restartTask },
-                    this._dataTree.data.status.value !== 'running' && { name: '启动', callback: this._startTask },
+                    this._dataTree.data.status.value === 'running' && { name: '停止任务', callback: () => stopTask(this._name) },
+                    this._dataTree.data.status.value === 'running' && { name: '重启任务', callback: () => restartTask(this._name) },
+                    this._dataTree.data.status.value !== 'running' && { name: '启动任务', callback: () => startTask(this._name) },
                 ]
             ];
         }
     }
+
+    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) { return parentProps }
+    protected async _onOpenBranch(): Promise<false | void> { }
 }

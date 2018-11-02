@@ -29,4 +29,4 @@ SystemSetting.addSystemSetting('client.editor.fontSize', 14, false, 'number');
 SystemSetting.addSystemSetting('client.shortcut', '[]', false, 'string');
 
 //刷新任务列表时间间隔
-SystemSetting.addSystemSetting('client.task.listRefreshInterval', 30 * 1000, false, 'number');
+SystemSetting.addSystemSetting('client.task.listRefreshInterval', 10 * 1000, false, 'number');

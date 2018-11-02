@@ -20,7 +20,7 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
             }
         };
 
-        openWindow(args);
+        openWindow(args, this.props.side === 'left' ? 'right' : 'left');
     };
 
     private readonly _openMarkdownViewer = () => {

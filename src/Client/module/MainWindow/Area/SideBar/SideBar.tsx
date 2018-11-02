@@ -1,11 +1,12 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import { ObservableVariable, oVar } from 'observable-variable';
+import { ObservableVariable, oVar, watch } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { normalSettings } from '../../../../global/SystemSetting';
 import { displayType } from '../FunctionArea/FunctionArea';
-import { crashedServiceNumber } from '../FunctionArea/FunctionPanel/ServiceManager/ServiceManager';
+import { taskList } from '../FunctionArea/FunctionPanel/TaskManager/TaskList';
+import { serviceList } from '../FunctionArea/FunctionPanel/ServiceManager/ServiceManager';
 import { showLogWindow } from '../LogWindow/LogWindow';
 import { openWindow } from '../ContentWindow/WindowList';
 import { WindowType, SettingsWindowArgs } from '../ContentWindow/ContentWindowTypes';
@@ -18,33 +19,40 @@ const less = require('./SideBar.less');
  */
 export class SideBar extends ObservableComponent {
 
-    /**
-     * 是否在顶部显示程序图标
-     */
+    //是否在顶部显示程序图标
     private readonly _showLogo = normalSettings.get('client.sidebar.showLogo') as ObservableVariable<boolean>;
 
-    /**
-     * 为程序图标添加一些内边距
-     */
+    //为程序图标添加一些内边距
     private readonly _logoPadding = normalSettings.get('client.sidebar.logoPadding') as ObservableVariable<boolean>;
 
-    /**
-     * 打开设置窗口
-     */
+    //崩溃的服务数量
+    private readonly _crashedServiceNumber = oVar(0);
+
+    //打开设置窗口
     private readonly _openSettingWindow = () => {
         const args: SettingsWindowArgs = { id: Math.random().toString(), name: '系统设置', type: WindowType.settings, fixed: oVar(true), args: {} };
         openWindow(args);
     };
 
-    /**
-     * 改变要显示的功能区
-     */
+    //改变要显示的功能区
     private readonly _changeFunctionArea = (changeTo: 'file' | 'task' | 'shortcut' | 'service') => {
         displayType.value = displayType.value === changeTo ? null : changeTo;
     }
 
     componentDidMount() {
-        this.watch([this._showLogo, this._logoPadding, displayType, showLogWindow, unsavedFiles, crashedServiceNumber]);
+        this.watch([this._showLogo, this._logoPadding, displayType, showLogWindow, unsavedFiles, this._crashedServiceNumber]);
+
+        //计算崩溃的服务数量
+        this._unobserve.push(watch([taskList, serviceList], () => {
+            let number = 0;
+
+            for (const path of serviceList.keys()) {
+                if (taskList.has(path) && taskList.get(path).value === 'crashed')
+                    number++;
+            }
+
+            this._crashedServiceNumber.value = number;
+        }));
     }
 
     render() {
@@ -70,8 +78,8 @@ export class SideBar extends ObservableComponent {
                     <div className={classnames(less.icon, { selected: displayType.value === 'service' })}
                         onClick={() => this._changeFunctionArea('service')} title="服务管理器" >
                         <i className="iconfont icon-ic_networkservices" />
-                        {crashedServiceNumber.value > 0 &&
-                            <span className={classnames(less.iconNumber, 'red')}>{Math.min(crashedServiceNumber.value, 99)}</span>}
+                        {this._crashedServiceNumber.value > 0 &&
+                            <span className={classnames(less.iconNumber, 'red')}>{Math.min(this._crashedServiceNumber.value, 99)}</span>}
                     </div>
                 </div>
                 <div className={less.bottom}>

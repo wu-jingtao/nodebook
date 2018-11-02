@@ -1,0 +1,39 @@
+@import "../../ThemeColor.less";
+
+:local(.checkBox) {
+    display: flex;
+    align-items: center;
+    color: @darkFontColor;
+    height: 25px;
+    font-size: .9em;
+
+    &.disabled {
+        .CheckBox_text {
+            color: darken(@darkFontColor, 20%, relative) !important;
+        }
+    }
+
+    &.checked {
+        .CheckBox_box {
+            &::before {
+                content: '✔';
+                position: relative;
+                left: 4px;
+                top: 1px;
+                font-size: .9em;
+            }
+        }
+    }
+}
+
+.CheckBox_box {
+    background-color: darken(@lightBackColor, 35%, relative);
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    border: solid 1px @lightBackColor;
+}
+
+.CheckBox_text {
+    margin: 0 1em;
+}

@@ -47,7 +47,7 @@ export class ServicesTable extends BaseServiceModule {
      */
     async addService(path: string, name: string, auto_restart: boolean, report_error: boolean): Promise<void> {
         await this._dbCon.run(`
-            INSERT INTO "main"."system_setting" ("path", "name", "auto_restart", "report_error")
+            INSERT INTO "main"."services" ("path", "name", "auto_restart", "report_error")
             VALUES (?, ?, ?, ?)
         `, path, name, auto_restart, report_error);
     }

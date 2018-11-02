@@ -1,14 +1,11 @@
 import * as React from 'react';
-import { oMap, ObservableVariable } from 'observable-variable';
+import { ObservableVariable, watch } from 'observable-variable';
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
+import { normalSettings } from '../../../../../../global/SystemSetting';
 import { displayType } from '../../FunctionArea';
 import { TaskManagerPanel } from './TaskManagerPanel';
-
-/**
- * 任务列表。key是运行文件的绝对路径，value是当前任务的运行状态。当某个任务不存在的时候会触发remove事件
- */
-export const taskList = oMap<string, ObservableVariable<'running' | 'stop' | 'crashed'>>([]);
+import { refreshTaskList } from './TaskList';
 
 /**
  * 任务管理器
@@ -17,6 +14,20 @@ export class TaskManager extends ObservableComponent {
 
     componentDidMount() {
         this.watch([displayType]);
+
+        const timerInterval = normalSettings.get('client.task.listRefreshInterval') as ObservableVariable<number>;
+
+        //自动刷新
+        let timer: any = setInterval(refreshTaskList, timerInterval.value);
+
+        this._unobserve.push(watch([timerInterval], () => {
+            clearInterval(timer);
+            timer = setInterval(refreshTaskList, timerInterval.value);
+        }));
+
+        this._unobserve.push(() => clearInterval(timer));
+
+        refreshTaskList();
     }
 
     render() {
