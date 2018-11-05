@@ -2,12 +2,8 @@ import * as React from 'react';
 
 import { BaseWindowContent } from '../BaseWindow/BaseWindowContent';
 import { TaskWindowArgs } from '../../ContentWindowTypes';
-
-const less = require('./TaskWindow.less');
+import { TaskWindowChart } from './TaskWindowChart/TaskWindowChart';
 
 export class TaskWindowContent extends BaseWindowContent<TaskWindowArgs> {
-    protected _content: JSX.Element;
-
-  
-
+    protected _content = <TaskWindowChart taskPath={this.props.args.args.path} />
 }

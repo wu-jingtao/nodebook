@@ -18,7 +18,7 @@ export abstract class BaseWindowContent<T extends WindowArgs> extends Observable
     /**
      * 要显示的内容
      */
-    protected abstract _content: JSX.Element;
+    protected abstract _content: React.ReactNode;
 
     componentDidMount() {
         this.watch([this._thisSide.displayOrder]);

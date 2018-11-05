@@ -135,7 +135,7 @@ export abstract class BaseWindowTitle<T extends WindowArgs> extends ObservableCo
                     <img className={less.titleIcon} src={this._icon} />
                 }
                 <span className={less.titleText}>{this._title}</span>
-                <div className={less.titleCloseButton} onClick={this.close_window}>×</div>
+                <div className={less.titleCloseButton} onClick={this.close_window} title="关闭窗口">×</div>
             </div>
         );
     }

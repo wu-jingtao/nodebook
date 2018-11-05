@@ -18,7 +18,7 @@ export abstract class BaseWindowFunctionButtons<T extends WindowArgs> extends Ob
      */
     protected readonly _communicator = this.props._communicator;
 
-    protected abstract _functionButtons: JSX.Element;
+    protected abstract _functionButtons: React.ReactNode;
 
     componentDidMount() {
         this.watch([this._thisSide.displayOrder]);

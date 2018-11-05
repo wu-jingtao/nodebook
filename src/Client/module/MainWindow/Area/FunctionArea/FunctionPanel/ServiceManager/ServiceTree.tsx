@@ -8,9 +8,13 @@ import { DeleteFiles } from '../../../../../../global/Component/Tree/EditableFil
 import { ContextMenuItemOptions } from '../../../../../ContextMenu/ContextMenuOptions';
 import { showMessageBox } from '../../../../../MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../../PopupWindow/PopupWindow';
+import { ServiceWindowArgs, WindowType } from '../../../ContentWindow/ContentWindowTypes';
+import { openWindow, closeWindowByPath } from '../../../ContentWindow/WindowList';
 import { taskList, startTask, stopTask, restartTask, _processingTask, refreshTaskList } from '../TaskManager/TaskList';
 import { serviceList, ServiceListValueType } from './ServiceManager';
 import { CreateService } from './CreateService/CreateService';
+
+const less = require('./ServiceManager.less');
 
 export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceListValueType & { status: ObservableVariable<"running" | "stop" | "crashed"> }> {
 
@@ -40,7 +44,10 @@ export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceList
                             showMessageBox({ icon: 'error', title: '删除服务失败', content: error.message });
                         } finally {
                             await this.refreshServiceList();
-                            deleteItems.forEach(item => item._loading.delete('_deleteService'));
+                            deleteItems.forEach(item => {
+                                item._loading.delete('_deleteService');
+                                closeWindowByPath(item._name, undefined, [WindowType.service]);
+                            });
                         }
                     }
                 }
@@ -79,6 +86,7 @@ export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceList
                                     this._loading.add('_alterService');
                                     await ServerApi.task.updateService(filePath.value, name, autoRestart.value, reportError.value);
                                     await this.refreshServiceList();
+                                    closeWindowByPath(this._name, undefined, [WindowType.service]);
                                 } catch (error) {
                                     showMessageBox({ icon: 'error', title: '更新服务失败', content: error.message });
                                 } finally {
@@ -207,11 +215,12 @@ export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceList
                         ({this._dataTree.data.status.value === 'running' ? '正在运行' :
                             this._dataTree.data.status.value === 'stop' ? '停止' : '崩溃'})&nbsp;
                         {this._dataTree.data.name.value}
+                        <span className={less.fileFullName}>{this._name}</span>
                     </>
                 );
             };
 
-            this._unobserve.push(watch([this._dataTree.data.status], setIconAndText));
+            this._unobserve.push(watch([this._dataTree.data.status, this._dataTree.data.name], setIconAndText));
             setIconAndText();
         }
 
@@ -224,7 +233,15 @@ export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceList
     }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
+        const winArgs: ServiceWindowArgs = {
+            id: Math.random().toString(),
+            fixed: oVar(false),
+            name: `(服务) ${this._dataTree.data.name.value}`,
+            type: WindowType.service,
+            args: { path: this._name }
+        };
 
+        openWindow(winArgs, e.altKey ? 'right' : undefined);
     }
 
     protected _onContextMenu(): (ContextMenuItemOptions | void | false)[][] {

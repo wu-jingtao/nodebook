@@ -5,7 +5,7 @@ import { FoldableContainer } from '../../../../../../../../global/Component/Fold
 import { FoldableContainerPropsType } from '../../../../../../../../global/Component/FoldableContainer/FoldableContainerPropsType';
 import { ObservableComponent, ObservableComponentWrapper } from '../../../../../../../../global/Tools/ObservableComponent';
 import { processingItems } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
-import { FileIcon } from '../../../../../../../../global/Component/FileIcon/FileIcon';
+import { getIconPath } from '../../../../../../../../global/Component/FileIcon/GetIconPath';
 import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
 import { windowList, closeAllWindow, closeWindow, closeOtherWindow, moveToOtherSide, focusWindow } from '../../../../../ContentWindow/WindowList';
 import { WindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
@@ -82,29 +82,26 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', arg
     private readonly _thisSide = this.props.side === 'left' ? windowList.leftWindows : windowList.rightWindows;
 
     //关闭窗口按钮
-    private readonly _closeWindow = (
-        <div className={less.close} title="关闭窗口"
-            onClick={e => { e.stopPropagation(); closeWindow(this.props.args.id, this.props.side); }}>×</div>
-    );
-
-    //关闭窗口按钮和加载动画
-    private readonly _closeAndLoading = (
-        this.props.args.args.path ?
-            <ObservableComponentWrapper watch={[processingItems]}
-                render={() => processingItems.has(this.props.args.args.path) ? <i className={less.loading} /> : this._closeWindow} /> :
-            this._closeWindow
-    );
+    private readonly _closeWindow = <div className={less.close} title="关闭窗口"
+        onClick={e => { e.stopPropagation(); closeWindow(this.props.args.id, this.props.side); }}>×</div>;
 
     //窗口图标
-    private readonly _icon = <FileIcon className={less.fileIcon} filename={
-        this.props.args.type === WindowType.task ? '.volt' : //闪电符号
-            this.props.args.type === WindowType.service ? '.apib' : //圆圈三角形
-                this.props.args.type === WindowType.settings ? '.plist' : //齿轮
-                    (this.props.args as any).args.path.split('/').pop()
+    private readonly _icon = <img className={less.fileIcon} src={
+        this.props.args.type === WindowType.task ? '/static/res/img/file_icons/file_type_bolt.svg' : //闪电符号
+            this.props.args.type === WindowType.service ? '/static/res/img/file_icons/file_type_apib2.svg' : //圆圈三角形
+                this.props.args.type === WindowType.settings ? '/static/res/img/file_icons/file_type_ini.svg' : //齿轮
+                    `/static/res/img/file_icons/${getIconPath((this.props.args as any).args.path)}`
     } />
 
     //文件名称
-    private readonly _fileName = <ObservableComponentWrapper watch={[unsavedFiles]} render={() => {
+    private readonly _fileName = this.props.args.type === WindowType.task || this.props.args.type === WindowType.settings ? (
+        <div className={less.fileName}>{this.props.args.name}</div>
+    ) : this.props.args.type === WindowType.service ? (
+        <>
+            <div className={less.fileName}>{this.props.args.name}</div>
+            <div className={less.fileFullName}>{this.props.args.args.path}</div>
+        </>
+    ) : (<ObservableComponentWrapper watch={[unsavedFiles]} render={() => {
         const modified = unsavedFiles.has(this.props.args.args.path);
 
         return (
@@ -114,7 +111,7 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', arg
                     <div className={classnames(less.fileFullName, { [less.fileModified]: modified })}>{this.props.args.args.path}</div>}
             </>
         );
-    }} />
+    }} />);
 
     //右键菜单
     private readonly _contextMenu = (e: React.MouseEvent) => {
@@ -160,7 +157,7 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', arg
                 onClick={() => focusWindow(this.props.args.id, this.props.side)}
                 onDoubleClick={() => this.props.args.fixed.value = true}
                 onContextMenu={this._contextMenu}>
-                {this._closeAndLoading}
+                {this._closeWindow}
                 {this._icon}
                 {this._fileName}
             </div>

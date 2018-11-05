@@ -75,7 +75,7 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
             }
             {this.props.args.args.path.endsWith('.server.js') &&
                 <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
-                    title={`运行任务`} onClick={this._runTask} />
+                    title={`启动任务`} onClick={this._runTask} />
             }
             {this.props.args.args.path.endsWith('.server.js') &&
                 <img src={`/static/res/img/buttons_icon/stop-inverse.svg`}

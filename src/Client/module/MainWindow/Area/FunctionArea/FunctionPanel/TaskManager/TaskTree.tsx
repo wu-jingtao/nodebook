@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { ObservableVariable, watch } from 'observable-variable';
+import { ObservableVariable, watch, oVar } from 'observable-variable';
 
 import { FileIconTree } from '../../../../../../global/Component/Tree/FileIconTree/FileIconTree';
 import { FileIconTreePropsType } from '../../../../../../global/Component/Tree/FileIconTree/FileIconTreePropsType';
 import { ContextMenuItemOptions } from '../../../../../ContextMenu/ContextMenuOptions';
+import { TaskWindowArgs, WindowType } from '../../../ContentWindow/ContentWindowTypes';
+import { openWindow } from '../../../ContentWindow/WindowList';
 import { taskList, _processingTask, stopTask, restartTask, startTask } from './TaskList';
 
 export class TaskTree extends FileIconTree<FileIconTreePropsType, { status: ObservableVariable<"running" | "stop" | "crashed"> }> {
@@ -54,7 +56,15 @@ export class TaskTree extends FileIconTree<FileIconTreePropsType, { status: Obse
     }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
+        const winArgs: TaskWindowArgs = {
+            id: Math.random().toString(),
+            fixed: oVar(false),
+            name: `(任务) ${this._name}`,
+            type: WindowType.task,
+            args: { path: this._name }
+        };
 
+        openWindow(winArgs, e.altKey ? 'right' : undefined);
     }
 
     protected _onContextMenu(): (ContextMenuItemOptions | void | false)[][] {

@@ -1,7 +1,7 @@
 import { permanent_oVar, permanent_oArr, ObservableArray, oVar, watch } from "observable-variable";
 import isEqual = require('lodash.isequal');
 
-import { WindowArgs } from "./ContentWindowTypes";
+import { WindowArgs, WindowType } from "./ContentWindowTypes";
 
 //WindowList初始化方法
 function init(value: WindowArgs[], save: () => void, oArr: ObservableArray<WindowArgs>): WindowArgs[] {
@@ -100,7 +100,7 @@ export function openWindow(args: WindowArgs, side?: 'left' | 'right'): void {
 export function closeWindow(id: string, side: 'left' | 'right'): void {
     const _thisSide = side === 'left' ? windowList.leftWindows : windowList.rightWindows;
     const _closeIndex = _thisSide.windowList.findIndex(item => item.id === id);
-    
+
     if (_closeIndex !== -1) {
         _thisSide.windowList.splice(_closeIndex, 1);
         _thisSide.displayOrder.delete(id);
@@ -146,12 +146,13 @@ export function closeOtherWindow(id: string, side: 'left' | 'right'): void {
 /**
  * 根据 WindowArgs.args.path 来关闭窗口
  * @param descendants 是否包含后代，这个主要是针对于文件夹
+ * @param types 关闭指定类型的窗口
  */
-export function closeWindowByPath(path: string, descendants?: boolean): void {
+export function closeWindowByPath(path: string, descendants?: boolean, types?: WindowType[]): void {
     const win: { id: string, side: 'left' | 'right' }[] = [];
 
     for (const item of windowList.leftWindows.windowList.value) {
-        if (item.args.path) {
+        if (item.args.path && (types === undefined || types.includes(item.type))) {
             if (descendants) {
                 if (item.args.path.startsWith(path))
                     win.push({ id: item.id, side: 'left' });
@@ -165,7 +166,7 @@ export function closeWindowByPath(path: string, descendants?: boolean): void {
     }
 
     for (const item of windowList.rightWindows.windowList.value) {
-        if (item.args.path) {
+        if (item.args.path && (types === undefined || types.includes(item.type))) {
             if (descendants) {
                 if (item.args.path.startsWith(path))
                     win.push({ id: item.id, side: 'right' });

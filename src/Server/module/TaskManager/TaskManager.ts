@@ -3,7 +3,7 @@ import * as child_process from 'child_process';
 import * as diskusage from 'diskusage';
 import * as util from 'util';
 import log from 'log-formatter';
-import pidusage, { Stat } from 'pidusage';
+import pidusage_type, { Stat } from 'pidusage';
 import { BaseServiceModule } from "service-starter";
 
 import * as FilePath from '../../FilePath';
@@ -11,6 +11,7 @@ import * as FilePath from '../../FilePath';
 import { LogManager } from "./LogManager/LogManager";
 import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
+const pidusage: typeof pidusage_type = require('pidusage');
 const os_utils = require('os-utils');
 const diskusage_check = util.promisify(diskusage.check);
 
@@ -23,6 +24,7 @@ export class TaskManager extends BaseServiceModule {
     private readonly _taskList: Map<string, { process: child_process.ChildProcess, invokeCallback: Map<string, (jsonResult: string) => void> }> = new Map();
     private _logManager: LogManager;
     private _mainProcessCommunicator: MainProcessCommunicator;
+    private _cpuInfo = os.cpus();
 
     async onStart(): Promise<void> {
         this._logManager = this.services.LogManager;
@@ -96,7 +98,11 @@ export class TaskManager extends BaseServiceModule {
      */
     async getTaskResourcesConsumption(taskFilePath: string): Promise<Stat | undefined> {
         const task = this._taskList.get(taskFilePath);
-        if (task) return await pidusage(task.process.pid);
+        if (task) {
+            const status = await pidusage(task.process.pid);
+            status.cpu /= this._cpuInfo.length;
+            return status;
+        }
     }
 
     /**
@@ -106,11 +112,9 @@ export class TaskManager extends BaseServiceModule {
         return new Promise((resolve, reject) => {
             os_utils.cpuUsage(async (cpuUsage: number) => {
                 try {
-                    const cpu = os.cpus();
-
                     resolve({
-                        cpuNumber: cpu.length,                                              //CPU核心数
-                        cpuName: cpu[0].model,                                              //CPU名称
+                        cpuNumber: this._cpuInfo.length,                                    //CPU核心数
+                        cpuName: this._cpuInfo[0].model,                                    //CPU名称
                         cpuUsage,                                                           //CPU使用百分比
                         domain: this._mainProcessCommunicator.domain,                       //域名
                         totalMemory: os.totalmem(),                                         //内存总量
