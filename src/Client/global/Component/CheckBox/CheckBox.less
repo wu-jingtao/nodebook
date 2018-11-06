@@ -7,6 +7,13 @@
     height: 25px;
     font-size: .9em;
 
+    &.disabled {
+        .CheckBox_box,
+        .CheckBox_text {
+            cursor: unset;
+        }
+    }
+
     &.checked {
         .CheckBox_box {
             &::before {
@@ -26,8 +33,10 @@
     height: 19px;
     border-radius: 50%;
     border: solid 1px @lightBackColor;
+    cursor: pointer;
 }
 
 .CheckBox_text {
-    margin: 0 1em;
+    padding-right: 1em;
+    cursor: pointer;
 }

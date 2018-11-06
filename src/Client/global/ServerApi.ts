@@ -266,6 +266,35 @@ export const ServerApi = {
         async deleteService(path: string): Promise<void> {
             expect(await Post('/task/deleteService', { path }), 'ok', '删除服务失败');
         },
+    },
+    /**
+     * 系统图标
+     */
+    logo: {
+        /**
+         * 修改登录页图片
+         */
+        async changeLoginBrand(file: File): Promise<void> {
+            expect(await Post('/logo/change', { filename: 'brand.png' }, file), 'ok', '修改登录页图片失败');
+        },
+        /**
+         * 修改侧边栏图标
+         */
+        async changeSidebarLogo(file: File): Promise<void> {
+            expect(await Post('/logo/change', { filename: 'icon.png' }, file), 'ok', '修改侧边栏图标失败');
+        },
+        /**
+         * 修改浏览器小图标
+         */
+        async changeFavicon(file: File): Promise<void> {
+            expect(await Post('/logo/change', { filename: 'favicon.ico' }, file), 'ok', '修改浏览器小图标失败');
+        },
+        /**
+         * 重置系统图标
+         */
+        async resetLogo(): Promise<void> {
+            expect(await Post('/logo/reset'), 'ok', '重置系统图标失败');
+        },
     }
 };
 

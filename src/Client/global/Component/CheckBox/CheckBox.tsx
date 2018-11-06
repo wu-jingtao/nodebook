@@ -16,10 +16,9 @@ interface Args {
  */
 export const CheckBox: React.StatelessComponent<Args> = ({ value, text, className, disabled }) => {
     return (
-        <div className={classnames(less.checkBox, { checked: value.value, disabled: disabled }, className)}
-            onClick={() => { if (!disabled) value.value = !value.value }}>
-            <div className="CheckBox_text">{text}</div>
-            <div className="CheckBox_box"></div>
+        <div className={classnames(less.checkBox, { checked: value.value, disabled: disabled }, className)}>
+            <div className="CheckBox_text" onClick={() => { if (!disabled) value.value = !value.value }}>{text}</div>
+            <div className="CheckBox_box" onClick={() => { if (!disabled) value.value = !value.value }}></div>
         </div>
     );
 };

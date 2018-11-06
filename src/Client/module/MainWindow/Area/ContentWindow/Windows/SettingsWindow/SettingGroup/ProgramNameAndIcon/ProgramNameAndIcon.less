@@ -1,0 +1,48 @@
+@import "../../../../../../../../global/ThemeColor.less";
+
+:local(.textInput) {
+    box-sizing: border-box;
+    border-radius: 3px;
+    height: 30px;
+    width: 50%;
+}
+
+:local(.selectImage) {
+    > img {
+        border: solid 1px @lightBackColor;
+        border-radius: 3px;
+        padding: 10px;
+        height: 40px;
+        min-width: 40px;
+        margin-right: 10px;
+    }
+
+    > label {
+        font-size: .9em;
+        padding: 5px 10px;
+        border-radius: 3px;
+        background-color: @lightBackColor;
+        color: @darkFontColor;
+        position: absolute;
+        top: 34px;
+        cursor: pointer;
+
+        > input {
+            display: none;
+        }
+
+        &:hover {
+            background-color: darken(@lightBackColor, 10%, relative);
+        }
+
+        &:active {
+            background-color: darken(@lightBackColor, 25%, relative);
+        }
+    }
+}
+
+:local(.button) {
+    font-size: .9em;
+    border-radius: 3px;
+    padding: 7px 10px;
+}

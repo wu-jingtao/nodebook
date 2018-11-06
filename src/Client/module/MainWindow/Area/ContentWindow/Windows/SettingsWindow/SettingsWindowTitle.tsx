@@ -1,10 +1,7 @@
 import { BaseWindowTitle } from '../BaseWindow/BaseWindowTitle';
 import { SettingsWindowArgs } from '../../ContentWindowTypes';
 
-/**
- * 顶部选项卡标题栏
- */
 export class SettingsWindowTitle extends BaseWindowTitle<SettingsWindowArgs> {
-    protected _icon: string;
-    protected _prompt: string;
+    protected _icon = '/static/res/img/file_icons/file_type_ini.svg';
+    protected _prompt = '设置';
 }

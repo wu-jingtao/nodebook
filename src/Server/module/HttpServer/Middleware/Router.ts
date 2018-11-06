@@ -153,7 +153,7 @@ function Logo(router_login: koa_router, router_no_login: koa_router) {
     router_login.post(_prefix + '/change', async (ctx) => {
         if (['brand.png', 'icon.png', 'favicon.ico'].includes(ctx.request.body.filename)) {
             if (ctx.request.files && ctx.request.files.file) {
-                await fs.move(ctx.request.files.file.path, node_path.join(FilePath._logoDir, ctx.request.body.filename));
+                await fs.move(ctx.request.files.file.path, node_path.join(FilePath._logoDir, ctx.request.body.filename), { overwrite: true });
                 ctx.body = 'ok';
             } else
                 throw new Error('没有接收到要上传的文件');
@@ -165,8 +165,8 @@ function Logo(router_login: koa_router, router_no_login: koa_router) {
     /**
      * 重置
      */
-    router_login.get(_prefix + '/reset', async (ctx) => {
-        await fs.copy(node_path.join(FilePath._appClientFileDir, './res/img/logo'), FilePath._logoDir);
+    router_login.post(_prefix + '/reset', async (ctx) => {
+        await fs.copy(node_path.join(FilePath._appClientFileDir, './res/img/logo'), FilePath._logoDir, { overwrite: true });
         ctx.body = 'ok';
     });
 }

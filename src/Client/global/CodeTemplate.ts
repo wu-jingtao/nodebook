@@ -40,8 +40,6 @@ function html(filename: string) {
 </head>
 <body>
     <!-- 
-        <script src="/static/res/helper/lodash.min.js"></script>
-        
         <script src="/file/data/code/用户代码目录下的文件.js"></script>
         <script src="/file/data/programData/程序数据目录下的文件.js"></script>
         <script src="/file/data/recycle/回收站目录下的文件.js"></script>
