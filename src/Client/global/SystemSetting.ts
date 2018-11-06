@@ -38,7 +38,7 @@ export async function loadSystemSetting(): Promise<void> {
     });
 
     secret.forEach(item => {
-        _secretSettings.set(item.key, oVar(item.value, { readonly: true }));
+        _secretSettings.set(item.key, oVar(item.value));
     });
 }
 

@@ -14,14 +14,12 @@ export class PopupWindowItem extends ObservableComponent<{ windowId: string, con
                 <div className={less.title}>{this.props.config.title}</div>
                 <div className={less.content}>{this.props.config.content}</div>
                 <div className={less.bottom}>
-                    <Button
-                        className={less.button}
+                    <Button className={less.button}
                         onClick={() => { closePopupWindow(this.props.windowId); this.props.config.cancel && this.props.config.cancel.callback(); }}>
                         {this.props.config.cancel && this.props.config.cancel.name || '取消'}
                     </Button>
                     {this.props.config.ok &&
-                        <Button
-                            className={less.button}
+                        <Button className={less.button}
                             onClick={() => { closePopupWindow(this.props.windowId); (this.props.config.ok as any).callback(); }}>
                             {this.props.config.ok.name || '确认'}
                         </Button>

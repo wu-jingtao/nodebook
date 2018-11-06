@@ -20,7 +20,7 @@ interface Args {
 export const Button: React.StatelessComponent<Args> = ({ loading, className, onClick, disabled, children }) => {
     return (
         <button className={classnames(less.button, { loading: loading }, className)} onClick={onClick} disabled={disabled}>
-            {!loading && children}
+            {children}
         </button>
     );
 };

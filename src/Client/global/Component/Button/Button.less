@@ -10,6 +10,7 @@
     background-color: @lightBackColor;
     text-align: center;
     color: @darkFontColor;
+    cursor: pointer;
 
     &:hover {
         background-color: darken(@lightBackColor, 10%, relative);
@@ -24,6 +25,12 @@
     }
 
     &.loading {
-        .LoadingAnimation();
+        color: transparent;
+        .LoadingAnimation(0.9em, .12em);
+
+        &::after,
+        &::before {
+            top: ~"calc(50% - 1px)";
+        }
     }
 }

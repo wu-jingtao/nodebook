@@ -30,3 +30,6 @@ SystemSetting.addSystemSetting('client.shortcut', '[]', false, 'string');
 
 //刷新任务列表时间间隔
 SystemSetting.addSystemSetting('client.task.listRefreshInterval', 10 * 1000, false, 'number');
+
+//刷新任务日志时间间隔
+SystemSetting.addSystemSetting('client.task.logRefreshInterval', 2 * 1000, false, 'number');
