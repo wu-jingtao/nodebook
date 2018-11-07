@@ -24,7 +24,7 @@ export class SystemSetting extends BaseServiceModule {
     /**
      * 添加系统设置项
      */
-    static addSystemSetting(key: string, value: string | null, secret: boolean, type: 'string'): void;
+    static addSystemSetting(key: string, value: string, secret: boolean, type: 'string'): void;
     static addSystemSetting(key: string, value: boolean, secret: boolean, type: 'boolean'): void;
     static addSystemSetting(key: string, value: number, secret: boolean, type: 'number'): void
     static addSystemSetting(key: string, value: any, secret: boolean, type: string): void {

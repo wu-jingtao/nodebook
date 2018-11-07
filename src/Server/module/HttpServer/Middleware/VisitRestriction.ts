@@ -6,8 +6,8 @@ import { SystemSetting } from "../../SystemSetting/SystemSetting";
 import { MainProcessCommunicator } from '../../MainProcess/MainProcessCommunicator';
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('http.ipWhiteListRegexp', null, true, 'string');    //ip访问白名单正则表达式。如果设置了白名单则黑名单将失效
-SystemSetting.addSystemSetting('http.ipBlackListRegexp', null, true, 'string');    //ip访问黑名单正则表达式
+SystemSetting.addSystemSetting('http.ipWhiteListRegexp', '', true, 'string');    //ip访问白名单正则表达式。如果设置了白名单则黑名单将失效
+SystemSetting.addSystemSetting('http.ipBlackListRegexp', '', true, 'string');    //ip访问黑名单正则表达式
 
 /**
  * 访问限制，用于限制IP地址以及域名
@@ -16,8 +16,8 @@ export function VisitRestriction(httpServer: HttpServer): koa.Middleware {
     const _systemSetting = httpServer.services.SystemSetting as SystemSetting;
     const _mainProcessCommunicator = httpServer.services.MainProcessCommunicator as MainProcessCommunicator;
 
-    const _ipWhiteListRegexp = _systemSetting.secretSettings.get('http.ipWhiteListRegexp') as ObservableVariable<string | null>;
-    const _ipBlackListRegexp = _systemSetting.secretSettings.get('http.ipBlackListRegexp') as ObservableVariable<string | null>;
+    const _ipWhiteListRegexp = _systemSetting.secretSettings.get('http.ipWhiteListRegexp') as ObservableVariable<string>;
+    const _ipBlackListRegexp = _systemSetting.secretSettings.get('http.ipBlackListRegexp') as ObservableVariable<string>;
 
     let _ip_white: RegExp = _ipWhiteListRegexp.value ? new RegExp(_ipWhiteListRegexp.value) : undefined as any;
     let _ip_black: RegExp = _ipBlackListRegexp.value ? new RegExp(_ipBlackListRegexp.value) : undefined as any;

@@ -9,9 +9,9 @@ import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator'
 const nodemailer_services_list: string[] = Object.keys(require('nodemailer/lib/well-known/services.json'));
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('mail.service', null, true, 'string');      //邮件服务商
-SystemSetting.addSystemSetting('mail.user', null, true, 'string');         //账号
-SystemSetting.addSystemSetting('mail.pass', null, true, 'string');         //授权码
+SystemSetting.addSystemSetting('mail.service', '', true, 'string');      //邮件服务商
+SystemSetting.addSystemSetting('mail.user', '', true, 'string');         //账号
+SystemSetting.addSystemSetting('mail.pass', '', true, 'string');         //密码
 
 /**
  * 发送邮件
@@ -20,9 +20,9 @@ export class MailService extends BaseServiceModule {
 
     private _mainProcessCommunicator: MainProcessCommunicator;
 
-    private _mailService: ObservableVariable<string | null>;
-    private _mailUser: ObservableVariable<string | null>;
-    private _mailPass: ObservableVariable<string | null>;
+    private _mailService: ObservableVariable<string>;
+    private _mailUser: ObservableVariable<string>;
+    private _mailPass: ObservableVariable<string>;
 
     private _userName: ObservableVariable<string>;  //登陆用户的用户名
 
@@ -37,8 +37,13 @@ export class MailService extends BaseServiceModule {
         this._userName = systemSetting.secretSettings.get('user.name') as any;
 
         this._mailService.on('beforeSet', newValue => {
-            if (newValue != null && !nodemailer_services_list.includes(newValue))
+            if (newValue && !nodemailer_services_list.includes(newValue))
                 throw new Error(`不支持的邮件服务商：${newValue}`);
+        });
+
+        this._mailUser.on('beforeSet', newValue => {
+            if (!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(newValue))
+                throw new Error(`邮箱地址 '${newValue}' 不是有效的电子邮箱格式`);
         });
     }
 
@@ -46,9 +51,9 @@ export class MailService extends BaseServiceModule {
      * 发送邮件
      */
     async sendMail(title: string, content: string, files?: { filename: string, content: Buffer }[]): Promise<void> {
-        if (this._mailService.value == null) throw new Error('邮件服务商没有设置');
-        if (this._mailUser.value == null) throw new Error('邮件服务账号没有设置');
-        if (this._mailPass.value == null) throw new Error('邮件服务授权码没有设置');
+        if (!this._mailService.value) throw new Error('邮件服务商没有设置');
+        if (!this._mailUser.value) throw new Error('邮件服务账号没有设置');
+        if (!this._mailPass.value) throw new Error('邮件服务密码没有设置');
 
         const transporter = nodemailer.createTransport({
             service: this._mailService.value,
@@ -56,7 +61,7 @@ export class MailService extends BaseServiceModule {
         });
 
         await transporter.sendMail({
-            from: `NodeBook <${this._mainProcessCommunicator.domain}>`,
+            from: this._mailUser.value,
             to: this._userName.value,
             subject: title,
             text: content,

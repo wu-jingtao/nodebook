@@ -10,6 +10,33 @@ import { ServiceConfig } from '../../Server/module/Database/ServicesTable';
  * 服务器端接口
  */
 export const ServerApi = {
+    others: {
+        /**
+         * 重启服务器
+         * @param password 用户密码
+         */
+        async restart(password: string): Promise<void> {
+            expect(await Post('/others/restart', { password: md5(password) }), 'ok', '重启服务器失败');
+        },
+        /**
+         * 向用户返回他自己的ip
+         */
+        async getIP(): Promise<string> {
+            return await Get('/others/getIP');
+        },
+        /**
+         * 重新生成openssl证书
+         */
+        async regenerateCert(password: string): Promise<void> {
+            expect(await Post('/others/regenerateCert', { password: md5(password) }), 'ok', '重新生成openssl证书失败');
+        },
+        /**
+         * 发送测试邮件，用于检测邮箱设置是否正确
+         */
+        async sendTestMail(): Promise<void> {
+            expect(await Get('/others/sendTestMail'), 'ok', '发送测试邮件失败');
+        },
+    },
     /**
      * 用户相关操作
      */

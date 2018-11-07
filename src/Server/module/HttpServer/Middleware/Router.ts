@@ -80,9 +80,10 @@ function Others(router: koa_router, httpServer: HttpServer) {
      * @param password 用户密码
      */
     router.post(_prefix + '/restart', ctx => {
-        if (_userPassword.value === ctx.request.body.password)
-            _mainProcessCommunicator.restart();
-        else
+        if (_userPassword.value === ctx.request.body.password) {
+            setTimeout(() => _mainProcessCommunicator.restart(), 1000);
+            ctx.body = 'ok';
+        } else
             throw new Error('用户密码错误');
     });
 
@@ -98,9 +99,10 @@ function Others(router: koa_router, httpServer: HttpServer) {
      * @param password 用户密码
      */
     router.post(_prefix + '/regenerateCert', async (ctx) => {
-        if (_userPassword.value === ctx.request.body.password)
+        if (_userPassword.value === ctx.request.body.password) {
             await _openSSLCertificate.generateCert();
-        else
+            ctx.body = 'ok';
+        } else
             throw new Error('用户密码错误');
     });
 
@@ -108,7 +110,11 @@ function Others(router: koa_router, httpServer: HttpServer) {
      * 发送测试邮件，用于检测邮箱设置是否正确
      */
     router.get(_prefix + '/sendTestMail', async (ctx) => {
-        await _mailService.sendMail('nodebook 测试邮件', `时间:${moment().format('YYYY-MM-DD HH:mm:ss')}\nhost:${_mainProcessCommunicator.domain}`);
+        await _mailService.sendMail(
+            'nodebook 测试邮件',
+            `时间:${moment().format('YYYY-MM-DD HH:mm:ss')}\nhost:${_mainProcessCommunicator.domain}`,
+            [{ filename: 'logo.png', content: await fs.promises.readFile(node_path.join(FilePath._logoDir, './brand.png')) }]
+        );
         ctx.body = 'ok';
     });
 }
@@ -406,7 +412,7 @@ function Setting(router: koa_router, httpServer: HttpServer) {
      */
     router.get(_prefix + '/getAllSecretKey', async (ctx) => {
         const result = await _systemSettingTable.getAllSecretKey();
-        ctx.body = result.filter(item => item.key !== 'user.password');
+        ctx.body = result.filter(item => item.key !== 'user.password' && item.key !== 'mail.pass');
     });
 
     /**

@@ -7,6 +7,7 @@ import { ProgramNameAndIcon } from './SettingGroup/ProgramNameAndIcon/ProgramNam
 import { CodeEditor } from './SettingGroup/CodeEditor/CodeEditor';
 import { Task } from './SettingGroup/Task/Task';
 import { UsernameAndPassword } from './SettingGroup/UsernameAndPassword/UsernameAndPassword';
+import { Mail } from './SettingGroup/Mail/Mail';
 
 const less = require('./SettingsWindow.less');
 
@@ -14,6 +15,7 @@ export class SettingsWindowContent extends BaseWindowContent<SettingsWindowArgs>
     protected _content = (
         <ScrollBar className={less.SettingsWindowContent}>
             <UsernameAndPassword />
+            <Mail />
             <CodeEditor />
             <Task />
             <ProgramNameAndIcon />
