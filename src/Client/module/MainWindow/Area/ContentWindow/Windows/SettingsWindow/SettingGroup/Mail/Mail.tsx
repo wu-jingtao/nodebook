@@ -135,7 +135,7 @@ export class Mail extends BaseSettingGroup {
         },
         {
             name: '密码',
-            description: '邮箱密码或口令',
+            description: '邮箱密码或授权码',
             items: [
                 (
                     <ObservableComponentWrapper watch={[this._password, this._password_changed, this._password_updating]} render={() => (

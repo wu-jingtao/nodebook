@@ -1,12 +1,13 @@
 import * as React from 'react';
 import * as $ from 'jquery';
-import { oSet, oVar, ObservableMap } from 'observable-variable';
+import { oSet, oVar, ObservableMap, ObservableVariable } from 'observable-variable';
 import clipboard = require('copy-text-to-clipboard');
 
 import { showMessageBox } from '../../../../module/MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../module/PopupWindow/PopupWindow';
 import { ContextMenuItemOptions } from '../../../../module/ContextMenu/ContextMenuOptions';
 import { ServerApi } from '../../../ServerApi';
+import { normalSettings } from '../../../SystemSetting';
 import { codeTemplate } from '../../../CodeTemplate';
 import { BaseFileTree } from "../BaseFileTree/BaseFileTree";
 import { EditableFileTreePropsType } from './EditableFileTreePropsType';
@@ -335,6 +336,8 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
 
     //#region 上传文件
 
+    private readonly _uploadFileSizeLimit: ObservableVariable<number> = this._root._uploadFileSizeLimit || normalSettings.get('http.uploadFileSizeLimit');
+
     /**
      * 上传文件。只有目录才有
      */
@@ -357,37 +360,41 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
      */
     protected async _prepareUploadFile(file: File) {
         if (this._dataTree.subItem && checkIsBusy(this._fullNameString)) {
-            const progress = oVar(0);
-            const filename = `${this._fullNameString}/${this._deduplicateFilename(this._dataTree.subItem, file.name)}`;
-            const promise = ServerApi.file.uploadFile(file, filename, progress);
+            if (file.size > (this._uploadFileSizeLimit.value * 1024 * 1024))
+                showMessageBox({ icon: 'error', title: '上传的文件超过了规定的大小限制', content: `文件:${file.name}` });
+            else {
+                const progress = oVar(0);
+                const filename = `${this._fullNameString}/${this._deduplicateFilename(this._dataTree.subItem, file.name)}`;
+                const promise = ServerApi.file.uploadFile(file, filename, progress);
 
-            try {
-                showMessageBox({
-                    icon: 'file',
-                    title: '上传文件',
-                    fileName: filename,
-                    content: filename,
-                    progress,
-                    autoClose: 3,
-                    buttons: {
-                        cancel: {
-                            name: '取消上传',
-                            callback: () => {
-                                promise.abort();
+                try {
+                    showMessageBox({
+                        icon: 'file',
+                        title: '上传文件',
+                        fileName: filename,
+                        content: filename,
+                        progress,
+                        autoClose: 3,
+                        buttons: {
+                            cancel: {
+                                name: '取消上传',
+                                callback: () => {
+                                    promise.abort();
+                                }
                             }
                         }
-                    }
-                });
+                    });
 
-                await promise;
-            } catch (error) {
-                showMessageBox({
-                    icon: 'error',
-                    title: '上传文件失败',
-                    content: `文件：${filename}。${error.message}`
-                });
-            } finally {
-                this._menu_refresh();
+                    await promise;
+                } catch (error) {
+                    showMessageBox({
+                        icon: 'error',
+                        title: '上传文件失败',
+                        content: `文件：${filename}。${error.message}`
+                    });
+                } finally {
+                    this._menu_refresh();
+                }
             }
         }
     }

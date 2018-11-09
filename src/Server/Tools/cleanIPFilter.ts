@@ -12,7 +12,7 @@ import { InitializeDatabase } from '../module/Database/InitializeDatabase';
         UPDATE "main"."system_setting"
         SET "value" = ?
         WHERE "key" IN (?, ?) AND "secret" = 1
-    `, null, 'http.ipWhiteListRegexp', 'http.ipBlackListRegexp');
+    `, '', 'http.ipWhiteListRegexp', 'http.ipBlackListRegexp');
 
     await iniDB.onStop();
 

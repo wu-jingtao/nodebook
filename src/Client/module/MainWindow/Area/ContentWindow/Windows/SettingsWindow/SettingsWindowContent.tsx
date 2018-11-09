@@ -8,6 +8,8 @@ import { CodeEditor } from './SettingGroup/CodeEditor/CodeEditor';
 import { Task } from './SettingGroup/Task/Task';
 import { UsernameAndPassword } from './SettingGroup/UsernameAndPassword/UsernameAndPassword';
 import { Mail } from './SettingGroup/Mail/Mail';
+import { UploadFile } from './SettingGroup/UploadFile/UploadFile';
+import { AccessRestriction } from './SettingGroup/AccessRestriction/AccessRestriction';
 
 const less = require('./SettingsWindow.less');
 
@@ -16,8 +18,10 @@ export class SettingsWindowContent extends BaseWindowContent<SettingsWindowArgs>
         <ScrollBar className={less.SettingsWindowContent}>
             <UsernameAndPassword />
             <Mail />
-            <CodeEditor />
+            <AccessRestriction />
+            <UploadFile />
             <Task />
+            <CodeEditor />
             <ProgramNameAndIcon />
         </ScrollBar>
     );
