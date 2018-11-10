@@ -74,7 +74,7 @@ export class UsernameAndPassword extends BaseSettingGroup {
                 (
                     <ObservableComponentWrapper watch={[this._username, this._username_changed, this._username_updating]} render={() => (
                         <>
-                            <TextInput className={less_ProgramNameAndIcon.textInput} type="email" value={this._username} />
+                            <TextInput className={less_ProgramNameAndIcon.textInput} type="email" value={this._username} disabled={this._username_updating.value} />
                             {this._username_changed.value && <Button className={classnames(less_ProgramNameAndIcon.button, less.button)}
                                 loading={this._username_updating.value} onClick={this._changeUsername}>确认修改</Button>}
                         </>
@@ -88,7 +88,7 @@ export class UsernameAndPassword extends BaseSettingGroup {
                 (
                     <ObservableComponentWrapper watch={[this._password, this._password_changed, this._password_updating]} render={() => (
                         <>
-                            <TextInput className={less_ProgramNameAndIcon.textInput} type="text" value={this._password} placeholder="新密码" />
+                            <TextInput className={less_ProgramNameAndIcon.textInput} type="text" value={this._password} placeholder="新密码" disabled={this._password_updating.value} />
                             {this._password_changed.value && <Button className={classnames(less_ProgramNameAndIcon.button, less.button)}
                                 loading={this._password_updating.value} onClick={this._changePassword}>确认修改</Button>}
                         </>

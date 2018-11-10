@@ -9,16 +9,16 @@ export class MainProcessCommunicator extends BaseServiceModule {
      * 是否开启了debug模式。
      */
     readonly isDebug = (process.env.DEBUG || '').toLowerCase() === 'true';
-    
+
     /**
      * 本机的域名
      */
     domain = (process.env.DOMAIN || 'localhost').trim().toLowerCase().replace(/:443$/, ''); //去掉443是因为浏览器不会把443端口号发过来
-    
+
     async onStart(): Promise<void> { }
 
-    private _sendMessage(signal: string, args: any[] = []): void {
-        (process as any).send({ signal, args });
+    private _sendMessage(signal: string, bash?: string): void {
+        (process as any).send({ signal, bash });
     }
 
     /**
@@ -31,7 +31,7 @@ export class MainProcessCommunicator extends BaseServiceModule {
     /**
      * 重启服务并执行某些命令
      */
-    restartAndRun(bash: string, cwd?: string) {
-        this._sendMessage('restartAndRun', [bash, cwd]);
+    restartAndRun(bash: string) {
+        this._sendMessage('restartAndRun', bash);
     }
 }

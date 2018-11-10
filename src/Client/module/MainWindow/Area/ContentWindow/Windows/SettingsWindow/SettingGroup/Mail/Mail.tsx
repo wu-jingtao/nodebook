@@ -36,6 +36,7 @@ export class Mail extends BaseSettingGroup {
     private readonly _service_updating = oVar(false);
     private readonly _username_updating = oVar(false);
     private readonly _password_updating = oVar(false);
+
     private readonly _sendingTestMail = oVar(false);
 
     //修改邮件服务提供商
@@ -111,7 +112,7 @@ export class Mail extends BaseSettingGroup {
                 (
                     <ObservableComponentWrapper watch={[this._service, this._service_changed, this._service_updating]} render={() => (
                         <>
-                            <DropDownList className={less.DropDownList} value={this._service} options={nodemailer_services_list} />
+                            <DropDownList className={less.DropDownList} value={this._service} options={nodemailer_services_list} disabled={this._service_updating.value} />
                             {this._service_changed.value && <Button className={classnames(less_ProgramNameAndIcon.button, less_UsernameAndPassword.button)}
                                 loading={this._service_updating.value} onClick={this._change_service}>确认修改</Button>}
                         </>
@@ -125,7 +126,7 @@ export class Mail extends BaseSettingGroup {
                 (
                     <ObservableComponentWrapper watch={[this._username, this._username_changed, this._username_updating]} render={() => (
                         <>
-                            <TextInput className={less_ProgramNameAndIcon.textInput} type="email" value={this._username} />
+                            <TextInput className={less_ProgramNameAndIcon.textInput} type="email" value={this._username} disabled={this._username_updating.value} />
                             {this._username_changed.value && <Button className={classnames(less_ProgramNameAndIcon.button, less_UsernameAndPassword.button)}
                                 loading={this._username_updating.value} onClick={this._changeUsername}>确认修改</Button>}
                         </>
@@ -140,7 +141,7 @@ export class Mail extends BaseSettingGroup {
                 (
                     <ObservableComponentWrapper watch={[this._password, this._password_changed, this._password_updating]} render={() => (
                         <>
-                            <TextInput className={less_ProgramNameAndIcon.textInput} type="text" value={this._password} placeholder="新密码" />
+                            <TextInput className={less_ProgramNameAndIcon.textInput} type="text" value={this._password} placeholder="新密码" disabled={this._password_updating.value} />
                             {this._password_changed.value && <Button className={classnames(less_ProgramNameAndIcon.button, less_UsernameAndPassword.button)}
                                 loading={this._password_updating.value} onClick={this._changePassword}>确认修改</Button>}
                         </>

@@ -106,7 +106,8 @@ export class AccessRestriction extends BaseSettingGroup {
                 (
                     <ObservableComponentWrapper watch={[this._ipWhiteListRegexp, this._ipWhiteListRegexp_changed, this._ipWhiteListRegexp_updating]} render={() => (
                         <>
-                            <TextInput className={less_ProgramNameAndIcon.textInput} type="text" value={this._ipWhiteListRegexp} placeholder="例如：^192.168.0.\d{0,3}$" />
+                            <TextInput className={less_ProgramNameAndIcon.textInput} type="text" value={this._ipWhiteListRegexp}
+                                placeholder="例如：^192.168.0.\d{0,3}$" disabled={this._ipWhiteListRegexp_updating.value} />
                             {this._ipWhiteListRegexp_changed.value && <Button className={classnames(less_ProgramNameAndIcon.button, less_UsernameAndPassword.button)}
                                 loading={this._ipWhiteListRegexp_updating.value} onClick={this._changeIpWhiteListRegexp}>确认修改</Button>}
                         </>
@@ -121,7 +122,8 @@ export class AccessRestriction extends BaseSettingGroup {
                 (
                     <ObservableComponentWrapper watch={[this._ipBlackListRegexp, this._ipBlackListRegexp_changed, this._ipBlackListRegexp_updating]} render={() => (
                         <>
-                            <TextInput className={less_ProgramNameAndIcon.textInput} type="text" value={this._ipBlackListRegexp} placeholder="例如：^192.168.0.(123|231)$" />
+                            <TextInput className={less_ProgramNameAndIcon.textInput} type="text" value={this._ipBlackListRegexp}
+                                placeholder="例如：^192.168.0.(123|231)$" disabled={this._ipBlackListRegexp_updating.value} />
                             {this._ipBlackListRegexp_changed.value && <Button className={classnames(less_ProgramNameAndIcon.button, less_UsernameAndPassword.button)}
                                 loading={this._ipBlackListRegexp_updating.value} onClick={this._changeIpBlackListRegexp}>确认修改</Button>}
                         </>

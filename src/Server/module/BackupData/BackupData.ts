@@ -132,7 +132,7 @@ export class BackupData extends BaseServiceModule {
      */
     async listBackupFiles(): Promise<ReadonlyArray<string>> {
         const files = await fs.promises.readdir(FilePath._userDataBackupDir);
-        return files.filter(item => /^\d{4}-\d{2}-\d{2}_\d{2}∶\d{2}∶\d{2}\.zip$/.test(item));   //确保正确性
+        return files.filter(item => /^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.zip$/.test(item));   //确保正确性
     }
 
     /**
@@ -174,7 +174,7 @@ export class BackupData extends BaseServiceModule {
      */
     resumeFromBackup(filename: string, userPassword: string): void {
         if (this._userPassword.value === userPassword)
-            this._mainProcessCommunicator.restartAndRun(`npm run resumeFromBackup ${filename}`, FilePath._userDataDir);
+            setTimeout(() => this._mainProcessCommunicator.restartAndRun(`npm run resumeFromBackup ${filename}`), 1000);
         else
             throw new Error('用户密码错误');
     }

@@ -1,3 +1,5 @@
+import log from 'log-formatter';
+
 import { InitializeDatabase } from '../module/Database/InitializeDatabase';
 
 /**
@@ -5,16 +7,22 @@ import { InitializeDatabase } from '../module/Database/InitializeDatabase';
  */
 
 (async () => {
-    const iniDB = new InitializeDatabase();
-    await iniDB.onStart();
+    try {
+        const iniDB = new InitializeDatabase();
+        await iniDB.onStart();
 
-    await iniDB.dbCon.run(`
-        UPDATE "main"."system_setting"
-        SET "value" = ?
-        WHERE "key" IN (?, ?) AND "secret" = 1
-    `, '', 'http.ipWhiteListRegexp', 'http.ipBlackListRegexp');
+        await iniDB.dbCon.run(`
+            UPDATE "main"."system_setting"
+            SET "value" = ?
+            WHERE "key" IN (?, ?) AND "secret" = 1
+        `, '', 'http.ipWhiteListRegexp', 'http.ipBlackListRegexp');
 
-    await iniDB.onStop();
+        await iniDB.onStop();
 
-    console.log('清空IP过滤规则成功，重启容器后生效。');
+        console.log('清空IP过滤规则成功，重启容器后生效。');
+    } catch (error) {
+        log.error(error);
+    } finally {
+        process.exit();
+    }
 })();

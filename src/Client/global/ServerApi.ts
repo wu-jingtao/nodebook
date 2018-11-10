@@ -322,6 +322,41 @@ export const ServerApi = {
         async resetLogo(): Promise<void> {
             expect(await Post('/logo/reset'), 'ok', '重置系统图标失败');
         },
+    },
+    /**
+     * 数据备份
+     */
+    backup: {
+        /**
+         * 将某个备份文件发送到用户邮箱
+         */
+        async sendBackupEmail(filename: string): Promise<void> {
+            expect(await Post('/backup/sendBackupEmail', { filename }), 'ok', `将备份文件 (${filename}) 发送到用户邮箱失败`);
+        },
+        /**
+         * 列出所有备份文件的文件名
+         */
+        async listBackupFiles(): Promise<string[]> {
+            return JSON.parse(await Get('/backup/listBackupFiles'));
+        },
+        /**
+         * 删除某个备份文件
+         */
+        async deleteBackupFiles(filename: string): Promise<void> {
+            expect(await Post('/backup/deleteBackupFiles', { filename }), 'ok', `删除备份文件 (${filename}) 失败`);
+        },
+        /**
+         * 创建一个新的备份
+         */
+        async createBackupFile(): Promise<string> {
+            return await Get('/backup/createBackupFile');
+        },
+        /**
+         * 从备份文件中恢复数据
+         */
+        async resumeFromBackup(filename: string, password: string): Promise<void> {
+            expect(await Post('/backup/resumeFromBackup', { filename, password: md5(password) }), 'ok', `从备份文件 (${filename}) 恢复数据失败`);
+        },
     }
 };
 

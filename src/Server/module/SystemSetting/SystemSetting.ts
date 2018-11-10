@@ -153,4 +153,19 @@ export class SystemSetting extends BaseServiceModule {
         } else
             throw new Error(`私密设置项 '${key}' 不存在`);
     }
+
+    /**
+     * 获取所有普通设置的键值对
+     */
+    getAllNormalKey(): ReadonlyArray<{ key: string, value: any }> {
+        return [...this.normalSettings.entries()].map(([key, value]) => ({ key, value: value.value }));
+    }
+
+    /**
+     * 获取所有私密设置的键值对。除了密码
+     */
+    getAllSecretKey(): ReadonlyArray<{ key: string, value: any }> {
+        const data = [...this.secretSettings.entries()].map(([key, value]) => ({ key, value: value.value }));
+        return data.filter(item => item.key !== 'user.password' && item.key !== 'mail.pass');
+    }
 }

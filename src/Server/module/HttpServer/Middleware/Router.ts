@@ -397,22 +397,20 @@ function User(router_login: koa_router, router_no_login: koa_router, httpServer:
  */
 function Setting(router: koa_router, httpServer: HttpServer) {
     const _systemSetting = httpServer.services.SystemSetting as SystemSetting;
-    const _systemSettingTable = httpServer.services.SystemSettingTable as SystemSettingTable;
     const _prefix = '/setting';
 
     /**
      * 获取所有普通设置
      */
-    router.get(_prefix + '/getAllNormalKey', async (ctx) => {
-        ctx.body = await _systemSettingTable.getAllNormalKey();
+    router.get(_prefix + '/getAllNormalKey', ctx => {
+        ctx.body = _systemSetting.getAllNormalKey();
     });
 
     /**
      * 获取所有私密设置。除了密码
      */
-    router.get(_prefix + '/getAllSecretKey', async (ctx) => {
-        const result = await _systemSettingTable.getAllSecretKey();
-        ctx.body = result.filter(item => item.key !== 'user.password' && item.key !== 'mail.pass');
+    router.get(_prefix + '/getAllSecretKey', ctx => {
+        ctx.body = _systemSetting.getAllSecretKey();
     });
 
     /**
@@ -448,9 +446,10 @@ function Backup(router: koa_router, httpServer: HttpServer) {
      * 下载某个备份文件。
      * @param filename
      */
-    router.post(_prefix + '/readBackupFile', async (ctx: any) => {
+    router.get(_prefix + '/readBackupFile', async (ctx: any) => {
         ctx.compress = false;   //确保不会被 koa-compress 压缩
-        ctx.body = await _backupData.readBackupFile(ctx.request.body.filename);
+        ctx.set('Content-Disposition', `attachment;filename*=UTF-8''${ctx.request.query.filename}`);
+        ctx.body = await _backupData.readBackupFile(ctx.request.query.filename);
     });
 
     /**
