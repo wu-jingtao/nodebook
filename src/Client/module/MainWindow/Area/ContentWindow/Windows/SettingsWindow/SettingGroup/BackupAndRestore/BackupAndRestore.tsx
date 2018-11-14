@@ -316,9 +316,13 @@ export class BackupAndRestore extends BaseSettingGroup {
             .then(list => this._backupList.value = list)
             .catch(error => showMessageBox({ icon: 'error', title: '读取备份数据列表失败', content: error.message }));
 
-        this._unobserve.push(watch([this._interval], () => this._interval_changed.value = true));
-        this._unobserve.push(watch([this._maxNumber], () => this._maxNumber_changed.value = true));
-        this._unobserve.push(watch([this._autoSendEmail], () => this._autoSendEmail_changed.value = true));
-        this._unobserve.push(watch([this._encryptEmailFile], () => this._encryptEmailFile_changed.value = true));
+        this._unobserve.push(watch([this._interval], () =>
+            this._interval_changed.value = this._interval.value !== this._secret_interval.value));
+        this._unobserve.push(watch([this._maxNumber], () =>
+            this._maxNumber_changed.value = this._maxNumber.value !== this._secret_maxNumber.value));
+        this._unobserve.push(watch([this._autoSendEmail], () =>
+            this._autoSendEmail_changed.value = this._autoSendEmail.value !== this._secret_autoSendEmail.value));
+        this._unobserve.push(watch([this._encryptEmailFile], () =>
+            this._encryptEmailFile_changed.value = this._encryptEmailFile.value !== this._secret_encryptEmailFile.value));
     }
 }

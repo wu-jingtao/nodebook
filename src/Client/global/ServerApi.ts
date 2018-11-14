@@ -357,6 +357,36 @@ export const ServerApi = {
         async resumeFromBackup(filename: string, password: string): Promise<void> {
             expect(await Post('/backup/resumeFromBackup', { filename, password: md5(password) }), 'ok', `从备份文件 (${filename}) 恢复数据失败`);
         },
+    },
+    /**
+     * 类库操作
+     */
+    library: {
+        /**
+         * 获取安装了的类库列表
+         */
+        async getInstalledLibraries(): Promise<{ name: string, version: string }[]> {
+            return JSON.parse(await Get('/library/getInstalledLibraries'));
+        },
+        /**
+         * 安装类库
+         * @param name npm包名称
+         */
+        async installLibrary(name: string): Promise<void> {
+            expect(await Post('/library/installLibrary', { name }), 'ok', `安装类库 (${name}) 失败`);
+        },
+        /**
+         * 卸载类库
+         */
+        async uninstallLibrary(name: string): Promise<void> {
+            expect(await Post('/library/uninstallLibrary', { name }), 'ok', `卸载类库 (${name}) 失败`);
+        },
+        /**
+         * 更新某个类库
+         */
+        async updateLibrary(name: string): Promise<void> {
+            expect(await Post('/library/updateLibrary', { name }), 'ok', `更新类库 (${name}) 失败`);
+        },
     }
 };
 

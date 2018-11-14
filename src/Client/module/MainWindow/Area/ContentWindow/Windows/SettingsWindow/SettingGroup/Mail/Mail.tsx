@@ -3,7 +3,7 @@ import * as classnames from 'classnames';
 import { ObservableVariable, oVar, watch } from 'observable-variable';
 
 import { ObservableComponentWrapper } from '../../../../../../../../global/Tools/ObservableComponent';
-import { DropDownList } from '../../../../../../../../global/Component/DropdownList/DropdownList';
+import { DropDownList } from '../../../../../../../../global/Component/DropDownList/DropDownList';
 import { TextInput } from '../../../../../../../../global/Component/TextInput/TextInput';
 import { Button } from '../../../../../../../../global/Component/Button/Button';
 import { secretSettings } from '../../../../../../../../global/SystemSetting';
@@ -160,8 +160,10 @@ export class Mail extends BaseSettingGroup {
     ];
 
     componentDidMount() {
-        this._unobserve.push(watch([this._service], () => this._service_changed.value = true));
-        this._unobserve.push(watch([this._username], () => this._username_changed.value = true));
+        this._unobserve.push(watch([this._service], () =>
+            this._service_changed.value = this._service.value !== this._secret_service.value));
+        this._unobserve.push(watch([this._username], () =>
+            this._username_changed.value = this._username.value !== this._secret_username.value));
         this._unobserve.push(watch([this._password], () => this._password_changed.value = true));
     }
 }

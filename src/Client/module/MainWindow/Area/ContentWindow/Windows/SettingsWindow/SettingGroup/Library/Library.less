@@ -1,0 +1,102 @@
+@import "../../../../../../../../global/ThemeColor.less";
+@import "../../../../../../../../global/Component/Button/LoadingAnimation.less";
+
+:local(.Library) {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    color: @darkFontColor;
+    font-size: .9em;
+}
+
+:local(.ScrollBar) {
+    flex-grow: 1;
+    flex-shrink: 1;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    width: 100%;
+}
+
+:local(.titleBar) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 100%;
+    flex-basis: 30px;
+    padding-right: 10px;
+    box-sizing: border-box;
+    background-color: lighten(@backColor, 20%, relative);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    font-weight: bold;
+}
+
+:local(.row) {
+    height: 30px;
+    display: flex;
+    border-bottom: 1px solid lighten(@lightBackColor, 20%, relative);
+
+    > div {
+        height: 30px;
+        line-height: 25px;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &:last-child {
+        border: none;
+    }
+}
+
+:local(.processing) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 40px;
+
+    > i {
+        position: relative;
+        left: 8px;
+        top: 10px;
+        .LoadingAnimation(0.8em, 0.12em, @fontColor, fade(lighten(@darkFontColor, 10%, relative), 600%));
+    }
+}
+
+:local(.packageName) {
+    flex-grow: 1;
+    flex-shrink: 1;
+    border-left: 1px solid lighten(@lightBackColor, 20%, relative);
+}
+
+:local(.packageVersion) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 200px;
+    border-left: 1px solid lighten(@lightBackColor, 20%, relative);
+}
+
+:local(.functionButton) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 100px;
+    border-left: 1px solid lighten(@lightBackColor, 20%, relative);
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 0 !important;
+
+    & > img {
+        height: 16px;
+        width: 16px;
+        padding: 2px 4px;
+        cursor: pointer;
+
+        &:last-child {
+            padding-right: 12px;
+        }
+
+        &:active {
+            transform: scale(1.2);
+        }
+    }
+}

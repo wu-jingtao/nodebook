@@ -138,7 +138,9 @@ export class AccessRestriction extends BaseSettingGroup {
             .then(ip => this._userIp.value = ip)
             .catch(error => showMessageBox({ icon: 'error', title: '获取用户IP失败', content: error.message }));
 
-        this._unobserve.push(watch([this._ipWhiteListRegexp], () => this._ipWhiteListRegexp_changed.value = true));
-        this._unobserve.push(watch([this._ipBlackListRegexp], () => this._ipBlackListRegexp_changed.value = true));
+        this._unobserve.push(watch([this._ipWhiteListRegexp], () =>
+            this._ipWhiteListRegexp_changed.value = this._ipWhiteListRegexp.value !== this._secret_ipWhiteListRegexp.value));
+        this._unobserve.push(watch([this._ipBlackListRegexp], () =>
+            this._ipBlackListRegexp_changed.value = this._ipBlackListRegexp.value !== this._secret_ipBlackListRegexp.value));
     }
 }

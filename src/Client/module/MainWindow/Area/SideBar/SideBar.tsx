@@ -8,7 +8,7 @@ import { displayType } from '../FunctionArea/FunctionArea';
 import { taskList } from '../FunctionArea/FunctionPanel/TaskManager/TaskList';
 import { serviceList } from '../FunctionArea/FunctionPanel/ServiceManager/ServiceManager';
 import { showLogWindow } from '../LogWindow/LogWindow';
-import { openWindow } from '../ContentWindow/WindowList';
+import { openWindow, windowList, focusWindow } from '../ContentWindow/WindowList';
 import { WindowType, SettingsWindowArgs } from '../ContentWindow/ContentWindowTypes';
 import { unsavedFiles } from '../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 
@@ -30,8 +30,17 @@ export class SideBar extends ObservableComponent {
 
     //打开设置窗口
     private readonly _openSettingWindow = () => {
-        const args: SettingsWindowArgs = { id: Math.random().toString(), name: '系统设置', type: WindowType.settings, fixed: oVar(true), args: {} };
-        openWindow(args);
+        let settingWindow;
+
+        //确保只允许打开一个设置窗口
+        if (settingWindow = windowList.leftWindows.windowList.find(item => item.type === WindowType.settings))
+            focusWindow(settingWindow.id, 'left');
+        else if (settingWindow = windowList.rightWindows.windowList.find(item => item.type === WindowType.settings))
+            focusWindow(settingWindow.id, 'right');
+        else {
+            const args: SettingsWindowArgs = { id: Math.random().toString(), name: '系统设置', type: WindowType.settings, fixed: oVar(true), args: {} };
+            openWindow(args);
+        }
     };
 
     //改变要显示的功能区

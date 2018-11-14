@@ -11,6 +11,7 @@ import { Mail } from './SettingGroup/Mail/Mail';
 import { UploadFile } from './SettingGroup/UploadFile/UploadFile';
 import { AccessRestriction } from './SettingGroup/AccessRestriction/AccessRestriction';
 import { BackupAndRestore } from './SettingGroup/BackupAndRestore/BackupAndRestore';
+import { Library } from './SettingGroup/Library/Library';
 
 const less = require('./SettingsWindow.less');
 
@@ -23,6 +24,7 @@ export class SettingsWindowContent extends BaseWindowContent<SettingsWindowArgs>
             <UploadFile />
             <BackupAndRestore />
             <Task />
+            <Library />
             <CodeEditor />
             <ProgramNameAndIcon />
         </ScrollBar>

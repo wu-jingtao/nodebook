@@ -99,7 +99,8 @@ export class UsernameAndPassword extends BaseSettingGroup {
     ];
 
     componentDidMount() {
-        this._unobserve.push(watch([this._username], () => this._username_changed.value = true));
+        this._unobserve.push(watch([this._username], () =>
+            this._username_changed.value = this._username.value !== this._secret_username.value));
         this._unobserve.push(watch([this._password], () => this._password_changed.value = true));
     }
 }
