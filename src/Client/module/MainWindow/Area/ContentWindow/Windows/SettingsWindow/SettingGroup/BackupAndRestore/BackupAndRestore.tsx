@@ -189,7 +189,7 @@ export class BackupAndRestore extends BaseSettingGroup {
                                 this._resumingFromBackup.value = true;
                                 this._disableBackupButton.value = true;
                                 await ServerApi.backup.resumeFromBackup(this._selectedBackupFile.value, password);
-                                showMessageBox({ icon: 'message', title: '开始恢复', content: '恢复过程中将导致与服务器连接断开，恢复成功服务器会自动重启' });
+                                showMessageBox({ icon: 'message', title: '开始恢复', content: '恢复过程中将导致与服务器连接断开，恢复成功后服务器会自动重启' });
                             } catch (error) {
                                 showMessageBox({ icon: 'error', title: '从备份中恢复数据失败', content: error.message });
                             } finally {
@@ -199,7 +199,7 @@ export class BackupAndRestore extends BaseSettingGroup {
                         }
                     }
                 }
-            })
+            });
         }
     };
 

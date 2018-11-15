@@ -11,6 +11,11 @@ export class MainProcessCommunicator extends BaseServiceModule {
     readonly isDebug = (process.env.DEBUG || '').toLowerCase() === 'true';
 
     /**
+     * 系统启动时间
+     */
+    readonly systemUpTime = Date.now();
+
+    /**
      * 本机的域名
      */
     domain = (process.env.DOMAIN || 'localhost').trim().toLowerCase().replace(/:443$/, ''); //去掉443是因为浏览器不会把443端口号发过来

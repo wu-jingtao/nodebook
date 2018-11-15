@@ -37,7 +37,7 @@ export class TaskWindowChart extends ObservableComponent<{ taskPath: string, cla
         this._chart = echarts.init(this._chartDom, 'dark');
 
         //更改图表大小
-        const observer: MutationObserver = new (window as any).ResizeObserver(debounce(() => this._chart.resize(), 100));
+        const observer: MutationObserver = new (window as any).ResizeObserver(debounce(() => this._chart.resize(), 100, { leading: true }));
         observer.observe(this._chartDom);
         this._unobserve.push(() => observer.disconnect());
 
@@ -163,7 +163,7 @@ export class TaskWindowChart extends ObservableComponent<{ taskPath: string, cla
                         this._createTime.value = status.timestamp - status.elapsed;
                         this._elapsed.value = status.elapsed;
 
-                        chartOption.xAxis.data.push(moment().format('YYYY-MM-DD HH:mm:ss'));
+                        chartOption.xAxis.data.push(moment().format('HH:mm:ss'));
                         chartOption.series[0].data.push((status.cpu).toFixed(2));
                         chartOption.series[1].data.push((status.memory / 1024 / 1024).toFixed(2));
 

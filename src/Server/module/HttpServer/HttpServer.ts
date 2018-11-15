@@ -56,6 +56,7 @@ export class HttpServer extends BaseServiceModule {
     onStop(): Promise<void> {
         return new Promise(resolve => {
             this._httpServer.close(resolve);
+            setTimeout(resolve, 2000);  //最多等待2秒
         });
     }
 

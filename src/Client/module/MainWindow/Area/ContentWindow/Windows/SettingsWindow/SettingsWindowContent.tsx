@@ -12,12 +12,16 @@ import { UploadFile } from './SettingGroup/UploadFile/UploadFile';
 import { AccessRestriction } from './SettingGroup/AccessRestriction/AccessRestriction';
 import { BackupAndRestore } from './SettingGroup/BackupAndRestore/BackupAndRestore';
 import { Library } from './SettingGroup/Library/Library';
+import { SystemInfo } from './SettingGroup/SystemInfo/SystemInfo';
+import { Restart } from './SettingGroup/Restart/Restart';
+import { HTTPSCert } from './SettingGroup/HTTPSCert/HTTPSCert';
 
 const less = require('./SettingsWindow.less');
 
 export class SettingsWindowContent extends BaseWindowContent<SettingsWindowArgs> {
     protected _content = (
         <ScrollBar className={less.SettingsWindowContent}>
+            <SystemInfo />
             <UsernameAndPassword />
             <Mail />
             <AccessRestriction />
@@ -27,6 +31,8 @@ export class SettingsWindowContent extends BaseWindowContent<SettingsWindowArgs>
             <Library />
             <CodeEditor />
             <ProgramNameAndIcon />
+            <HTTPSCert />
+            <Restart />
         </ScrollBar>
     );
 }

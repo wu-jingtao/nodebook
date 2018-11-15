@@ -246,8 +246,8 @@ export const ServerApi = {
          */
         async getSystemHardwareInfo(): Promise<{
             cpuNumber: number, cpuName: string, cpuUsage: number,
-            domain: string, totalMemory: number, freeMemory: number,
-            uptime: number, userDataDir: DiskUsage, programDataDir: DiskUsage
+            uptime: number, totalMemory: number, freeMemory: number,
+            userDataDir: DiskUsage, programDataDir: DiskUsage
         }> {
             return JSON.parse(await Get('/task/getSystemHardwareInfo'));
         },

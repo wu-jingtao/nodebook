@@ -116,10 +116,9 @@ export class TaskManager extends BaseServiceModule {
                         cpuNumber: this._cpuInfo.length,                                    //CPU核心数
                         cpuName: this._cpuInfo[0].model,                                    //CPU名称
                         cpuUsage,                                                           //CPU使用百分比
-                        domain: this._mainProcessCommunicator.domain,                       //域名
                         totalMemory: os.totalmem(),                                         //内存总量
                         freeMemory: os.freemem(),                                           //剩余内存大小
-                        uptime: os.uptime(),                                                //系统运行了多久了
+                        uptime: this._mainProcessCommunicator.systemUpTime,                 //系统的启动时间
                         userDataDir: await diskusage_check(FilePath._userDataDir),          //查看用户数据目录还有多少可用空间
                         programDataDir: await diskusage_check(FilePath._programDataDir)     //查看程序数据目录还有多少可用空间。这两个目录如果位于同一个分区下则大小一样
                     });

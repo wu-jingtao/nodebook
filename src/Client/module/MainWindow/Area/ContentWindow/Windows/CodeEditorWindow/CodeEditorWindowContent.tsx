@@ -155,7 +155,7 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
         }
 
         //更改编辑器窗口大小
-        const observer: MutationObserver = new (window as any).ResizeObserver(debounce(() => this._editor.layout(), 100));
+        const observer: MutationObserver = new (window as any).ResizeObserver(debounce(() => this._editor.layout(), 100, { leading: true }));
         observer.observe(this._editor_div);
         this._unobserve.push(() => observer.disconnect());
 
