@@ -23,7 +23,6 @@ import { LibraryManager } from '../../LibraryManager/LibraryManager';
 import { LogManager } from '../../TaskManager/LogManager/LogManager';
 import { TaskManager } from '../../TaskManager/TaskManager';
 import { ServiceManager } from '../../TaskManager/ServiceManager';
-import { SystemSettingTable } from '../../Database/SystemSettingTable';
 
 import { FormParser } from './FormParser';
 import { LoginCheck } from './LoginCheck';
@@ -71,6 +70,7 @@ function Others(router: koa_router, httpServer: HttpServer) {
     const _openSSLCertificate = httpServer.services.OpenSSLCertificate as OpenSSLCertificate;
     const _mailService = httpServer.services.MailService as MailService;
 
+    const _programName = _systemSetting.normalSettings.get('client.programName') as ObservableVariable<string>;
     const _userPassword = _systemSetting.secretSettings.get('user.password') as ObservableVariable<string>;
 
     const _prefix = '/others';
@@ -111,7 +111,7 @@ function Others(router: koa_router, httpServer: HttpServer) {
      */
     router.get(_prefix + '/sendTestMail', async (ctx) => {
         await _mailService.sendMail(
-            'nodebook 测试邮件',
+            `${_programName.value} 测试邮件`,
             `时间:${moment().format('YYYY-MM-DD HH:mm:ss')}\nhost:${_mainProcessCommunicator.domain}`,
             [{ filename: 'logo.png', content: await fs.promises.readFile(node_path.join(FilePath._logoDir, './brand.png')) }]
         );
@@ -250,8 +250,16 @@ function File(router: koa_router, httpServer: HttpServer) {
     //#endregion
 
     /**
-     * 列出某个目录中的子目录与文件
+     * 查询某个单独的文件的状态信息
      * @param path 传入的路径需对应服务器端全路径
+     */
+    router.post(_prefix_api + '/fileStatus', async (ctx) => {
+        ctx.body = await _fileManager.fileStatus(ctx.request.body.path);
+    });
+
+    /**
+     * 列出某个目录中的子目录与文件
+     * @param path 
      */
     router.post(_prefix_api + '/listDirectory', async (ctx) => {
         ctx.body = await _fileManager.listDirectory(ctx.request.body.path);

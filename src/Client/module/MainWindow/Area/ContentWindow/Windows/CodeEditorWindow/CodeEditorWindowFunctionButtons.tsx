@@ -6,6 +6,7 @@ import { CodeEditorWindowArgs, HtmlViewerWindowArgs, WindowType, MarkdownViewerW
 import { openWindow } from '../../WindowList';
 import { BaseWindowFunctionButtons } from '../BaseWindow/BaseWindowFunctionButtons';
 import { unsavedFiles, saveToServer, refreshData } from './CodeEditorFileCache';
+import { taskList, createTask, startTask, restartTask, stopTask } from '../../../FunctionArea/FunctionPanel/TaskManager/TaskList';
 
 export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<CodeEditorWindowArgs> {
 
@@ -47,12 +48,20 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
         openWindow(args, this.props.side === 'left' ? 'right' : 'left');
     };
 
-    private readonly _runTask = () => {
+    private readonly _createTask = () => {
+        createTask(this.props.args.args.path);
+    };
 
+    private readonly _startTask = () => {
+        startTask(this.props.args.args.path);
+    };
+
+    private readonly _restartTask = () => {
+        restartTask(this.props.args.args.path);
     };
 
     private readonly _stopTask = () => {
-
+        stopTask(this.props.args.args.path);
     };
 
     private readonly _openLog = () => {
@@ -74,16 +83,30 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
                     title={`在Image查看器中打开`} onClick={this._openImageViewer} />
             }
             {this.props.args.args.path.endsWith('.server.js') &&
-                <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
-                    title={`启动任务`} onClick={this._runTask} />
-            }
-            {this.props.args.args.path.endsWith('.server.js') &&
-                <img src={`/static/res/img/buttons_icon/stop-inverse.svg`}
-                    title={`停止任务`} onClick={this._stopTask} />
-            }
-            {this.props.args.args.path.endsWith('.server.js') &&
-                <img src={`/static/res/img/buttons_icon/repl-inverse.svg`}
-                    title={`查看日志`} onClick={this._openLog} />
+                <ObservableComponentWrapper watch={[taskList]} render={() => {
+                    const status = taskList.get(this.props.args.args.path);
+                    return status ?
+                        (
+                            <>
+                                <ObservableComponentWrapper watch={[status]} render={() => (
+                                    status.value !== 'running' ?
+                                        <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
+                                            title={`启动任务`} onClick={this._startTask} /> :
+                                        <>
+                                            <img src={`/static/res/img/buttons_icon/restart-inverse.svg`}
+                                                title={`重启任务`} onClick={this._restartTask} />
+                                            <img src={`/static/res/img/buttons_icon/stop-inverse.svg`}
+                                                title={`停止任务`} onClick={this._stopTask} />
+                                        </>
+                                )} />
+                                <img src={`/static/res/img/buttons_icon/repl-inverse.svg`}
+                                    title={`查看日志`} onClick={this._openLog} />
+                            </>
+                        ) : (
+                            <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
+                                title={`创建任务`} onClick={this._createTask} />
+                        );
+                }} />
             }
             <ObservableComponentWrapper watch={[unsavedFiles]} render={() => (
                 unsavedFiles.has(this.props.args.args.path) &&

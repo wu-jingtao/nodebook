@@ -45,6 +45,7 @@ export class TaskManager extends BaseServiceModule {
 
             const child = child_process.fork(taskFilePath, [], { cwd: FilePath._programDataDir, execArgv: [], stdio: ['pipe', 'pipe', 'pipe', 'ipc'] });
             const logger = this._logManager.createTaskLogger(taskFilePath);
+            logger.addLog(false, log.location.bold.green.text.bold.format('启动', taskFilePath));
 
             child.stdout.on('data', chunk => logger.addLog(false, chunk.toString()));
             child.stderr.on('data', chunk => logger.addLog(true, chunk.toString()));
@@ -52,6 +53,7 @@ export class TaskManager extends BaseServiceModule {
             child.on('close', (code, signal) => {
                 logger.status.value = code === 0 || signal === 'SIGTERM' ? 'stop' : 'crashed';
                 this._taskList.delete(taskFilePath);
+                logger.addLog(false, log.location.bold.red.text.bold.format('停止', taskFilePath));
             });
 
             const invokeCallback: Map<string, (jsonResult: string) => void> = new Map();

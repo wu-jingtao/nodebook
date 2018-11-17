@@ -177,7 +177,9 @@ export class TaskWindowChart extends ObservableComponent<{ taskPath: string, cla
 
         const timer = setInterval(updateData, 5000);
         this._unobserve.push(() => clearInterval(timer));
-        updateData();
+        
+        this._chart.showLoading();
+        updateData().then(() => this._chart.hideLoading()).catch(() => this._chart.hideLoading());
     }
 
     componentWillUnmount() {

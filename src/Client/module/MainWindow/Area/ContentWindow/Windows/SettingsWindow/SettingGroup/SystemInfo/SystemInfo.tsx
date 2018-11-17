@@ -255,8 +255,10 @@ export class SystemInfo extends BaseSettingGroup {
 
         const timer = setInterval(updateData, 5000);
         this._unobserve.push(() => clearInterval(timer));
-        updateData();
 
         //#endregion        
+
+        this._chart.showLoading();
+        updateData().then(() => this._chart.hideLoading()).catch(() => this._chart.hideLoading());
     }
 }

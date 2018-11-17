@@ -52,6 +52,21 @@ export class FileManager extends BaseServiceModule {
     }
 
     /**
+     * 查询某个单独的文件的状态信息
+     * @param path 文件的绝对路径
+     */
+    async fileStatus(path: string): Promise<{ isBinary: boolean, modifyTime: number, size: number }> {
+        FileManager._pathStartWith(path, [FilePath._userCodeDir, FilePath._programDataDir, FilePath._recycleDir, FilePath._libraryDir]);
+        const stats = await fs.promises.stat(path);
+
+        return {
+            isBinary: await isBinaryFile(path),
+            modifyTime: stats.mtimeMs,
+            size: stats.size
+        }
+    }
+
+    /**
      * 列出某个目录中的子目录与文件。注意，只允许查看 '_userCodeDir' 、'_programDataDir' 、'_recycleDir' 与 '_libraryDir' 这四个目录下的内容
      */
     async listDirectory(path: string): Promise<{ name: string, isFile: boolean, isBinary: boolean, modifyTime: number, size: number }[]> {

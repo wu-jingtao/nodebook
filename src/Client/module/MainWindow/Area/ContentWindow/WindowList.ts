@@ -1,7 +1,8 @@
 import { permanent_oVar, permanent_oArr, ObservableArray, oVar, watch } from "observable-variable";
 import isEqual = require('lodash.isequal');
 
-import { WindowArgs, WindowType } from "./ContentWindowTypes";
+import { WindowArgs, WindowType, PDFViewerWindowArgs, ImageViewerWindowArgs, VideoPlayerWindowArgs, MarkdownViewerWindowArgs, CodeEditorWindowArgs, HtmlViewerWindowArgs } from "./ContentWindowTypes";
+import { showMessageBox } from "../../../MessageBox/MessageBox";
 
 //WindowList初始化方法
 function init(value: WindowArgs[], save: () => void, oArr: ObservableArray<WindowArgs>): WindowArgs[] {
@@ -91,6 +92,98 @@ export function openWindow(args: WindowArgs, side?: 'left' | 'right'): void {
             _focusedSide.windowList.push(args);
 
         focusWindow(args.id, _side)
+    }
+}
+
+/**
+ * 根据文件路径打开对应的窗口
+ * @param path 文件路径
+ * @param isBinary 是否是二进制文件
+ * @param size 文件的大小
+ * @param side 在哪一边显示，默认是处于焦点的一边
+ * @param readonly 文本文件是否以只读方式打开
+ * @param viewerFirst 对于某些文本文件是否优先使用查看器打开
+ */
+export function openWindowByFilePath(path: string, isBinary: boolean, size: number, side?: 'left' | 'right', readonly?: boolean, viewerFirst?: boolean) {
+    if (path.endsWith('.pdf')) {
+        const winArgs: PDFViewerWindowArgs = {
+            id: Math.random().toString(),
+            fixed: oVar(false),
+            name: `(查看) ${path.split('/').pop()}`,
+            type: WindowType.pdf_viewer,
+            args: { path }
+        };
+
+        openWindow(winArgs, side);
+    } else if (/.(jpg|jpeg|jpe|jif|jfif|jfi|webp|gif|png|apng|svg|svgz|xbm|bmp|dib|ico)$/i.test(path)) {
+        const winArgs: ImageViewerWindowArgs = {
+            id: Math.random().toString(),
+            fixed: oVar(false),
+            name: `(查看) ${path.split('/').pop()}`,
+            type: WindowType.image_viewer,
+            args: { path }
+        };
+
+        openWindow(winArgs, side);
+    } else if (/.(wav|mpeg|mp3|mp4|webm|aac|aacp|ogg|flac|rm|rmvb|3gp|avi|mpg|mov|mkv)$/i.test(path)) {
+        const winArgs: VideoPlayerWindowArgs = {
+            id: Math.random().toString(),
+            fixed: oVar(false),
+            name: `(查看) ${path.split('/').pop()}`,
+            type: WindowType.video_player,
+            args: { path }
+        };
+
+        openWindow(winArgs, side);
+    } else if (!isBinary) {    //不是二进制文件就是用编辑器打开
+        const openTextFile = () => {
+            if (viewerFirst) {
+                if (path.endsWith('.html')) {
+                    const winArgs: HtmlViewerWindowArgs = {
+                        id: Math.random().toString(),
+                        fixed: oVar(false),
+                        name: `(查看) ${path.split('/').pop()}`,
+                        type: WindowType.html_viewer,
+                        args: { path }
+                    };
+
+                    openWindow(winArgs, side);
+                } else if (path.endsWith('.md')) {
+                    const winArgs: MarkdownViewerWindowArgs = {
+                        id: Math.random().toString(),
+                        fixed: oVar(false),
+                        name: `(查看) ${path.split('/').pop()}`,
+                        type: WindowType.markdown_viewer,
+                        args: { path, readonly }
+                    };
+
+                    openWindow(winArgs, side);
+                }
+            } else {
+                const winArgs: CodeEditorWindowArgs = {
+                    id: Math.random().toString(),
+                    fixed: oVar(false),
+                    name: path.split('/').pop() as string,
+                    type: WindowType.code_editor,
+                    args: { path, readonly }
+                };
+
+                openWindow(winArgs, side);
+            }
+        };
+
+        if (size > 5 * 1024 * 1024) {
+            showMessageBox({
+                icon: 'question',
+                title: '文件大小过大，确定要打开吗?',
+                content: `文件大小: ${(size / 1024 / 1024).toFixed(2)}MB。\n文件名：${path}`,
+                buttons: {
+                    ok: { callback: openTextFile },
+                    cancel: { callback() { } }
+                }
+            });
+        } else
+            openTextFile();
     }
 }
 

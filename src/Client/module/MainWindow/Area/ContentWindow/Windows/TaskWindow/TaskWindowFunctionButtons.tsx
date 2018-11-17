@@ -10,6 +10,10 @@ export class TaskWindowFunctionButtons extends BaseWindowFunctionButtons<TaskWin
 
     private readonly _status = oVar<ObservableVariable<'running' | 'stop' | 'crashed'> | false>(false);
 
+    private readonly _openLog = () => {
+
+    };
+
     protected _functionButtons = <ObservableComponentWrapper watch={[this._status]} render={() => (
         this._status.value && <ObservableComponentWrapper watch={[this._status.value]} render={() => (
             <>
@@ -22,6 +26,7 @@ export class TaskWindowFunctionButtons extends BaseWindowFunctionButtons<TaskWin
                     </>
                 ) : <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
                     title={`启动任务`} onClick={() => startTask(this.props.args.args.path)} />}
+                <img src={`/static/res/img/buttons_icon/repl-inverse.svg`} title={`查看日志`} onClick={this._openLog} />
             </>
         )} />
     )} />

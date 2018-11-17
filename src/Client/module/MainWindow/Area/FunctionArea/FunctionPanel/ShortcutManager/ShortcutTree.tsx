@@ -8,15 +8,17 @@ import { FileIconTreePropsType } from "../../../../../../global/Component/Tree/F
 import { processingItems, checkIsBusy, dragText } from "../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree";
 import { DeleteFiles } from '../../../../../../global/Component/Tree/EditableFileTree/DeleteFiles/DeleteFiles';
 import { normalSettings } from "../../../../../../global/SystemSetting";
+import { ServerApi } from '../../../../../../global/ServerApi';
 import { getIconPath } from '../../../../../../global/Component/FileIcon/GetIconPath';
 import { ContextMenuItemOptions } from "../../../../../ContextMenu/ContextMenuOptions";
 import { showMessageBox } from "../../../../../MessageBox/MessageBox";
 import { showPopupWindow } from "../../../../../PopupWindow/PopupWindow";
 import { InputShortcutName } from "./InputShortcutName/InputShortcutName";
+import { openWindowByFilePath } from '../../../ContentWindow/WindowList';
 
 const less = require('./ShortcutManager.less');
 
-export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: string }> {
+export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: string, isBinary: boolean, size: number }> {
 
     /**
      * 鼠标拖拽的项目
@@ -62,12 +64,29 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
                         subItems={this._dataTree.subItem as any} />
                 ),
                 ok: {
-                    callback: () => {
+                    callback: async () => {
                         if (filePath.value.length > 0 && errorTip.every(item => item.length === 0)) {
-                            const name = shortcutName.value || filePath.value.split('/').pop() as string;
-                            (this._dataTree.subItem as any).set(name, {
-                                name, data: { path: filePath.value }
-                            });
+                            const tag = `_menu_createShortcut_${Math.random()}`;
+
+                            try {
+                                this._root._loading.add(tag);
+
+                                const status = await ServerApi.file.fileStatus(filePath.value);
+
+                                const name = shortcutName.value || filePath.value.split('/').pop() as string;
+                                (this._dataTree.subItem as any).set(name, {
+                                    name,
+                                    data: {
+                                        path: filePath.value,
+                                        isBinary: status.isBinary,
+                                        size: status.size
+                                    }
+                                });
+                            } catch (error) {
+                                showMessageBox({ icon: 'error', title: '查询文件状态信息失败', content: error.message });
+                            } finally {
+                                this._root._loading.delete(tag);
+                            }
                         }
                     }
                 }
@@ -369,7 +388,14 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
     protected async _onOpenBranch(isOpen: boolean): Promise<false | void> { }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
-        //TODO 等所有窗口都做完之后添加
+        openWindowByFilePath(
+            this._dataTree.data.path,
+            this._dataTree.data.isBinary,
+            this._dataTree.data.size,
+            e.altKey ? 'right' : undefined,
+            undefined,
+            true
+        );
     }
 
     protected _onContextMenu(): (ContextMenuItemOptions | void | false)[][] {

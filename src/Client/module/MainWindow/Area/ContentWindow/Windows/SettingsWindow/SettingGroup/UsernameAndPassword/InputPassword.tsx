@@ -24,7 +24,7 @@ export function inputPassword(title: string, placeholder: string = '请输入用
                 callback() { resolve(password.value) }
             },
             cancel: {
-                callback() { resolve(password.value) }
+                callback() { resolve('') }
             }
         });
     });

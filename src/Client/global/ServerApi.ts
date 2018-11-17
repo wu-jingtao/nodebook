@@ -96,6 +96,13 @@ export const ServerApi = {
             return await Get('/file/api/readFile', { path }, true);
         },
         /**
+         * 查询某个单独的文件的状态信息
+         * @param path 
+         */
+        async fileStatus(path: string): Promise<{ isBinary: boolean, modifyTime: number, size: number }> {
+            return JSON.parse(await Post('/file/api/fileStatus', { path }));
+        },
+        /**
          * 列出某个目录中的子目录与文件
          * @param path 
          */

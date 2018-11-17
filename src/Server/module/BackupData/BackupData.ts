@@ -34,7 +34,8 @@ export class BackupData extends BaseServiceModule {
     private _maxNumber: ObservableVariable<number>;
     private _autoSendEmail: ObservableVariable<boolean>;
     private _encryptEmailFile: ObservableVariable<boolean>;
-
+    
+    private _programName: ObservableVariable<string>;
     private _userPassword: ObservableVariable<string>;
 
     private _lastBackupTime: moment.Moment = moment();  //上一次备份的时间
@@ -50,6 +51,7 @@ export class BackupData extends BaseServiceModule {
         this._autoSendEmail = _systemSetting.secretSettings.get('backup.autoSendEmail') as any;
         this._encryptEmailFile = _systemSetting.secretSettings.get('backup.encryptEmailFile') as any;
 
+        this._programName = _systemSetting.normalSettings.get('client.programName') as any;
         this._userPassword = _systemSetting.secretSettings.get('user.password') as any;
 
         this._interval.on('beforeSet', newValue => {
@@ -97,7 +99,7 @@ export class BackupData extends BaseServiceModule {
      */
     async sendBackupEmail(filename: string): Promise<void> {
         const path = node_path.join(FilePath._userDataBackupDir, filename);
-        const text = `nodebook 用户数据备份 ${filename}`;
+        const text = `${this._programName.value} 用户数据备份 ${filename}`;
 
         if (this._encryptEmailFile.value) {
             return new Promise<void>((resolve, reject) => {

@@ -1,7 +1,7 @@
 import * as $ from 'jquery';
 import * as React from 'react';
 import * as monaco from 'monaco-editor';
-import { ObservableVariable, watch } from 'observable-variable';
+import { ObservableVariable, watch, permanent_oArr } from 'observable-variable';
 import debounce = require('lodash.debounce');
 
 import { processingItems } from '../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
@@ -54,10 +54,12 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
     private readonly _minimap = normalSettings.get('client.editor.minimap') as ObservableVariable<boolean>;
     private readonly _fontSize = normalSettings.get('client.editor.fontSize') as ObservableVariable<number>;
 
+    //代码编辑器滚动条位置
+    private readonly _scrollPosition = permanent_oArr(`ui._codeEditor_scrollPosition_${this.props.args.args.path}`, { defaultValue: [0, 0], expire: 1000 * 60 * 60 * 24 * 30 });
     private _editor_div: HTMLDivElement;
     private _editor: monaco.editor.IEditor;
 
-    protected _content = <div style={{ width: '100%', height: '100%' }} ref={(e: any) => this._editor_div = e} />
+    protected _content = <div style={{ width: '100%', height: '100%' }} ref={(e: any) => this._editor_div = e} />;
 
     //获取编辑器参数
     private _getOptions(): monaco.editor.IEditorOptions {
@@ -130,6 +132,21 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
         });
     }
 
+    //配置和记录编辑器滚动条位置
+    private _recordEditorScrollPosition(ed: monaco.editor.IStandaloneCodeEditor) {
+        const dispose = ed.onDidChangeModel(() => { //等待编辑器加载完数据
+            ed.setScrollTop(this._scrollPosition.get(0));
+            ed.setScrollLeft(this._scrollPosition.get(1));
+
+            ed.onDidScrollChange(e => {
+                this._scrollPosition.set(0, e.scrollTop);
+                this._scrollPosition.set(1, e.scrollLeft);
+            });
+
+            dispose.dispose();
+        });
+    }
+
     componentDidMount() {
         super.componentDidMount();
 
@@ -150,6 +167,7 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
             });
 
             this._setKeyboardShortcut(editor);
+            this._recordEditorScrollPosition(editor);
 
             this._editor = editor;
         }

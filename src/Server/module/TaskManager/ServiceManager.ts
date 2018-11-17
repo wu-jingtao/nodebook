@@ -1,6 +1,7 @@
 import log from 'log-formatter';
 import * as moment from 'moment';
 import { BaseServiceModule } from "service-starter";
+import { ObservableVariable } from 'observable-variable';
 
 import * as FilePath from '../../FilePath';
 
@@ -9,6 +10,7 @@ import { ServicesTable, ServiceConfig } from "../Database/ServicesTable";
 import { LogManager } from "./LogManager/LogManager";
 import { MailService } from '../MailService/MailService';
 import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
+import { SystemSetting } from '../SystemSetting/SystemSetting';
 
 /**
  * 用户服务管理器。服务是一种特殊的任务，主要区别在于它可以随系统重启，崩溃的时候可以给用户发送邮件通知
@@ -24,12 +26,17 @@ export class ServiceManager extends BaseServiceModule {
     private _mailService: MailService;
     private _mainProcessCommunicator: MainProcessCommunicator;
 
+    private _programName: ObservableVariable<string>;
+
     async onStart(): Promise<void> {
+        const _systemSetting: SystemSetting = this.services.SystemSetting;
         this._taskManager = this.services.TaskManager;
         this._logManager = this.services.LogManager;
         this._servicesTable = this.services.ServicesTable;
         this._mailService = this.services.MailService;
-        this._mainProcessCommunicator = this.services.OpenSSLCertificate;
+        this._mainProcessCommunicator = this.services.MainProcessCommunicator;
+
+        this._programName = _systemSetting.normalSettings.get('client.programName') as any;
 
         for (const item of await this._servicesTable.getAllServices()) {
             this._servicesList.set(item.path, item);
@@ -55,16 +62,16 @@ export class ServiceManager extends BaseServiceModule {
             logger.status.on('set', newValue => {
                 if (serviceConfig.report_error && newValue === 'crashed') {
                     const content = `
-                        NodeBook <${this._mainProcessCommunicator.domain}>
+                        ${this._programName.value} <${this._mainProcessCommunicator.domain}>
                         崩溃时间：${moment().format('YYYY-MM-DD HH:mm:ss')}
                         服务名称：${serviceConfig.name}
-                        程序文件路径：${serviceConfig.path.replace(FilePath._userCodeDir, '/')}
+                        程序文件路径：${serviceConfig.path}
 
                         下面是一些日志的错误摘要：
                         ${logger.getLogsFromEnd(100).map(item => `[${moment(item.date).format('YYYY-MM-DD HH:mm:ss')}]  ${item.text}`).join('\n')}
                     `;
 
-                    this._mailService.sendMail(`NodeBook 服务'${serviceConfig.name}'崩溃`, content).catch(err => {
+                    this._mailService.sendMail(`${this._programName.value} 服务'${serviceConfig.name}'崩溃`, content).catch(err => {
                         log.error.location.text.content(this.name, '发送服务崩溃邮件失败，请检查邮件发送配置是否正确', err);
                     });
                 }

@@ -25,6 +25,8 @@ export class UserManager extends BaseServiceModule {
     private _userName: ObservableVariable<string>;
     private _password: ObservableVariable<string>;
 
+    private _programName: ObservableVariable<string>;
+
     private _maxRetry = 0;                              //用户登陆失败最大重试。规定：连续失败10次，60分钟内禁止登陆，同时发送一份邮件提示用户
     private _loginCountdown: moment.Moment;             //超过最大重试次数之后下次最早可在什么时候登陆
     private _loginTimeout: any;                         //清除_maxRetry的倒计时器
@@ -38,6 +40,8 @@ export class UserManager extends BaseServiceModule {
 
         this._userName = _systemSetting.secretSettings.get('user.name') as any;
         this._password = _systemSetting.secretSettings.get('user.password') as any;
+
+        this._programName = _systemSetting.normalSettings.get('client.programName') as any;
 
         this._userName.on('beforeSet', newValue => {
             if (!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(newValue))
@@ -104,7 +108,7 @@ export class UserManager extends BaseServiceModule {
 
         if (this._maxRetry === 10) {
             this._maxRetry++;
-            this._mailService.sendMail('NodeBook 连续登陆失败', `NodeBook <${this._mainProcessCommunicator.domain}> 账号 <${this._userName.value}> 连续登陆失败超过10次。\n登陆用户IP：${ip}`).catch(() => { });
+            this._mailService.sendMail(`${this._programName.value} 连续登陆失败`, `${this._programName.value} <${this._mainProcessCommunicator.domain}> 账号 <${this._userName.value}> 连续登陆失败超过10次。\n登陆用户IP：${ip}`).catch(() => { });
         }
 
         this._loginCountdown = moment().add(1, 'h');

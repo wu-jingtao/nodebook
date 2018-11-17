@@ -1,17 +1,15 @@
 import * as React from 'react';
-import { oVar } from 'observable-variable';
 
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
-import { openWindow, closeWindowByPath } from '../../../../../ContentWindow/WindowList';
-import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
-import { CodeEditorWindowArgs, WindowType, WindowArgs, MarkdownViewerWindowArgs, ImageViewerWindowArgs, VideoPlayerWindowArgs, PDFViewerWindowArgs } from '../../../../../ContentWindow/ContentWindowTypes';
+import { closeWindowByPath, openWindowByFilePath } from '../../../../../ContentWindow/WindowList';
 import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 import { refreshRecycle } from '../RecyclePanel/RefreshRecycle';
 import { checkUnsavedFile } from './DeleteUnsavedFiles';
+import { checkTaskOrServiceFile } from './DeleteTaskOrServiceFile';
 
 const less = require('./UserCodePanel.less');
 
@@ -106,100 +104,33 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
 
     protected async _onDelete(): Promise<void> {
         if (await checkUnsavedFile(this._fullNameString, 'delete', this._isBranch)) {
-            await ServerApi.file.deleteCodeData(this._fullNameString);
-            refreshRecycle();
-            closeWindowByPath(this._fullNameString, this._isBranch);
-            discardChange(this._fullNameString, this._isBranch);
+            if (await checkTaskOrServiceFile(this._fullNameString, 'delete', this._isBranch)) {
+                await ServerApi.file.deleteCodeData(this._fullNameString);
+                refreshRecycle();
+                closeWindowByPath(this._fullNameString, this._isBranch);
+                discardChange(this._fullNameString, this._isBranch);
+            }
         }
     }
 
     protected async _onCut(to: string): Promise<void> {
         if (await checkUnsavedFile(this._fullNameString, 'cut', this._isBranch)) {
-            await super._onCut(to);
-            closeWindowByPath(this._fullNameString, this._isBranch);
-            discardChange(this._fullNameString, this._isBranch);
+            if (await checkTaskOrServiceFile(this._fullNameString, 'cut', this._isBranch)) {
+                await super._onCut(to);
+                closeWindowByPath(this._fullNameString, this._isBranch);
+                discardChange(this._fullNameString, this._isBranch);
+            }
         }
     }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
-        if (this._name.endsWith('.pdf')) {
-            const winArgs: PDFViewerWindowArgs = {
-                id: Math.random().toString(),
-                fixed: oVar(false),
-                name: `(查看) ${this._name}`,
-                type: WindowType.pdf_viewer,
-                args: { path: this._fullNameString }
-            };
-
-            openWindow(winArgs, e.altKey ? 'right' : undefined);
-        } else if (/.(jpg|jpeg|jpe|jif|jfif|jfi|webp|gif|png|apng|svg|svgz|xbm|bmp|dib|ico)$/i.test(this._name)) {
-            const winArgs: ImageViewerWindowArgs = {
-                id: Math.random().toString(),
-                fixed: oVar(false),
-                name: `(查看) ${this._name}`,
-                type: WindowType.image_viewer,
-                args: { path: this._fullNameString }
-            };
-
-            openWindow(winArgs, e.altKey ? 'right' : undefined);
-        } else if (/.(wav|mpeg|mp3|mp4|webm|aac|aacp|ogg|flac|rm|rmvb|3gp|avi|mpg|mov|mkv)$/i.test(this._name)) {
-            const winArgs: VideoPlayerWindowArgs = {
-                id: Math.random().toString(),
-                fixed: oVar(false),
-                name: `(查看) ${this._name}`,
-                type: WindowType.video_player,
-                args: { path: this._fullNameString }
-            };
-
-            openWindow(winArgs, e.altKey ? 'right' : undefined);
-        } else if (!this._dataTree.data.isBinary) {    //不是二进制文件就是用编辑器打开
-            const openTextFile = () => {
-                let winArgs: WindowArgs;
-
-                if (this._fullNameString.endsWith('.md')) {
-                    const args: MarkdownViewerWindowArgs = {
-                        id: Math.random().toString(),
-                        fixed: oVar(false),
-                        name: `(查看) ${this._name}`,
-                        type: WindowType.markdown_viewer,
-                        args: {
-                            path: this._fullNameString,
-                            readonly: this.props.noCreate   //对于回收站和类库
-                        }
-                    };
-
-                    winArgs = args;
-                } else {
-                    const args: CodeEditorWindowArgs = {
-                        id: Math.random().toString(),
-                        fixed: oVar(false),
-                        name: this._name,
-                        type: WindowType.code_editor,
-                        args: {
-                            path: this._fullNameString,
-                            readonly: this.props.noCreate   //对于回收站和类库
-                        }
-                    };
-
-                    winArgs = args;
-                }
-
-                openWindow(winArgs, e.altKey ? 'right' : undefined);
-            };
-
-            if (this._dataTree.data.size > 5 * 1024 * 1024) {
-                showMessageBox({
-                    icon: 'question',
-                    title: '文件大小过大，确定要打开吗?',
-                    content: `文件大小: ${(this._dataTree.data.size / 1024 / 1024).toFixed(2)}MB。\n文件名：${this._fullNameString}`,
-                    buttons: {
-                        ok: { callback: openTextFile },
-                        cancel: { callback() { } }
-                    }
-                });
-            } else
-                openTextFile();
-        }
+        openWindowByFilePath(
+            this._fullNameString,
+            this._dataTree.data.isBinary,
+            this._dataTree.data.size,
+            e.altKey ? 'right' : undefined,
+            this._root.props.noCreate
+        );
     }
 
     /**
