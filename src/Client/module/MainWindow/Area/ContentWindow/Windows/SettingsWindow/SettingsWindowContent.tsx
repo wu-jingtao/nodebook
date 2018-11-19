@@ -15,6 +15,7 @@ import { Library } from './SettingGroup/Library/Library';
 import { SystemInfo } from './SettingGroup/SystemInfo/SystemInfo';
 import { Restart } from './SettingGroup/Restart/Restart';
 import { HTTPSCert } from './SettingGroup/HTTPSCert/HTTPSCert';
+import { Terminal } from './SettingGroup/Terminal/Terminal';
 
 const less = require('./SettingsWindow.less');
 
@@ -30,6 +31,7 @@ export class SettingsWindowContent extends BaseWindowContent<SettingsWindowArgs>
             <Task />
             <Library />
             <CodeEditor />
+            <Terminal />
             <ProgramNameAndIcon />
             <HTTPSCert />
             <Restart />

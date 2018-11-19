@@ -33,3 +33,9 @@ SystemSetting.addSystemSetting('client.task.listRefreshInterval', 10 * 1000, fal
 
 //刷新任务日志时间间隔
 SystemSetting.addSystemSetting('client.task.logRefreshInterval', 2 * 1000, false, 'number');
+
+//终端字体大小
+SystemSetting.addSystemSetting('client.terminal.fontSize', 14, false, 'number');
+
+//是否开启终端提示音
+SystemSetting.addSystemSetting('client.terminal.bellSound', true, false, 'boolean');

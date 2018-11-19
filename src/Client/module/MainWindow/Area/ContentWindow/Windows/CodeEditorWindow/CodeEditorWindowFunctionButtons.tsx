@@ -7,6 +7,7 @@ import { openWindow } from '../../WindowList';
 import { BaseWindowFunctionButtons } from '../BaseWindow/BaseWindowFunctionButtons';
 import { unsavedFiles, saveToServer, refreshData } from './CodeEditorFileCache';
 import { taskList, createTask, startTask, restartTask, stopTask } from '../../../FunctionArea/FunctionPanel/TaskManager/TaskList';
+import { openTaskLogWindow } from '../../../LogWindow/Windows/TaskLogWindow/TaskLogWindowList';
 
 export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<CodeEditorWindowArgs> {
 
@@ -65,7 +66,7 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
     };
 
     private readonly _openLog = () => {
-
+        openTaskLogWindow(this.props.args.args.path);
     };
 
     protected _functionButtons: JSX.Element = (

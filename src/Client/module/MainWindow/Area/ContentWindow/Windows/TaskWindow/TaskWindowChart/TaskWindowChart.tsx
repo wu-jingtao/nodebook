@@ -26,7 +26,6 @@ export class TaskWindowChart extends ObservableComponent<{ taskPath: string, cla
 
     private _chartDom: HTMLDivElement;
     private _chart: echarts.ECharts;
-    private readonly _status = taskList.get(this.props.taskPath);
 
     private readonly _pid = oVar<number>(0);
     private readonly _createTime = oVar<number>(0);
@@ -155,29 +154,31 @@ export class TaskWindowChart extends ObservableComponent<{ taskPath: string, cla
         };
 
         const updateData = async () => {
-            if (this._status.value === 'running') {
-                try {
-                    const status = await ServerApi.task.getTaskResourcesConsumption(this.props.taskPath);
-                    if (status) {
-                        this._pid.value = status.pid;
-                        this._createTime.value = status.timestamp - status.elapsed;
-                        this._elapsed.value = status.elapsed;
+            if (taskList.has(this.props.taskPath)) {
+                if (taskList.get(this.props.taskPath).value === 'running') {
+                    try {
+                        const status = await ServerApi.task.getTaskResourcesConsumption(this.props.taskPath);
+                        if (status) {
+                            this._pid.value = status.pid;
+                            this._createTime.value = status.timestamp - status.elapsed;
+                            this._elapsed.value = status.elapsed;
 
-                        chartOption.xAxis.data.push(moment().format('HH:mm:ss'));
-                        chartOption.series[0].data.push((status.cpu).toFixed(2));
-                        chartOption.series[1].data.push((status.memory / 1024 / 1024).toFixed(2));
+                            chartOption.xAxis.data.push(moment().format('HH:mm:ss'));
+                            chartOption.series[0].data.push((status.cpu).toFixed(2));
+                            chartOption.series[1].data.push((status.memory / 1024 / 1024).toFixed(2));
 
-                        this._chart.setOption(chartOption);
+                            this._chart.setOption(chartOption);
+                        }
+                    } catch (error) {
+                        showMessageBox({ icon: 'error', title: '获取任务资源消耗信息失败', content: `任务: ${this.props.taskPath}\n${error.message}` });
                     }
-                } catch (error) {
-                    showMessageBox({ icon: 'error', title: '获取任务资源消耗信息失败', content: `任务: ${this.props.taskPath}\n${error.message}` });
                 }
             }
         };
 
         const timer = setInterval(updateData, 5000);
         this._unobserve.push(() => clearInterval(timer));
-        
+
         this._chart.showLoading();
         updateData().then(() => this._chart.hideLoading()).catch(() => this._chart.hideLoading());
     }

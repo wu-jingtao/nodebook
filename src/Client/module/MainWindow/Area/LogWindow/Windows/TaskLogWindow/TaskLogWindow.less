@@ -1,0 +1,69 @@
+@import "../../../../../../global/ThemeColor.less";
+
+:local(.TaskLogWindowFunctionArea) {
+    width: 100%;
+    height: 100%;
+    justify-content: flex-end;
+    align-items: center;
+    overflow: hidden;
+}
+
+:local(.dropDownList) {
+    flex-grow: 1;
+    flex-shrink: 1;
+    max-width: 60%;
+    width: 70px;
+    height: 25px;
+    margin-right: 9px;
+    padding: 0 10px;
+}
+
+:local(.functionButton) {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    padding: 0 9px;
+    cursor: pointer;
+
+    &:active {
+        transform: scale(1.2);
+    }
+}
+
+:local(.TaskLogWindowContent) {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+:local(.TaskLogDisplay) {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    bottom: 0;
+    left: 20px;
+    overflow: hidden;
+
+    > .terminal.xterm {
+        width: 100%;
+        height: 100%;
+
+        > .xterm-viewport {
+            &::-webkit-scrollbar {
+                width: 12px;
+                height: 12px;
+                background: transparent;
+            }
+
+            &::-webkit-scrollbar-corner {
+                background: transparent;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: darken(@darkFontColor, 60%, relative);
+                border-radius: 2px;
+            }
+        }
+    }
+}
