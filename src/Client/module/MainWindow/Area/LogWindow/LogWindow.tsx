@@ -19,7 +19,7 @@ export const showLogWindow = permanent_oVar('ui.LogWindow._showLogWindow', { def
 /**
  * 显示那种类型的窗口
  */
-export const displayType = oVar<'log' | 'terminal'>('log');
+export const displayType = permanent_oVar<'log' | 'terminal'>('ui.LogWindow._displayType', { defaultValue: 'log' });
 
 /**
  * 日志窗口

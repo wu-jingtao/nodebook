@@ -6,10 +6,10 @@ import throttle = require('lodash.throttle');
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
 import { normalSettings } from '../../../../../../global/SystemSetting';
-import { displayType } from '../../LogWindow';
-import { taskLogWindowList, focusedTaskLogWindow } from './TaskLogWindowList';
 import { ServerApi } from '../../../../../../global/ServerApi';
 import { showMessageBox } from '../../../../../MessageBox/MessageBox';
+import { displayType } from '../../LogWindow';
+import { taskLogWindowList, focusedTaskLogWindow } from './TaskLogWindowList';
 
 require('xterm/dist/xterm.css');
 Terminal.applyAddon(fit);
@@ -114,6 +114,7 @@ class TaskLogDisplay extends ObservableComponent<{ taskFilePath: string }> {
     }
 
     componentWillUnmount() {
+        super.componentWillUnmount();
         this._terminal.dispose();
     }
 

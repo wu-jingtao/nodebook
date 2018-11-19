@@ -5,6 +5,8 @@ import * as koa_compose from 'koa-compose';
 import * as koa_router from 'koa-router';
 import * as koa_cache from 'koa-cache-control';
 import * as moment from 'moment';
+import * as ws from 'ws';
+import * as node_pty from 'node-pty';
 import { ObservableVariable } from 'observable-variable';
 import koa_conditional = require('koa-conditional-get');
 import koa_etag = require('koa-etag');
@@ -48,6 +50,7 @@ export function Router(httpServer: HttpServer): koa.Middleware {
     Backup(router_login, httpServer);
     Library(router_login, httpServer);
     Task(router_login, httpServer);
+    Terminal(router_login, httpServer);
 
     router_no_login.redirect('/', '/static/index.html');
     router_no_login.redirect('/favicon.ico', '/logo/favicon.ico');
@@ -708,4 +711,44 @@ function Task(router: koa_router, httpServer: HttpServer) {
     });
 
     //#endregion
+}
+
+/**
+ * websocket终端
+ */
+function Terminal(router: koa_router, httpServer: HttpServer) {
+    //websocket服务器
+    const wsServer = new ws.Server({
+        noServer: true,
+        perMessageDeflate: {
+            zlibDeflateOptions: {
+                chunkSize: 1024,
+                memLevel: 7,
+                level: 3
+            }
+        }
+    });
+
+    router.get('/terminal', ctx => {
+        ctx.respond = false;
+
+        wsServer.handleUpgrade(ctx.req, ctx.socket, Buffer.alloc(0), ws => {
+            let terminal = node_pty.spawn('bash', [], { cwd: '/' });
+
+            terminal.on('exit', () => ws.close());
+
+            terminal.on('data', data => {
+                if (ws.readyState === ws.OPEN)
+                    ws.send(data)
+            });
+
+            ws.once('close', () => {
+                terminal.kill();
+            });
+
+            ws.on('message', data => {
+                terminal.write(data.toString());
+            });
+        });
+    });
 }
