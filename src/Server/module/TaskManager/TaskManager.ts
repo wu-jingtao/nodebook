@@ -2,6 +2,7 @@ import * as os from 'os';
 import * as child_process from 'child_process';
 import * as diskusage from 'diskusage';
 import * as util from 'util';
+import * as getPort from 'get-port';
 import log from 'log-formatter';
 import pidusage_type, { Stat } from 'pidusage';
 import { BaseServiceModule } from "service-starter";
@@ -38,22 +39,30 @@ export class TaskManager extends BaseServiceModule {
 
     /**
      * 创建一个新的任务。如果任务正在运行，则不执行任何操作
+     * @param debug 是否以调试方式来启动任务
+     * @returns 返回的调试的端口号，如果不是调试模式则返回-1
      */
-    createTask(taskFilePath: string): void {
+    async createTask(taskFilePath: string, debug?: boolean): Promise<number> {
         if (!this._taskList.has(taskFilePath)) {    //确保要创建的任务并未处于运行状态
             LogManager._checkPath(taskFilePath);
+            const debugPort = debug ? await getPort() : -1;
 
-            const child = child_process.fork(taskFilePath, [], { cwd: FilePath._programDataDir, execArgv: [], stdio: ['pipe', 'pipe', 'pipe', 'ipc'] });
+            const child = child_process.fork(taskFilePath, [], {
+                cwd: FilePath._programDataDir,
+                execArgv: debug ? [`--inspect-brk=127.0.0.1:${debugPort}`] : [],
+                stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+            });
+
             const logger = this._logManager.createTaskLogger(taskFilePath);
-            logger.addLog(false, log.location.bold.green.text.bold.format('启动', taskFilePath));
+            logger.addLog(log.location.bold.green.text.bold.format('启动', taskFilePath));
 
-            child.stdout.on('data', chunk => logger.addLog(false, chunk.toString()));
-            child.stderr.on('data', chunk => logger.addLog(true, chunk.toString()));
+            child.stdout.on('data', chunk => logger.addLog(chunk.toString()));
+            child.stderr.on('data', chunk => logger.addLog(chunk.toString()));
 
             child.on('close', (code, signal) => {
                 logger.status.value = code === 0 || signal === 'SIGTERM' ? 'stop' : 'crashed';
                 this._taskList.delete(taskFilePath);
-                logger.addLog(false, log.location.bold.red.text.bold.format('停止', taskFilePath));
+                logger.addLog(log.location.bold.red.text.bold.format('停止', taskFilePath));
             });
 
             const invokeCallback: Map<string, (jsonResult: string) => void> = new Map();
@@ -83,8 +92,12 @@ export class TaskManager extends BaseServiceModule {
             });
 
             this._taskList.set(taskFilePath, { process: child, invokeCallback });
-            logger.status.value = 'running';
+            logger.status.value = debug ? 'debugging' : 'running';
+
+            return debugPort;
         }
+
+        return -1;
     }
 
     /**

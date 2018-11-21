@@ -1,30 +1,61 @@
 import { ObservableVariable, oMap, oArr, oVar } from 'observable-variable';
+import clipboard = require('copy-text-to-clipboard');
 
 import { ServerApi } from '../../../../../../global/ServerApi';
-import { showMessageBox } from '../../../../../MessageBox/MessageBox';
+import { showMessageBox, closeMessageBox } from '../../../../../MessageBox/MessageBox';
 import { selectFile } from '../ShortcutManager/SelectFile/SelectFile';
 
 /**
  * 任务列表。key是运行文件的绝对路径，value是当前任务的运行状态。当某个任务不存在的时候会触发remove事件
  */
-export const taskList = oMap<string, ObservableVariable<'running' | 'stop' | 'crashed'>>([]);
+export const taskList = oMap<string, ObservableVariable<'running' | 'debugging' | 'stop' | 'crashed'>>([]);
 
 /**
  * 内部使用，表示正在处理中的任务
  */
 export const _processingTask = oArr<string>([]);
 
+async function _inner_createTask(filePath: string, debug?: boolean): Promise<void> {
+    const port = await ServerApi.task.createTask(filePath, debug);
+
+    if (debug) {
+        const content = `chrome-devtools://devtools/bundled/js_app.html?experiments=true&v8only=true&wss=${window.location.host}/task/debugProxy?port=${port}`;
+
+        const id = showMessageBox({
+            icon: 'message',
+            title: '复制链接地址，在当前浏览器的新标签页中打开',
+            content,
+            autoClose: 0,
+            buttons: {
+                ok: {
+                    name: '复制',
+                    callback() {
+                        if (!clipboard(content)) {
+                            showMessageBox({ icon: 'message', title: '复制调试地址失败，请手动复制' });
+                        } else {
+                            closeMessageBox(id);
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
 /**
  * 创建新的任务
  * @param filePath 运行文件的绝对路径
+ * @param debug 是否以调试模式打开
  */
-export async function createTask(filePath?: string): Promise<void> {
+export async function createTask(filePath?: string, debug?: boolean): Promise<void> {
     try {
         filePath = filePath || await selectFile(/\.server\.js$/);
+        const taskStatus = taskList.get(filePath);
 
-        if (filePath && (!taskList.has(filePath) || taskList.get(filePath).value !== 'running')) {
+        if (filePath && (!taskStatus || (taskStatus.value !== 'running' && taskStatus.value !== 'debugging'))) {
             _processingTask.push('任务列表');   //任务列表的根显示加载动画
-            await ServerApi.task.createTask(filePath);
+            await _inner_createTask(filePath, debug);
+
             refreshTaskList();
         }
     } catch (error) {
@@ -36,14 +67,16 @@ export async function createTask(filePath?: string): Promise<void> {
 
 /**
  * 启动任务
+ * @param debug 是否以调试模式打开
  */
-export async function startTask(filePath: string): Promise<void> {
+export async function startTask(filePath: string, debug?: boolean): Promise<void> {
     const taskStatus = taskList.get(filePath);
 
-    if (taskStatus && taskStatus.value !== 'running' && !_processingTask.includes(filePath)) {
+    if (taskStatus && taskStatus.value !== 'running' && taskStatus.value !== 'debugging' && !_processingTask.includes(filePath)) {
         try {
             _processingTask.push(filePath);
-            await ServerApi.task.createTask(filePath);
+            await _inner_createTask(filePath, debug);
+
             taskStatus.value = await ServerApi.task.getTaskStatus(filePath) || 'stop';
         } catch (error) {
             showMessageBox({ icon: 'error', title: '启动任务失败', content: error.message });
@@ -59,7 +92,7 @@ export async function startTask(filePath: string): Promise<void> {
 export async function stopTask(filePath: string): Promise<false | void> {
     const taskStatus = taskList.get(filePath);
 
-    if (taskStatus && taskStatus.value === 'running' && !_processingTask.includes(filePath)) {
+    if (taskStatus && (taskStatus.value === 'running' || taskStatus.value === 'debugging') && !_processingTask.includes(filePath)) {
         try {
             _processingTask.push(filePath);
             await ServerApi.task.destroyTask(filePath);
@@ -75,11 +108,13 @@ export async function stopTask(filePath: string): Promise<false | void> {
 
 /**
  * 重启任务
+ * @param debug 是否以调试模式重启，如果不设置，之前是调试模式，重启后也进入调试模式
  */
-export async function restartTask(filePath: string): Promise<void> {
+export async function restartTask(filePath: string, debug?: boolean): Promise<void> {
     if (taskList.has(filePath)) {
+        const isDebug = debug !== undefined ? debug : taskList.get(filePath).value === 'debugging';
         if (await stopTask(filePath) !== false)
-            await startTask(filePath);
+            await startTask(filePath, isDebug);
     }
 }
 

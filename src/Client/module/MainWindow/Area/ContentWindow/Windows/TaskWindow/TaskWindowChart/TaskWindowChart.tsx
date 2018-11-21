@@ -154,8 +154,10 @@ export class TaskWindowChart extends ObservableComponent<{ taskPath: string, cla
         };
 
         const updateData = async () => {
-            if (taskList.has(this.props.taskPath)) {
-                if (taskList.get(this.props.taskPath).value === 'running') {
+            const status = taskList.get(this.props.taskPath);
+
+            if (status) {
+                if (status.value === 'running' || status.value === 'debugging') {
                     try {
                         const status = await ServerApi.task.getTaskResourcesConsumption(this.props.taskPath);
                         if (status) {

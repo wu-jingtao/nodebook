@@ -8,17 +8,17 @@ import { TaskWindowArgs, WindowType } from '../../../ContentWindow/ContentWindow
 import { openWindow } from '../../../ContentWindow/WindowList';
 import { taskList, _processingTask, stopTask, restartTask, startTask } from './TaskList';
 
-export class TaskTree extends FileIconTree<FileIconTreePropsType, { status: ObservableVariable<"running" | "stop" | "crashed"> }> {
+export class TaskTree extends FileIconTree<FileIconTreePropsType, { status: ObservableVariable<"running" | "debugging" | "stop" | "crashed"> }> {
 
     constructor(props: any, context: any) {
         super(props, context);
 
         if (this._isRoot) {
-            const taskAdd = (status: ObservableVariable<"running" | "stop" | "crashed">, path: string) => {
+            const taskAdd = (status: ObservableVariable<"running" | "debugging" | "stop" | "crashed">, path: string) => {
                 (this._dataTree.subItem as any).set(path, { name: path, data: { status } });
             }
 
-            const taskRemove = (status: ObservableVariable<"running" | "stop" | "crashed">, path: string) => {
+            const taskRemove = (status: ObservableVariable<"running" | "debugging" | "stop" | "crashed">, path: string) => {
                 (this._dataTree.subItem as any).delete(path);
             }
 
@@ -37,7 +37,8 @@ export class TaskTree extends FileIconTree<FileIconTreePropsType, { status: Obse
                 this._fileIcon_displayContent.value = (
                     <>
                         ({this._dataTree.data.status.value === 'running' ? '正在运行' :
-                            this._dataTree.data.status.value === 'stop' ? '停止' : '崩溃'})&nbsp;
+                            this._dataTree.data.status.value === 'debugging' ? '正在调试' :
+                                this._dataTree.data.status.value === 'stop' ? '停止' : '崩溃'})&nbsp;
                         {this._name}
                     </>
                 );
@@ -71,11 +72,14 @@ export class TaskTree extends FileIconTree<FileIconTreePropsType, { status: Obse
         if (this._isRoot || this._loading.size > 0)
             return [];
         else {
+            const isRunning = this._dataTree.data.status.value === 'running' || this._dataTree.data.status.value === 'debugging';
+
             return [
                 [
-                    this._dataTree.data.status.value === 'running' && { name: '停止任务', callback: () => stopTask(this._name) },
-                    this._dataTree.data.status.value === 'running' && { name: '重启任务', callback: () => restartTask(this._name) },
-                    this._dataTree.data.status.value !== 'running' && { name: '启动任务', callback: () => startTask(this._name) },
+                    isRunning && { name: '停止任务', callback: () => stopTask(this._name) },
+                    isRunning && { name: '重启任务', callback: () => restartTask(this._name) },
+                    !isRunning && { name: '启动任务', callback: () => startTask(this._name) },
+                    !isRunning && { name: '调试任务', callback: () => startTask(this._name, true) },
                 ]
             ];
         }

@@ -16,6 +16,12 @@ export class TaskManagerPanel extends FoldableContainer<FoldableContainerPropsTy
         createTask();
     };
 
+    //创建调试任务
+    private readonly _createDebugTask = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        createTask(undefined, true);
+    };
+
     //刷新任务列表
     private readonly _refreshTaskList = async (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -26,6 +32,7 @@ export class TaskManagerPanel extends FoldableContainer<FoldableContainerPropsTy
         return (
             <div className={less.titleButtons}>
                 <img title="新建任务" src="/static/res/img/buttons_icon/add_inverse.svg" onClick={this._createTask} />
+                <img title="新建调试任务" src="/static/res/img/buttons_icon/debug-dark.svg" onClick={this._createDebugTask} />
                 <img title="刷新" src="/static/res/img/buttons_icon/Refresh_inverse.svg" onClick={this._refreshTaskList} />
             </div>
         );

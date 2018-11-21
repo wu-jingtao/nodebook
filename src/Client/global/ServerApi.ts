@@ -208,33 +208,35 @@ export const ServerApi = {
          * 获取某个任务在某个时间点之后的所有日志
          * @param date 数字形式。不传入则表示获取所有日志
          */
-        async getLogsAfterDate(path: string, date?: number): Promise<ReadonlyArray<{ date: number, is_error: boolean, text: string }>> {
+        async getLogsAfterDate(path: string, date?: number): Promise<ReadonlyArray<{ date: number, text: string }>> {
             return JSON.parse(await Post('/task/getLogsAfterDate', { path, date }));
         },
         /**
          * 从末尾获取多少条日志
          * @param size 要获取的条数
          */
-        async getLogsFromEnd(path: string, size: number): Promise<ReadonlyArray<{ date: number, is_error: boolean, text: string }>> {
+        async getLogsFromEnd(path: string, size: number): Promise<ReadonlyArray<{ date: number, text: string }>> {
             return JSON.parse(await Post('/task/getLogsFromEnd', { path, size }));
         },
         /**
          * 获取某个任务当前的运行状态
          */
-        async getTaskStatus(path: string): Promise<'running' | 'stop' | 'crashed' | null> {
+        async getTaskStatus(path: string): Promise<'running' | 'debugging' | 'stop' | 'crashed' | null> {
             return (await Post('/task/getTaskStatus', { path }) as any) || 'null';
         },
         /**
          * 获取所有任务的状态
          */
-        async getAllTaskStatus(): Promise<ReadonlyArray<{ path: string, status: 'running' | 'stop' | 'crashed' }>> {
+        async getAllTaskStatus(): Promise<ReadonlyArray<{ path: string, status: 'running' | 'debugging' | 'stop' | 'crashed' }>> {
             return JSON.parse(await Get('/task/getAllTaskStatus'));
         },
         /**
          * 创建一个新的任务
+         * @param debug 是否启动调试模式
+         * @returns 返回调试的端口号。-1表示无法调试
          */
-        async createTask(path: string): Promise<void> {
-            expect(await Post('/task/createTask', { path }), 'ok', '创建任务失败');
+        async createTask(path: string, debug?: boolean): Promise<number> {
+            return Number.parseInt(await Post('/task/createTask', { path, debug }));
         },
         /**
          * 终止某个正在运行的任务

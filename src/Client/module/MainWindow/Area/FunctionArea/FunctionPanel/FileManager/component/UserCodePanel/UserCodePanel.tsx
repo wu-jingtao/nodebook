@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { watch } from 'observable-variable';
 
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
@@ -7,6 +8,7 @@ import { MultipleFoldableContainerItem } from '../../../../../../../../global/Co
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { closeWindowByPath, openWindowByFilePath } from '../../../../../ContentWindow/WindowList';
 import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
+import { taskList } from '../../../TaskManager/TaskList';
 import { refreshRecycle } from '../RecyclePanel/RefreshRecycle';
 import { checkUnsavedFile } from './DeleteUnsavedFiles';
 import { checkTaskOrServiceFile } from './DeleteTaskOrServiceFile';
@@ -147,5 +149,45 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
         const items = EditableFileTree._copyItem;
         EditableFileTree._copyItem = [];
         this._preparePaste(items, action);
+    }
+
+    componentDidMount() {
+        //根据任务的运行状态，改变背景色
+        if (!this._isBranch && this._name.endsWith('.server.js')) {
+            const getStatus = () => {
+                const status = taskList.get(this._fullNameString);
+                if (status) {
+                    const setBackgroundColor = () => {
+                        switch (status.value) {
+                            case 'running':
+                                this._backgroundColor.value = '#89d185';
+                                break;
+
+                            case 'debugging':
+                                this._backgroundColor.value = '#fc0';
+                                break;
+
+                            case 'crashed':
+                                this._backgroundColor.value = '#f48771';
+                                break;
+
+                            default:
+                                this._backgroundColor.value = undefined;
+                                break;
+                        }
+                    };
+
+                    unWatch();
+                    setBackgroundColor();
+                    this._unobserve.push(watch([status], setBackgroundColor));
+                }
+            }
+
+            taskList.on('add', getStatus);
+            const unWatch = () => taskList.off('add', getStatus);
+
+            this._unobserve.push(unWatch);
+            getStatus();
+        }
     }
 }

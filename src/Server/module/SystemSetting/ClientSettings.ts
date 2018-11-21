@@ -34,6 +34,12 @@ SystemSetting.addSystemSetting('client.task.listRefreshInterval', 10 * 1000, fal
 //刷新任务日志时间间隔
 SystemSetting.addSystemSetting('client.task.logRefreshInterval', 2 * 1000, false, 'number');
 
+//任务日志字体大小
+SystemSetting.addSystemSetting('client.taskLog.fontSize', 14, false, 'number');
+
+//显示每条任务日志的时间
+SystemSetting.addSystemSetting('client.taskLog.displayTime', true, false, 'boolean');
+
 //终端字体大小
 SystemSetting.addSystemSetting('client.terminal.fontSize', 14, false, 'number');
 

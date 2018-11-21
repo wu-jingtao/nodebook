@@ -16,7 +16,7 @@ import { CreateService } from './CreateService/CreateService';
 
 const less = require('./ServiceManager.less');
 
-export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceListValueType & { status: ObservableVariable<"running" | "stop" | "crashed"> }> {
+export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceListValueType & { status: ObservableVariable<"running" | "debugging" | "stop" | "crashed"> }> {
 
     //删除服务
     private readonly _deleteService = () => {
@@ -213,7 +213,8 @@ export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceList
                 this._fileIcon_displayContent.value = (
                     <>
                         ({this._dataTree.data.status.value === 'running' ? '正在运行' :
-                            this._dataTree.data.status.value === 'stop' ? '停止' : '崩溃'})&nbsp;
+                            this._dataTree.data.status.value === 'debugging' ? '正在调试' :
+                                this._dataTree.data.status.value === 'stop' ? '停止' : '崩溃'})&nbsp;
                         {this._dataTree.data.name.value}
                         <span className={less.fileFullName}>{this._name}</span>
                     </>
@@ -251,7 +252,7 @@ export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceList
             return [
                 [
                     this._dataTree.data.status.value === 'running' && { name: '停止服务', callback: () => stopTask(this._name) },
-                    this._dataTree.data.status.value === 'running' && { name: '重启服务', callback: () => restartTask(this._name) },
+                    this._dataTree.data.status.value === 'running' && { name: '重启服务', callback: () => restartTask(this._name, false) },
                     this._dataTree.data.status.value !== 'running' && { name: '启动服务', callback: () => startTask(this._name) },
                 ],
                 [

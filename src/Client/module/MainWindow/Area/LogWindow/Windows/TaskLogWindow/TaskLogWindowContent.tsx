@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
+import * as moment from 'moment';
 import { ObservableVariable, watch, oMap } from 'observable-variable';
 import throttle = require('lodash.throttle');
 
@@ -39,7 +40,8 @@ export class TaskLogWindowContent extends ObservableComponent {
 class TaskLogDisplay extends ObservableComponent<{ taskFilePath: string }> {
 
     private readonly _logRefreshInterval = normalSettings.get('client.task.logRefreshInterval') as ObservableVariable<number>;
-    private readonly _fontSize = normalSettings.get('client.terminal.fontSize') as ObservableVariable<number>;
+    private readonly _fontSize = normalSettings.get('client.taskLog.fontSize') as ObservableVariable<number>;
+    private readonly _displayTime = normalSettings.get('client.taskLog.displayTime') as ObservableVariable<boolean>;
 
     private _ref: HTMLDivElement;
     private _terminal: Terminal;
@@ -96,7 +98,13 @@ class TaskLogDisplay extends ObservableComponent<{ taskFilePath: string }> {
                 try {
                     const logs = await ServerApi.task.getLogsAfterDate(this.props.taskFilePath, lastLogTime);
                     if (logs.length > 0) {
-                        logs.forEach(item => this._terminal.writeln(item.text));
+                        logs.forEach(item => {
+                            if (this._displayTime.value)
+                                this._terminal.writeln(`[${moment(item.date).format('YYYY-MM-DD HH:mm:ss')}] ${item.text}`);
+                            else
+                                this._terminal.writeln(item.text);
+                        });
+                        
                         lastLogTime = logs[logs.length - 1].date;
                     }
                 } catch (error) {

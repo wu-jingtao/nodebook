@@ -6,7 +6,7 @@ import { ObservableVariable, oVar } from "observable-variable";
 export class TaskLogger {
 
     //保存的日志
-    private readonly _logList: { date: number, is_error: boolean, text: string }[] = [];
+    private readonly _logList: { date: number, text: string }[] = [];
 
     //日志最大长度改变回调
     private readonly _onLogMaxLengthChange = (maxLength: number) => {
@@ -17,7 +17,7 @@ export class TaskLogger {
     /**
      * 当前任务的运行状态
      */
-    readonly status: ObservableVariable<'running' | 'stop' | 'crashed'> = oVar('stop') as any;
+    readonly status: ObservableVariable<'running' | 'debugging' | 'stop' | 'crashed'> = oVar('stop') as any;
 
     /**
      * 该任务是否是服务。服务的日志永远不会过期
@@ -40,8 +40,8 @@ export class TaskLogger {
      * @param is_error 是否是 stderr 输出
      * @param text 日志内容
      */
-    addLog(is_error: boolean, text: string): void {
-        this._logList.push({ date: Date.now(), is_error, text });
+    addLog(text: string): void {
+        this._logList.push({ date: Date.now(), text });
         if (this._logList.length > this._logMaxLength.value)
             this._logList.shift();
     }
@@ -57,7 +57,7 @@ export class TaskLogger {
      * 获取某个时间点之后的所有日志，如果不传入则表示获取所有日志
      * @param date 时间戳
      */
-    getLogsAfterDate(date?: number): ReadonlyArray<{ date: number, is_error: boolean, text: string }> {
+    getLogsAfterDate(date?: number): ReadonlyArray<{ date: number, text: string }> {
         if (date === undefined)
             return this._logList;
         else {
@@ -78,7 +78,7 @@ export class TaskLogger {
     /**
      * 从末尾获取多少条日志
      */
-    getLogsFromEnd(size: number): ReadonlyArray<{ date: number, is_error: boolean, text: string }> {
+    getLogsFromEnd(size: number): ReadonlyArray<{ date: number, text: string }> {
         return this._logList.slice(-size);
     }
 

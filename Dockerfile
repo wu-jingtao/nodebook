@@ -1,10 +1,8 @@
-# 镜像地址：https://github.com/mx601595686/my-docker-image/tree/master/nodejs
-FROM registry.cn-hangzhou.aliyuncs.com/wujingtao/node:latest
+FROM node
 
-# 如果容器还缺少curl，那么还需要安装curl(注意curl版本必须大于7.4 不然没有--unix-socket参数)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     dos2unix \
-    curl \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 # 创建存放 用户数据目录 以及 任务数据目录
@@ -14,7 +12,7 @@ WORKDIR /app
 
 # 复制代码
 COPY ["src", "/app/src/"]
-COPY ["package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "LICENSE", "/app/"]
+COPY ["package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "start.sh", "LICENSE", "/app/"]
 
 # 编译
 RUN npm install && \ 
@@ -27,8 +25,8 @@ RUN npm install && \
 # 确保程序代码不会被破坏
     chmod 755 /app && \
 # 确保可执行
-    dos2unix /app/node_modules/service-starter/src/Docker/health_check.sh && \
-    chmod 755 /app/node_modules/service-starter/src/Docker/health_check.sh
+    dos2unix node_modules/service-starter/src/Docker/health_check.sh start.sh && \
+    chmod 755 node_modules/service-starter/src/Docker/health_check.sh start.sh
 
 HEALTHCHECK \
     # 每次检查的间隔时间
@@ -42,11 +40,12 @@ HEALTHCHECK \
     # 调用程序所暴露出的健康检查接口(要使用绝对路径)
     CMD /app/node_modules/service-starter/src/Docker/health_check.sh
 
-# DOMAIN：配置域名，默认localhost:443
-# DEBUG： 是否开启了debug模式。
-ENV DOMAIN=localhost:443 DEBUG=false
+# DOMAIN：  配置域名，默认localhost:443
+# DEBUG：   是否开启了debug模式。
+# TZ：      时区默认是上海
+ENV DOMAIN=localhost:443 DEBUG=false TZ=Asia/Shanghai
 
 # 只暴露https
 EXPOSE 443
 
-CMD ["node", "."]
+CMD ["./start.sh"]

@@ -9,7 +9,7 @@ import { openTaskLogWindow } from '../../../LogWindow/Windows/TaskLogWindow/Task
 
 export class ServiceWindowFunctionButtons extends BaseWindowFunctionButtons<ServiceWindowArgs> {
 
-    private readonly _status = oVar<ObservableVariable<'running' | 'stop' | 'crashed'> | false>(false);
+    private readonly _status = oVar<ObservableVariable<'running' | 'debugging' | 'stop' | 'crashed'> | false>(false);
 
     protected _functionButtons = <ObservableComponentWrapper watch={[this._status]} render={() => (
         this._status.value && <ObservableComponentWrapper watch={[this._status.value]} render={() => (
@@ -19,7 +19,7 @@ export class ServiceWindowFunctionButtons extends BaseWindowFunctionButtons<Serv
                         <img src={`/static/res/img/buttons_icon/stop-inverse.svg`}
                             title={`停止服务`} onClick={() => stopTask(this.props.args.args.path)} />
                         <img src={`/static/res/img/buttons_icon/restart-inverse.svg`}
-                            title={`重启服务`} onClick={() => restartTask(this.props.args.args.path)} />
+                            title={`重启服务`} onClick={() => restartTask(this.props.args.args.path, false)} />
                     </>
                 ) : <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
                     title={`启动服务`} onClick={() => startTask(this.props.args.args.path)} />}

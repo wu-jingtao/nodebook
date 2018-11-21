@@ -53,8 +53,16 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
         createTask(this.props.args.args.path);
     };
 
+    private readonly _createDebugTask = () => {
+        createTask(this.props.args.args.path, true);
+    };
+
     private readonly _startTask = () => {
         startTask(this.props.args.args.path);
+    };
+
+    private readonly _startDebugTask = () => {
+        startTask(this.props.args.args.path, true);
     };
 
     private readonly _restartTask = () => {
@@ -90,9 +98,13 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
                         (
                             <>
                                 <ObservableComponentWrapper watch={[status]} render={() => (
-                                    status.value !== 'running' ?
-                                        <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
-                                            title={`启动任务`} onClick={this._startTask} /> :
+                                    status.value !== 'running' && status.value !== 'debugging' ?
+                                        <>
+                                            <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
+                                                title={`启动任务`} onClick={this._startTask} />
+                                            <img src={`/static/res/img/buttons_icon/debug-dark.svg`}
+                                                title={`启动调试任务`} onClick={this._startDebugTask} />
+                                        </> :
                                         <>
                                             <img src={`/static/res/img/buttons_icon/restart-inverse.svg`}
                                                 title={`重启任务`} onClick={this._restartTask} />
@@ -104,8 +116,12 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
                                     title={`查看日志`} onClick={this._openLog} />
                             </>
                         ) : (
-                            <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
-                                title={`创建任务`} onClick={this._createTask} />
+                            <>
+                                <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
+                                    title={`创建任务`} onClick={this._createTask} />
+                                <img src={`/static/res/img/buttons_icon/debug-dark.svg`}
+                                    title={`创建调试任务`} onClick={this._createDebugTask} />
+                            </>
                         );
                 }} />
             }

@@ -16,11 +16,12 @@ export async function checkTask(path: string, action: 'delete' | 'cut', descenda
 
         if (descendants) {
             taskList.forEach((status, taskPath) => {
-                if (status.value === 'running' && taskPath.startsWith(path))
+                if ((status.value === 'running' || status.value === 'debugging') && taskPath.startsWith(path))
                     taskFile.push(taskPath);
             });
         } else {
-            if (taskList.has(path) && taskList.get(path).value === 'running')
+            const status = taskList.get(path);
+            if (status && (status.value === 'running' || status.value === 'debugging'))
                 taskFile.push(path);
         }
 

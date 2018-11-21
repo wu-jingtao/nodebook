@@ -43,7 +43,7 @@ export class ServiceManager extends BaseServiceModule {
             this._generateServiceLogger(item);
             if (item.auto_restart) {    //启动用户服务
                 try {
-                    this._taskManager.createTask(item.path);
+                    await this._taskManager.createTask(item.path);
                 } catch (err) {
                     log.error.location.text.content.content(this.name, '启动用户服务失败',
                         `服务名：${item.name}  服务文件：${item.path.replace(FilePath._userCodeDir, '/')}`, err);

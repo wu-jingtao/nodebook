@@ -4,4 +4,5 @@
 !package.json
 !tsconfig.json
 !webpack.config.js
+!start.sh
 !LICENSE

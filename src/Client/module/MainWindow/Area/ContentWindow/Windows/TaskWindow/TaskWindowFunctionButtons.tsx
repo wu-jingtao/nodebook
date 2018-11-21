@@ -9,20 +9,27 @@ import { openTaskLogWindow } from '../../../LogWindow/Windows/TaskLogWindow/Task
 
 export class TaskWindowFunctionButtons extends BaseWindowFunctionButtons<TaskWindowArgs> {
 
-    private readonly _status = oVar<ObservableVariable<'running' | 'stop' | 'crashed'> | false>(false);
+    private readonly _status = oVar<ObservableVariable<'running' | 'debugging' | 'stop' | 'crashed'> | false>(false);
 
     protected _functionButtons = <ObservableComponentWrapper watch={[this._status]} render={() => (
         this._status.value && <ObservableComponentWrapper watch={[this._status.value]} render={() => (
             <>
-                {(this._status.value as any).value === 'running' ? (
+                {(this._status.value as any).value === 'running' || (this._status.value as any).value === 'debugging' ? (
                     <>
                         <img src={`/static/res/img/buttons_icon/stop-inverse.svg`}
                             title={`停止任务`} onClick={() => stopTask(this.props.args.args.path)} />
                         <img src={`/static/res/img/buttons_icon/restart-inverse.svg`}
                             title={`重启任务`} onClick={() => restartTask(this.props.args.args.path)} />
                     </>
-                ) : <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
-                    title={`启动任务`} onClick={() => startTask(this.props.args.args.path)} />}
+                ) :
+                    (
+                        <>
+                            <img src={`/static/res/img/buttons_icon/start-inverse.svg`}
+                                title={`启动任务`} onClick={() => startTask(this.props.args.args.path)} />
+                            <img src={`/static/res/img/buttons_icon/debug-dark.svg`}
+                                title={`启动调试任务`} onClick={() => startTask(this.props.args.args.path, true)} />
+                        </>
+                    )}
                 <img src={`/static/res/img/buttons_icon/repl-inverse.svg`}
                     title={`查看日志`} onClick={() => openTaskLogWindow(this.props.args.args.path)} />
             </>

@@ -1,4 +1,5 @@
 import { oVar, oArr } from "observable-variable";
+import { displayType } from "../../LogWindow";
 
 /**
  * 任务窗口列表，value是任务文件的绝对路径
@@ -15,7 +16,9 @@ export const focusedTaskLogWindow = oVar('');
  * @param taskFilePath 任务文件的路径
  */
 export function openTaskLogWindow(taskFilePath: string): void {
-    if (!taskLogWindowList.includes(taskFilePath)) 
+    if (!taskLogWindowList.includes(taskFilePath))
         taskLogWindowList.push(taskFilePath);
+
     focusedTaskLogWindow.value = taskFilePath;
+    displayType.value = 'log';
 }
