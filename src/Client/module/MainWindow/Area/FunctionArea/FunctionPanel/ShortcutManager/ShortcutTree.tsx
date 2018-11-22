@@ -181,7 +181,7 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
             showPopupWindow({
                 title: '确定要删除吗?',
                 content: <DeleteFiles items={items.map(item => ({
-                    name: item._isBranch ? item._name : item._dataTree.data.path,
+                    name: item._isBranch ? item._name : item._dataTree.data.path.split('/').pop() as string,
                     fullName: item._name,
                     isDirectory: item._isBranch
                 }))} />,
@@ -363,7 +363,7 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
 
         //文件图标以及对应的文件名
         if (!this._isBranch) {
-            this._fileIcon_url.value = '/static/res/img/file_icons/' + getIconPath(this._dataTree.data.path);
+            this._fileIcon_url.value = '/static/res/img/file_icons/' + getIconPath(this._dataTree.data.path.split('/').pop() as string);
             this._fileIcon_displayContent.value = (
                 <>
                     <span>{this._name}</span>

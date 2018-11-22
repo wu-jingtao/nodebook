@@ -13,7 +13,7 @@ import { unsavedFiles } from './CodeEditorFileCache';
 export class CodeEditorWindowTitle extends BaseWindowTitle<CodeEditorWindowArgs> {
 
     protected _prompt = this.props.args.args.path;
-    protected _icon = `/static/res/img/file_icons/${getIconPath(this.props.args.name)}`;
+    protected _icon = `/static/res/img/file_icons/${getIconPath(this.props.args.args.path.split('/').pop() as string)}`;
     protected _title = <ObservableComponentWrapper watch={[unsavedFiles]} render={() => (
         <span style={{ color: unsavedFiles.has(this.props.args.args.path) ? '#cdab7a' : undefined }}>{this.props.args.name}</span>
     )} />

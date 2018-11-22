@@ -54,7 +54,7 @@ export class CreateService extends ObservableComponent<CreateServicePropsType> {
     render() {
         return (
             <div className={classnames(less.CreateService, { [less.error]: this.props.errorTip.some(item => item.length > 0) })}>
-                <FileIcon className={less.icon} filename={this.props.filePath.value} />
+                <FileIcon className={less.icon} filename={this.props.filePath.value.split('/').pop() as string} />
                 <TextInput className={classnames(less.input, { [less.input_filePath]: !this.props.isModify })}
                     placeholder="请输入运行文件的绝对路径" type="text" disabled={this.props.isModify} value={this.props.filePath} autoFocus />
                 {!this.props.isModify && <div className={less.selectFile} onClick={this._selectFile}>选择文件</div>}

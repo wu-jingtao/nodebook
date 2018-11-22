@@ -23,7 +23,7 @@ export class LibraryManager extends BaseServiceModule {
         } catch {
             await fs.writeJson(FilePath.packageJson, {
                 name: 'nodebook-user-installed-library',
-                version: '0.0.1',
+                version: '1.0.0',
                 private: true,
                 description: 'nodebook 用户安装的类库',
                 dependencies: {}

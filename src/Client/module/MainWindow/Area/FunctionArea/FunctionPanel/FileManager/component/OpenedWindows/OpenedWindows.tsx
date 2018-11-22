@@ -90,7 +90,7 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', arg
         this.props.args.type === WindowType.task ? '/static/res/img/file_icons/file_type_bolt.svg' : //闪电符号
             this.props.args.type === WindowType.service ? '/static/res/img/file_icons/file_type_apib2.svg' : //圆圈三角形
                 this.props.args.type === WindowType.settings ? '/static/res/img/file_icons/file_type_ini.svg' : //齿轮
-                    `/static/res/img/file_icons/${getIconPath((this.props.args as any).args.path)}`
+                    `/static/res/img/file_icons/${getIconPath((this.props.args as any).args.path.split('/').pop())}`
     } />
 
     //文件名称

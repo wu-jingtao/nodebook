@@ -80,7 +80,7 @@ export const _databasePath = _databaseDir + 'nodebook_system_data.db';
 /**
  * 用户安装类库 package.json
  */
-export const packageJson = _userCodeDir + 'package.json';
+export const packageJson = _userDataDir + 'package.json';
 
 /**
  * 程序商标路径

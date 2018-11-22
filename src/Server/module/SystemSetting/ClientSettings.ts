@@ -17,7 +17,7 @@ SystemSetting.addSystemSetting('client.programName', 'NodeBook', false, 'string'
 SystemSetting.addSystemSetting('client.editor.lineNumbers', true, false, 'boolean');
 
 //代码编辑器 平滑滚动
-SystemSetting.addSystemSetting('client.editor.smoothScrolling', false, false, 'boolean');
+SystemSetting.addSystemSetting('client.editor.smoothScrolling', true, false, 'boolean');
 
 //代码编辑器 minimap
 SystemSetting.addSystemSetting('client.editor.minimap', true, false, 'boolean');

@@ -75,7 +75,7 @@ class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
             title: '确认要放弃保存吗?',
             content: (
                 <div className={less_deleteFiles.DeleteFiles}>
-                    <FileIcon className={less_deleteFiles.icon} filename={this.props.path.split('/').pop() as any} />
+                    <FileIcon className={less_deleteFiles.icon} filename={this._name} />
                     <input className={less_deleteFiles.filename} readOnly value={this.props.path} />
                 </div>
             ),
@@ -139,7 +139,7 @@ class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
         return (
             <div className={less.contentItem} onClick={this._openEditor} onContextMenu={this._contextMenu}>
                 {this._undoAndLoading}
-                <FileIcon className={less.fileIcon} filename={this.props.path} />
+                <FileIcon className={less.fileIcon} filename={this._name} />
                 <div className={`${less.fileName} ${less.fileModified}`}>{this._name}</div>
                 <div className={`${less.fileFullName} ${less.fileModified}`}>{this.props.path}</div>
             </div>

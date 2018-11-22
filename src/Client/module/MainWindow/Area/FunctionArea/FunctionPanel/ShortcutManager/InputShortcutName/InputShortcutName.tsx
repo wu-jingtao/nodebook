@@ -67,7 +67,7 @@ export class InputShortcutName extends ObservableComponent<InputShortcutNameProp
                             <TextInput className={less.input} placeholder="请输入文件夹名称" type="text" value={this.props.name} autoFocus />
                         </>) :
                         (<>
-                            <FileIcon className={less.icon} filename={this.props.filePath.value} />
+                            <FileIcon className={less.icon} filename={this.props.filePath.value.split('/').pop() as string} />
                             <TextInput className={classnames(less.input, less.input_filePath)} placeholder="请输入对应文件的绝对路径" type="text" value={this.props.filePath} autoFocus />
                             <div className={less.selectFile} onClick={this._selectFile}>选择文件</div>
                             <div className={less.shortcutName}>快捷方式名称</div>
