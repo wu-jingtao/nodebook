@@ -25,7 +25,7 @@ export function VisitRestriction(httpServer: HttpServer): koa.Middleware {
     _ipWhiteListRegexp.on('set', newValue => _ip_white = newValue ? new RegExp(newValue) : undefined as any);
     _ipBlackListRegexp.on('set', newValue => _ip_black = newValue ? new RegExp(newValue) : undefined as any);
 
-    return async function VisitRestriction(ctx, next) {
+    return function VisitRestriction(ctx, next) {
         if (_mainProcessCommunicator.domain === ctx.host) { //ctx.host 格式："localhost:3000"
             if (_ip_white !== undefined) {
                 if (_ip_white.test(ctx.ip))

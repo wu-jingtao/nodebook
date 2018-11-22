@@ -112,7 +112,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
             //检查是否有文件夹，复制或剪切自己到自己内部
             checked = checked && items.every(item => {
                 if (item._dataTree.subItem) {
-                    const result = this._fullNameString.startsWith(item._fullNameString);
+                    const result = item._fullName.length <= this._fullName.length && item._fullName.every((name, index) => this._fullName[index] === name);
 
                     if (result)
                         showMessageBox({

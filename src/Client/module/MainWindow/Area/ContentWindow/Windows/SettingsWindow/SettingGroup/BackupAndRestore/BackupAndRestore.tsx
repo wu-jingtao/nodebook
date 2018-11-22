@@ -256,7 +256,7 @@ export class BackupAndRestore extends BaseSettingGroup {
                 (
                     <ObservableComponentWrapper watch={[this._interval, this._interval_changed, this._interval_updating]} render={() => (
                         <>
-                            <NumberInput className={less_CodeEditor.numberInput} min={0} max={999} step={1} value={this._interval} disabled={this._interval_updating.value} />
+                            <NumberInput className={less_CodeEditor.numberInput} min={0} max={20} step={1} value={this._interval} disabled={this._interval_updating.value} />
                             {this._interval_changed.value && <Button className={classnames(less_ProgramNameAndIcon.button, less_UsernameAndPassword.button)}
                                 loading={this._interval_updating.value} onClick={this._changeInterval}>确认修改</Button>}
                         </>

@@ -23,9 +23,10 @@ export class TaskManager extends BaseServiceModule {
 
     //存放正在执行的任务。key：文件路径。invokeCallback：调用任务内部方法回调，key：随机ID
     private readonly _taskList: Map<string, { process: child_process.ChildProcess, invokeCallback: Map<string, (jsonResult: string) => void> }> = new Map();
+    private readonly _cpuInfo = os.cpus();
+    
     private _logManager: LogManager;
     private _mainProcessCommunicator: MainProcessCommunicator;
-    private _cpuInfo = os.cpus();
 
     async onStart(): Promise<void> {
         this._logManager = this.services.LogManager;

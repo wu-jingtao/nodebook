@@ -100,7 +100,7 @@ class TaskLogDisplay extends ObservableComponent<{ taskFilePath: string }> {
                     if (logs.length > 0) {
                         logs.forEach(item => {
                             if (this._displayTime.value)
-                                this._terminal.writeln(`[${moment(item.date).format('YYYY-MM-DD HH:mm:ss')}] ${item.text}`);
+                                this._terminal.writeln(`[${moment(item.date).format('YYYY-MM-DD HH:mm:ss')}]  ${item.text}`);
                             else
                                 this._terminal.writeln(item.text);
                         });

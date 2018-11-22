@@ -18,13 +18,13 @@ export class MainProcessCommunicator extends BaseServiceModule {
     /**
      * 本机的域名
      */
-    domain = (process.env.DOMAIN || 'localhost').trim().toLowerCase().replace(/:443$/, ''); //去掉443是因为浏览器不会把443端口号发过来
-
-    async onStart(): Promise<void> { }
+    domain = (process.env.DOMAIN || 'localhost:443').trim().toLowerCase().replace(/:443$/, ''); //去掉443是因为浏览器不会把443端口号发过来
 
     private _sendMessage(signal: string, bash?: string): void {
         (process as any).send({ signal, bash });
     }
+
+    async onStart(): Promise<void> { }
 
     /**
      * 重启程序

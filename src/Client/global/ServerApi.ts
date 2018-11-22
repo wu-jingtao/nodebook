@@ -96,7 +96,7 @@ export const ServerApi = {
             return await Get('/file/api/readFile', { path }, true);
         },
         /**
-         * 查询某个单独的文件的状态信息
+         * 查询某个单独的文件或文件夹的状态信息
          * @param path 
          */
         async fileStatus(path: string): Promise<{ isBinary: boolean, modifyTime: number, size: number }> {

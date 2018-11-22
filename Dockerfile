@@ -1,7 +1,8 @@
-FROM node
+FROM node:10-stretch
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     dos2unix \
+    zip \
     tzdata \
     && rm -rf /var/lib/apt/lists/*
 
@@ -12,7 +13,8 @@ WORKDIR /app
 
 # 复制代码
 COPY ["src", "/app/src/"]
-COPY ["package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "start.sh", "LICENSE", "/app/"]
+COPY ["package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "LICENSE", "/app/"]
+COPY [".bashrc", "/root/.bashrc"]
 
 # 编译
 RUN npm install && \ 
@@ -25,8 +27,8 @@ RUN npm install && \
 # 确保程序代码不会被破坏
     chmod 755 /app && \
 # 确保可执行
-    dos2unix node_modules/service-starter/src/Docker/health_check.sh start.sh && \
-    chmod 755 node_modules/service-starter/src/Docker/health_check.sh start.sh
+    dos2unix node_modules/service-starter/src/Docker/health_check.sh /root/.bashrc && \
+    chmod 755 node_modules/service-starter/src/Docker/health_check.sh
 
 HEALTHCHECK \
     # 每次检查的间隔时间
@@ -48,4 +50,4 @@ ENV DOMAIN=localhost:443 DEBUG=false TZ=Asia/Shanghai
 # 只暴露https
 EXPOSE 443
 
-CMD ["./start.sh"]
+CMD ["node", "."]

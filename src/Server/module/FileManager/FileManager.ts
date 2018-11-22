@@ -16,9 +16,14 @@ export class FileManager extends BaseServiceModule {
 
     /**
      * 判断某个路径是否以什么开头，如果都不匹配则抛出异常
+     * @param startWith 给的路径必须以'/'结尾
+     * @param notEqual 不允许路径与给定路径相同
      */
-    private static _pathStartWith(path: string, startWith: string[]): void {
-        if (path.length > 4000 || !startWith.some(item => !node_path.relative(item, path).startsWith('../')))
+    private static _pathStartWith(path: string, startWith: string[], notEqual: boolean = true): void {
+        if (path.length > 4000 || !startWith.some(item => {
+            const result = node_path.relative(item, path);
+            return !result.startsWith('../') && (notEqual ? result !== '' : true)
+        }))
             throw new Error(`无权操作路径 '${path}'`);
     }
 
@@ -52,15 +57,15 @@ export class FileManager extends BaseServiceModule {
     }
 
     /**
-     * 查询某个单独的文件的状态信息
-     * @param path 文件的绝对路径
+     * 查询某个单独的文件或文件夹的状态信息
+     * @param path 绝对路径
      */
     async fileStatus(path: string): Promise<{ isBinary: boolean, modifyTime: number, size: number }> {
-        FileManager._pathStartWith(path, [FilePath._userCodeDir, FilePath._programDataDir, FilePath._recycleDir, FilePath._libraryDir]);
+        FileManager._pathStartWith(path, [FilePath._userCodeDir, FilePath._programDataDir, FilePath._recycleDir, FilePath._libraryDir], false);
         const stats = await fs.promises.stat(path);
 
         return {
-            isBinary: await isBinaryFile(path),
+            isBinary: stats.isFile() && await isBinaryFile(path),
             modifyTime: stats.mtimeMs,
             size: stats.size
         }
@@ -70,7 +75,7 @@ export class FileManager extends BaseServiceModule {
      * 列出某个目录中的子目录与文件。注意，只允许查看 '_userCodeDir' 、'_programDataDir' 、'_recycleDir' 与 '_libraryDir' 这四个目录下的内容
      */
     async listDirectory(path: string): Promise<{ name: string, isFile: boolean, isBinary: boolean, modifyTime: number, size: number }[]> {
-        FileManager._pathStartWith(path, [FilePath._userCodeDir, FilePath._programDataDir, FilePath._recycleDir, FilePath._libraryDir]);
+        FileManager._pathStartWith(path, [FilePath._userCodeDir, FilePath._programDataDir, FilePath._recycleDir, FilePath._libraryDir], false);
         const result = [];
 
         for (const name of await fs.promises.readdir(path)) {

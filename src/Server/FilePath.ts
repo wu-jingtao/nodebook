@@ -78,6 +78,11 @@ export const _opensslPasswordPath = _opensslKeyDir + 'password.txt';
 export const _databasePath = _databaseDir + 'nodebook_system_data.db';
 
 /**
+ * 用户安装类库 package.json
+ */
+export const packageJson = _userCodeDir + 'package.json';
+
+/**
  * 程序商标路径
  */
 export const _logoBrandPath = _logoDir + 'brand.png';

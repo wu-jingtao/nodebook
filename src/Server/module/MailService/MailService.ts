@@ -3,7 +3,6 @@ import { BaseServiceModule } from "service-starter";
 import { ObservableVariable } from 'observable-variable';
 
 import { SystemSetting } from '../SystemSetting/SystemSetting';
-import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
 
 //nodemailer 内置服务商列表
 const nodemailer_services_list: string[] = Object.keys(require('nodemailer/lib/well-known/services.json'));
@@ -18,8 +17,6 @@ SystemSetting.addSystemSetting('mail.pass', '', true, 'string');         //密�
  */
 export class MailService extends BaseServiceModule {
 
-    private _mainProcessCommunicator: MainProcessCommunicator;
-
     private _mailService: ObservableVariable<string>;
     private _mailUser: ObservableVariable<string>;
     private _mailPass: ObservableVariable<string>;
@@ -27,7 +24,6 @@ export class MailService extends BaseServiceModule {
     private _userName: ObservableVariable<string>;  //登陆用户的用户名
 
     async onStart(): Promise<void> {
-        this._mainProcessCommunicator = this.services.MainProcessCommunicator;
         const systemSetting = this.services.SystemSetting as SystemSetting;
 
         this._mailService = systemSetting.secretSettings.get('mail.service') as any;

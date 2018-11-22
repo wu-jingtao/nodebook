@@ -29,13 +29,13 @@ export class ServiceManager extends BaseServiceModule {
     private _programName: ObservableVariable<string>;
 
     async onStart(): Promise<void> {
-        const _systemSetting: SystemSetting = this.services.SystemSetting;
         this._taskManager = this.services.TaskManager;
         this._logManager = this.services.LogManager;
         this._servicesTable = this.services.ServicesTable;
         this._mailService = this.services.MailService;
         this._mainProcessCommunicator = this.services.MainProcessCommunicator;
-
+        
+        const _systemSetting: SystemSetting = this.services.SystemSetting;
         this._programName = _systemSetting.normalSettings.get('client.programName') as any;
 
         for (const item of await this._servicesTable.getAllServices()) {

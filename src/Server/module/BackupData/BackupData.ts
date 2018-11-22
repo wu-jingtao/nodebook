@@ -17,7 +17,7 @@ import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator'
 import { FileManager } from '../FileManager/FileManager';
 
 //设置系统变量默认值
-SystemSetting.addSystemSetting('backup.interval', 7, true, 'number');              //每隔几天备份一次数据，最小0，最大999。如果设置为0则表示不备份
+SystemSetting.addSystemSetting('backup.interval', 7, true, 'number');              //每隔几天备份一次数据，最小0，最大20。如果设置为0则表示不备份
 SystemSetting.addSystemSetting('backup.maxNumber', 10, true, 'number');            //最多保存多少个备份，最小1。超过最大备份数后，最旧的一个备份将会被删除
 SystemSetting.addSystemSetting('backup.autoSendEmail', true, true, 'boolean');     //是否每当有新的备份产生时自动将备份数据发送到用户邮箱
 SystemSetting.addSystemSetting('backup.encryptEmailFile', true, true, 'boolean');  //是否加密发送到邮箱的文件，密码是用户密码的MD5值
@@ -34,7 +34,7 @@ export class BackupData extends BaseServiceModule {
     private _maxNumber: ObservableVariable<number>;
     private _autoSendEmail: ObservableVariable<boolean>;
     private _encryptEmailFile: ObservableVariable<boolean>;
-    
+
     private _programName: ObservableVariable<string>;
     private _userPassword: ObservableVariable<string>;
 
@@ -55,7 +55,7 @@ export class BackupData extends BaseServiceModule {
         this._userPassword = _systemSetting.secretSettings.get('user.password') as any;
 
         this._interval.on('beforeSet', newValue => {
-            if (newValue < 0 || newValue > 999)
+            if (newValue < 0 || newValue > 20)
                 throw new Error('backup.interval 的值并不符合要求的范围');
         });
 
@@ -64,21 +64,10 @@ export class BackupData extends BaseServiceModule {
                 throw new Error('backup.maxNumber 的值必须大于1');
         });
 
-        const timer = (newValue: number, oldValue: number) => {
-            this.onStop();  //清除旧的计时器
-            if (newValue != 0) {
-                if (oldValue == 0) this._lastBackupTime = moment();
-
-                //计算时间差
-                const timeDiff = moment.duration(moment().add(newValue, 'days').diff(this._lastBackupTime));
-                this._timer = setTimeout(() => this._autoBackup(), timeDiff.asMilliseconds());
-            }
-        }
-
-        this._interval.on('set', timer);
+        this._interval.on('set', this._resetTimer.bind(this));
         this._maxNumber.on('set', () => this._cleanOldBackup());
 
-        timer(this._interval.value, this._interval.value);    //初始化计时器
+        this._resetTimer(this._interval.value, this._interval.value);    //初始化计时器
     }
 
     async onStop(): Promise<void> {
@@ -107,7 +96,7 @@ export class BackupData extends BaseServiceModule {
                 const process = node_pty.spawn('zipcloak', ['-O', temp_path, path], {});             //加密备份文件
 
                 process.on('data', data => {
-                    if (data.includes('password'))  //zipcloak会要求重复输入两次密码
+                    if (data.includes('password:'))  //zipcloak会要求重复输入两次密码
                         process.write(this._userPassword.value + '\r');
                 });
 
@@ -182,6 +171,22 @@ export class BackupData extends BaseServiceModule {
     }
 
     /**
+     * 重置自动备份计时器
+     * @param newValue 新this._interval值
+     * @param oldValue 旧this._interval值
+     */
+    private _resetTimer(newValue: number, oldValue: number): void {
+        this.onStop();  //清除旧的计时器
+        if (newValue != 0) {
+            if (oldValue == 0) this._lastBackupTime = moment();
+
+            //计算时间差
+            const timeDiff = moment.duration(moment().add(newValue, 'days').diff(this._lastBackupTime));
+            this._timer = setTimeout(() => this._autoBackup(), timeDiff.asMilliseconds());
+        }
+    }
+
+    /**
      * 定时备份数据
      */
     private async _autoBackup(): Promise<void> {
@@ -190,7 +195,7 @@ export class BackupData extends BaseServiceModule {
             await this._cleanOldBackup();
 
             this._lastBackupTime = moment();
-            this._interval.value = this._interval.value;    //重置计时器
+            this._resetTimer(this._interval.value, this._interval.value);    //重置计时器
 
             if (this._autoSendEmail.value) await this.sendBackupEmail(filename);
         } catch (error) {

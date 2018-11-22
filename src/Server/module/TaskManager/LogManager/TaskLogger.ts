@@ -11,7 +11,7 @@ export class TaskLogger {
     //日志最大长度改变回调
     private readonly _onLogMaxLengthChange = (maxLength: number) => {
         if (this._logList.length > maxLength)
-            this._logList.splice(0, maxLength - this._logList.length);
+            this._logList.splice(0, this._logList.length - maxLength);
     }
 
     /**

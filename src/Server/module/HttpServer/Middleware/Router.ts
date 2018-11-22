@@ -239,6 +239,10 @@ function File(router: koa_router, httpServer: HttpServer) {
             ctx.set('Content-Disposition', `attachment;filename*=UTF-8''${encodeURI(node_path.basename(ctx.body.path))}`);
     });
 
+    router.use(router_etag.routes(), router_etag.allowedMethods());
+
+    //#endregion
+
     /**
      * 压缩某个文件或目录，用于用户下载
      * @param path 传入的路径需对应服务器端全路径
@@ -248,10 +252,6 @@ function File(router: koa_router, httpServer: HttpServer) {
         ctx.body = await _fileManager.zipDownloadData(ctx.request.query.path);
         ctx.set('Content-Disposition', `attachment;filename*=UTF-8''${encodeURI(node_path.basename(ctx.request.query.path))}.zip`);
     });
-
-    router.use(router_etag.routes(), router_etag.allowedMethods());
-
-    //#endregion
 
     /**
      * 查询某个单独的文件的状态信息
@@ -460,8 +460,8 @@ function Backup(router: koa_router, httpServer: HttpServer) {
      */
     router.get(_prefix + '/readBackupFile', async (ctx: any) => {
         ctx.compress = false;   //确保不会被 koa-compress 压缩
-        ctx.set('Content-Disposition', `attachment;filename*=UTF-8''${ctx.request.query.filename}`);
         ctx.body = await _backupData.readBackupFile(ctx.request.query.filename);
+        ctx.set('Content-Disposition', `attachment;filename*=UTF-8''${ctx.request.query.filename}`);
     });
 
     /**
@@ -562,8 +562,8 @@ function Task(router: koa_router, httpServer: HttpServer) {
         perMessageDeflate: {
             zlibDeflateOptions: {
                 chunkSize: 1024,
-                memLevel: 7,
-                level: 3
+                memLevel: 9,
+                level: 9
             }
         }
     });
@@ -762,8 +762,8 @@ function Terminal(router: koa_router, httpServer: HttpServer) {
         perMessageDeflate: {
             zlibDeflateOptions: {
                 chunkSize: 1024,
-                memLevel: 7,
-                level: 3
+                memLevel: 9,
+                level: 9
             }
         }
     });

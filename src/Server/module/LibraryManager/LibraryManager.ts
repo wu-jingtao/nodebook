@@ -1,5 +1,4 @@
 import * as fs from 'fs-extra';
-import * as path from 'path';
 import * as child_process from 'child_process';
 import * as _ from 'lodash';
 import { BaseServiceModule } from "service-starter";
@@ -13,8 +12,6 @@ import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator'
  */
 export class LibraryManager extends BaseServiceModule {
 
-    private readonly _package_json_path = path.join(FilePath._userDataDir, 'package.json');
-
     private _mainProcessCommunicator: MainProcessCommunicator;
 
     async onStart(): Promise<void> {
@@ -22,9 +19,9 @@ export class LibraryManager extends BaseServiceModule {
 
         //检查 '/user-data/package.json' 是否存在，不存在就初始化一个
         try {
-            await fs.promises.access(this._package_json_path);
+            await fs.promises.access(FilePath.packageJson);
         } catch {
-            await fs.writeJson(this._package_json_path, {
+            await fs.writeJson(FilePath.packageJson, {
                 name: 'nodebook-user-installed-library',
                 version: '0.0.1',
                 private: true,
@@ -38,7 +35,7 @@ export class LibraryManager extends BaseServiceModule {
      * 获取安装了的类库列表
      */
     async getInstalledLibraries(): Promise<{ name: string, version: string }[]> {
-        const obj = await fs.readJson(this._package_json_path);
+        const obj = await fs.readJson(FilePath.packageJson);
         return _.map(obj.dependencies, (value, key) => ({ name: key, version: value }));
     }
 
