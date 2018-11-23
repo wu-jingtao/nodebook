@@ -12,7 +12,7 @@
         "jsx": "react",
         "sourceMap": true,
         "lib": [
-            "es2016",
+            "esnext",
             "dom",
             "dom.iterable"
         ]

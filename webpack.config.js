@@ -39,6 +39,11 @@ module.exports = env => {
             ]),
             new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/Client/module/IndexPage/index.html' }),
             new MonacoWebpackPlugin(),
-        ]
+        ],
+        resolveLoader: {
+            alias: {
+                "strip-dts-comment": path.resolve(__dirname, './webpack.strip_dts_comment.loader.js')
+            }
+        }
     };
 };

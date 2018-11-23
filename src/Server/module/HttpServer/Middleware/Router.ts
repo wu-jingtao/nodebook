@@ -772,7 +772,7 @@ function Terminal(router: koa_router, httpServer: HttpServer) {
         ctx.respond = false;
 
         wsServer.handleUpgrade(ctx.req, ctx.socket, Buffer.alloc(0), ws => {
-            let terminal = node_pty.spawn('bash', [], { cwd: '/' });
+            let terminal = node_pty.spawn('bash', [], { cwd: '/', cols: 120, rows: 30 });
 
             terminal.on('exit', () => ws.close());
             terminal.on('data', data => {

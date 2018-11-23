@@ -38,10 +38,53 @@ $(document).on('keydown', e => {
         e.preventDefault();
 });
 
-//加载tsd
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../../../node_modules/@types/jquery/index.d.ts'), 'jquery');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../../../node_modules/@types/node/index.d.ts'), 'node');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../../../node_modules/@types/node/inspector.d.ts'), 'node/inspector');
+//语法解析器配置
+monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    baseUrl: '/',
+    module: monaco.languages.typescript.ModuleKind.CommonJS,
+    target: monaco.languages.typescript.ScriptTarget.ESNext,
+    experimentalDecorators: true,
+    noEmit: true,
+    allowNonTsExtensions: true
+});
+
+/**
+ * 加载DTS类型声明文件。
+ * 提示：
+ *      1.addExtraLib的filePath 全部以/node_modules/@types/开头
+ *      2.如果require()无法获取到类型声明，可以添加一个声明文件强制导出，声明文件的名称统一为export.d.ts。
+ *          例如：declare module "jquery" { export = jQuery; }
+ */
+
+//@types/jquery 3.3.22
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/jquery/JQueryStatic.d.ts'), '/node_modules/@types/jquery/JQueryStatic.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/jquery/JQuery.d.ts'), '/node_modules/@types/jquery/JQuery.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/jquery/misc.d.ts'), '/node_modules/@types/jquery/misc.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/jquery/legacy.d.ts'), '/node_modules/@types/jquery/legacy.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/jquery/index.d.ts'), '/node_modules/@types/jquery/index.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib('declare module "jquery" { export = jQuery; }', '/node_modules/@types/jquery/export.d.ts');
+
+//@types/lodash 4.14.118
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/common.d.ts'), '/node_modules/@types/lodash/common/common.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/array.d.ts'), '/node_modules/@types/lodash/common/array.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/collection.d.ts'), '/node_modules/@types/lodash/common/collection.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/date.d.ts'), '/node_modules/@types/lodash/common/date.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/function.d.ts'), '/node_modules/@types/lodash/common/function.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/lang.d.ts'), '/node_modules/@types/lodash/common/lang.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/math.d.ts'), '/node_modules/@types/lodash/common/math.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/number.d.ts'), '/node_modules/@types/lodash/common/number.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/object.d.ts'), '/node_modules/@types/lodash/common/object.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/seq.d.ts'), '/node_modules/@types/lodash/common/seq.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/string.d.ts'), '/node_modules/@types/lodash/common/string.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/util.d.ts'), '/node_modules/@types/lodash/common/util.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/index.d.ts'), '/node_modules/@types/lodash/index.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib('declare module "lodash" { export = _; }', '/node_modules/@types/lodash/export.d.ts');
+
+//@types/node 10.12.10
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/node/index.d.ts'), '/node_modules/@types/node/index.d.ts');
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/node/inspector.d.ts'), '/node_modules/@types/node/inspector.d.ts');
+
+//nodebook内置模块
 monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../res/helper/client_helper.d.ts'), 'client_helper.js');
 monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../res/helper/server_helper.d.ts'), '/app/bin/Client/res/helper/server_helper.js');
 
