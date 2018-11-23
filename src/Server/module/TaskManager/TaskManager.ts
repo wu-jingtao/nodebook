@@ -24,9 +24,10 @@ export class TaskManager extends BaseServiceModule {
     //存放正在执行的任务。key：文件路径。invokeCallback：调用任务内部方法回调，key：随机ID
     private readonly _taskList: Map<string, { process: child_process.ChildProcess, invokeCallback: Map<string, (jsonResult: string) => void> }> = new Map();
     private readonly _cpuInfo = os.cpus();
-    
+
     private _logManager: LogManager;
     private _mainProcessCommunicator: MainProcessCommunicator;
+    private _lastDebugPort: number = 6666; //上次调试使用的端口
 
     async onStart(): Promise<void> {
         this._logManager = this.services.LogManager;
@@ -46,7 +47,7 @@ export class TaskManager extends BaseServiceModule {
     async createTask(taskFilePath: string, debug?: boolean): Promise<number> {
         if (!this._taskList.has(taskFilePath)) {    //确保要创建的任务并未处于运行状态
             LogManager._checkPath(taskFilePath);
-            const debugPort = debug ? await getPort() : -1;
+            const debugPort = debug ? this._lastDebugPort = await getPort({ port: this._lastDebugPort, host: '127.0.0.1' }) : -1;
 
             const child = child_process.fork(taskFilePath, [], {
                 cwd: FilePath._programDataDir,

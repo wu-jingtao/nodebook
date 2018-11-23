@@ -36,6 +36,10 @@ async function _inner_createTask(filePath: string, debug?: boolean): Promise<voi
                             closeMessageBox(id);
                         }
                     }
+                },
+                cancel: {
+                    name: '关闭',
+                    callback() { }
                 }
             }
         });
