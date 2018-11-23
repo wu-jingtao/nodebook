@@ -13,7 +13,7 @@ WORKDIR /app
 
 # 复制代码
 COPY ["src", "/app/src/"]
-COPY ["package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "LICENSE", "/app/"]
+COPY ["package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "webpack.strip_dts_comment.loader", "LICENSE", "/app/"]
 COPY [".bashrc", "/root/.bashrc"]
 
 # 编译
@@ -23,7 +23,7 @@ RUN npm install && \
 # 清除devDependencies包
     npm prune --production && \
 # 删除多余文件
-    rm -r src gulpfile.js tsconfig.json webpack.config.js && \
+    rm -r src gulpfile.js tsconfig.json webpack.config.js webpack.strip_dts_comment.loader && \
 # 确保程序代码不会被破坏
     chmod 755 /app && \
 # 确保可执行

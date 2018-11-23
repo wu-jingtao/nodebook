@@ -4,5 +4,6 @@
 !package.json
 !tsconfig.json
 !webpack.config.js
+!webpack.strip_dts_comment.loader
 !.bashrc
 !LICENSE
