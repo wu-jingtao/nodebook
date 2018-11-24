@@ -14,7 +14,7 @@ export class ServiceWindowFunctionButtons extends BaseWindowFunctionButtons<Serv
     protected _functionButtons = <ObservableComponentWrapper watch={[this._status]} render={() => (
         this._status.value && <ObservableComponentWrapper watch={[this._status.value]} render={() => (
             <>
-                {(this._status.value as any).value === 'running' ? (
+                {(this._status.value as any).value === 'running' || (this._status.value as any).value === 'debugging' ? (
                     <>
                         <img src={`/static/res/img/buttons_icon/stop-inverse.svg`}
                             title={`停止服务`} onClick={() => stopTask(this.props.args.args.path)} />

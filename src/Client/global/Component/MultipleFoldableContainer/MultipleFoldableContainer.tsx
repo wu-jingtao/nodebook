@@ -18,7 +18,7 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
     private _ref: JQuery<HTMLDivElement>;
 
     //容器期待的高度
-    private readonly _containerExpectHeight: ObservableArray<number> = permanent_oArr(`ui.MultipleFoldableContainer._containerExpectHeight._${this.props.uniqueID}`);
+    private readonly _containerExpectHeight = permanent_oArr<number>(`ui.MultipleFoldableContainer._containerExpectHeight._${this.props.uniqueID}`);
 
     //每个容器的实际高度
     private readonly _containerActualHeight: ObservableVariable<number>[] = [];
@@ -42,13 +42,18 @@ export abstract class MultipleFoldableContainer<T extends MultipleFoldableContai
 
             this._containerExpectHeight.set(splitterIndex, Math.max(position - (this._ref.offset() as any).top - topHeight, 0));
         } else {
-            let bottomHeight = 25 * (this._containerActualHeight.length - splitterIndex - 1); //底部其他容器的高度
+            for (let containerIndex = splitterIndex + 1; containerIndex < this._containerFolded.length; containerIndex++) {
+                if (!this._containerFolded[containerIndex].value) { //寻找在当前分隔条下面第一个没有折叠的容器
+                    let bottomHeight = 25 * (this._containerFolded.length - splitterIndex - 1); //计算当前分隔条下面所有标题栏的高度
 
-            for (let index = splitterIndex + 2; index < this._containerActualHeight.length; index++) {
-                bottomHeight += this._containerActualHeight[index].value;
+                    for (let index = containerIndex + 1; index < this._containerActualHeight.length; index++) {
+                        bottomHeight += this._containerActualHeight[index].value;
+                    }
+
+                    this._containerExpectHeight.set(containerIndex, Math.max((this._ref.offset() as any).top + this._ref.height() - position - bottomHeight, 0));
+                    break;
+                }
             }
-
-            this._containerExpectHeight.set(splitterIndex + 1, Math.max((this._ref.offset() as any).top + this._ref.height() - position - bottomHeight, 0));
         }
     }
 

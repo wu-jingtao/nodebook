@@ -71,12 +71,15 @@ export class LoginPage extends ObservableComponent {
         });
 
         //第一次打开后检查是否已经登录
-        ServerApi.user.updateToken().then(async () => {
-            await this._loadSystemSetting();
-            logged.value = true;
-        }).catch(() => { }).then(() => {
-            this._logging.value = false;
-        });
+        ServerApi.user.updateToken()
+            .then(async () => {
+                await this._loadSystemSetting();
+                logged.value = true;
+            })
+            .catch(() => { })
+            .finally(() => {
+                this._logging.value = false;
+            });
     }
 
     componentWillUnmount() {

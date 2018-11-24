@@ -62,7 +62,8 @@ export class LibraryManager extends BaseServiceModule {
                 if (this._mainProcessCommunicator.isDebug)
                     log.location.text.round.content(this.name, 'uninstallLibrary', stdout, stderr);
 
-                err ? reject(err) : resolve();
+                //npm在卸载完所有模块后会删除node_modules目录
+                fs.ensureDir(FilePath._libraryDir).then(() => err ? reject(err) : resolve()).catch(reject);
             });
         });
     }

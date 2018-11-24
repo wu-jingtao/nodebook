@@ -249,11 +249,13 @@ export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceList
         if (this._isRoot || this._loading.size > 0)
             return [];
         else {
+            const isRunning = this._dataTree.data.status.value === 'running' || this._dataTree.data.status.value === 'debugging';
+
             return [
                 [
-                    this._dataTree.data.status.value === 'running' && { name: '停止服务', callback: () => stopTask(this._name) },
-                    this._dataTree.data.status.value === 'running' && { name: '重启服务', callback: () => restartTask(this._name, false) },
-                    this._dataTree.data.status.value !== 'running' && { name: '启动服务', callback: () => startTask(this._name) },
+                    isRunning && { name: '停止服务', callback: () => stopTask(this._name) },
+                    isRunning && { name: '重启服务', callback: () => restartTask(this._name, false) },
+                    !isRunning && { name: '启动服务', callback: () => startTask(this._name) },
                 ],
                 [
                     !this._isRoot && { name: '修改服务', callback: this._alterService },

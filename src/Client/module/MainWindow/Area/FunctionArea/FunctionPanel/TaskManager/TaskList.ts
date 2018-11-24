@@ -25,7 +25,7 @@ async function _inner_createTask(filePath: string, debug?: boolean): Promise<voi
             icon: 'message',
             title: '复制链接地址，在当前浏览器的新标签页中打开',
             content,
-            autoClose: 0,
+            autoClose: 60 * 1000,
             buttons: {
                 ok: {
                     name: '复制',
