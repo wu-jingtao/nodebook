@@ -52,8 +52,7 @@ function html(filename: string) {
 }
 
 function clientJs(filename: string) {
-    return `"use strict";
-/* ${moment().format('YYYY-MM-DD HH:mm:ss')} */
+    return `"use strict"; /* ${moment().format('YYYY-MM-DD HH:mm:ss')} */
 
 /* 调用服务器端任务暴露出来的方法 */
 nodebook.invokeTask('/user_data/code/test.js', 'exportedFunctionName', {data: 123})
@@ -63,8 +62,7 @@ nodebook.invokeTask('/user_data/code/test.js', 'exportedFunctionName', {data: 12
 }
 
 function ServerJs(filename: string) {
-    return `"use strict";
-/* ${moment().format('YYYY-MM-DD HH:mm:ss')} */
+    return `"use strict"; /* ${moment().format('YYYY-MM-DD HH:mm:ss')} */
 
 const nodebook = require('/app/bin/Client/res/helper/server_helper.js');
 

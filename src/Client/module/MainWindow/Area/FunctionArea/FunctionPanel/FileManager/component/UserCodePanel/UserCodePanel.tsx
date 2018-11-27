@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { watch } from 'observable-variable';
+import { watch, ObservableVariable } from 'observable-variable';
 
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
@@ -154,9 +154,10 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
     componentDidMount() {
         //根据任务的运行状态，改变背景色
         if (!this._isBranch && this._name.endsWith('.server.js')) {
-            const getStatus = () => {
-                const status = taskList.get(this._fullNameString);
-                if (status) {
+            let unWatchStatus = () => { };
+
+            const onAdd = (status: ObservableVariable<'running' | 'debugging' | 'stop' | 'crashed'>, filePath: string) => {
+                if (filePath === this._fullNameString) {
                     const setBackgroundColor = () => {
                         switch (status.value) {
                             case 'running':
@@ -177,17 +178,27 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
                         }
                     };
 
-                    unWatch();
+                    unWatchStatus = watch([status], setBackgroundColor);
                     setBackgroundColor();
-                    this._unobserve.push(watch([status], setBackgroundColor));
                 }
-            }
+            };
 
-            taskList.on('add', getStatus);
-            const unWatch = () => taskList.off('add', getStatus);
+            const onRemove = (status: ObservableVariable<'running' | 'debugging' | 'stop' | 'crashed'>, filePath: string) => {
+                if (filePath === this._fullNameString) {
+                    this._backgroundColor.value = undefined;
+                    unWatchStatus();
+                    unWatchStatus = () => { };
+                }
+            };
 
-            this._unobserve.push(unWatch);
-            getStatus();
+            taskList.on('add', onAdd);
+            taskList.on('remove', onRemove);
+            this._unobserve.push(() => taskList.off('add', onAdd));
+            this._unobserve.push(() => taskList.off('remove', onRemove));
+            this._unobserve.push(() => unWatchStatus());
+
+            if (taskList.has(this._fullNameString))
+                onAdd(taskList.get(this._fullNameString), this._fullNameString);
         }
     }
 }

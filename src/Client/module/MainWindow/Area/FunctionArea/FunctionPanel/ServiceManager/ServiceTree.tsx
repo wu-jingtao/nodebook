@@ -40,13 +40,13 @@ export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceList
                         try {
                             deleteItems.forEach(item => item._loading.add('_deleteService'));
                             await Promise.all(deleteItems.map(item => ServerApi.task.deleteService(item._name)));
+                            await this.refreshServiceList();
                         } catch (error) {
                             showMessageBox({ icon: 'error', title: '删除服务失败', content: error.message });
                         } finally {
-                            await this.refreshServiceList();
                             deleteItems.forEach(item => {
                                 item._loading.delete('_deleteService');
-                                closeWindowByPath(item._name, undefined, [WindowType.service]);
+                                closeWindowByPath(item._name, undefined, [WindowType.service, WindowType.task]);
                             });
                         }
                     }

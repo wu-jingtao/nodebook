@@ -3,8 +3,6 @@ import * as moment from 'moment';
 import { BaseServiceModule } from "service-starter";
 import { ObservableVariable } from 'observable-variable';
 
-import * as FilePath from '../../FilePath';
-
 import { TaskManager } from "./TaskManager";
 import { ServicesTable, ServiceConfig } from "../Database/ServicesTable";
 import { LogManager } from "./LogManager/LogManager";
@@ -46,7 +44,7 @@ export class ServiceManager extends BaseServiceModule {
                     await this._taskManager.createTask(item.path);
                 } catch (err) {
                     log.error.location.text.content.content(this.name, '启动用户服务失败',
-                        `服务名：${item.name}  服务文件：${item.path.replace(FilePath._userCodeDir, '/')}`, err);
+                        `服务名：${item.name}  服务文件：${item.path}`, err);
                 }
             }
         }

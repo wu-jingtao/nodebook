@@ -137,28 +137,26 @@ export function openWindowByFilePath(path: string, isBinary: boolean, size: numb
         openWindow(winArgs, side);
     } else if (!isBinary) {    //不是二进制文件就是用编辑器打开
         const openTextFile = () => {
-            if (viewerFirst) {
-                if (path.endsWith('.html')) {
-                    const winArgs: HtmlViewerWindowArgs = {
-                        id: Math.random().toString(),
-                        fixed: oVar(false),
-                        name: `(查看) ${path.split('/').pop()}`,
-                        type: WindowType.html_viewer,
-                        args: { path }
-                    };
+            if (viewerFirst && path.endsWith('.html')) {
+                const winArgs: HtmlViewerWindowArgs = {
+                    id: Math.random().toString(),
+                    fixed: oVar(false),
+                    name: `(查看) ${path.split('/').pop()}`,
+                    type: WindowType.html_viewer,
+                    args: { path }
+                };
 
-                    openWindow(winArgs, side);
-                } else if (path.endsWith('.md')) {
-                    const winArgs: MarkdownViewerWindowArgs = {
-                        id: Math.random().toString(),
-                        fixed: oVar(false),
-                        name: `(查看) ${path.split('/').pop()}`,
-                        type: WindowType.markdown_viewer,
-                        args: { path, readonly }
-                    };
+                openWindow(winArgs, side);
+            } else if (viewerFirst && path.endsWith('.md')) {
+                const winArgs: MarkdownViewerWindowArgs = {
+                    id: Math.random().toString(),
+                    fixed: oVar(false),
+                    name: `(查看) ${path.split('/').pop()}`,
+                    type: WindowType.markdown_viewer,
+                    args: { path, readonly }
+                };
 
-                    openWindow(winArgs, side);
-                }
+                openWindow(winArgs, side);
             } else {
                 const winArgs: CodeEditorWindowArgs = {
                     id: Math.random().toString(),
@@ -250,10 +248,8 @@ export function closeWindowByPath(path: string, descendants?: boolean, types?: W
                 if (item.args.path.startsWith(path))
                     win.push({ id: item.id, side: 'left' });
             } else {
-                if (item.args.path === path) {
+                if (item.args.path === path)
                     win.push({ id: item.id, side: 'left' });
-                    break;
-                }
             }
         }
     }
@@ -264,10 +260,8 @@ export function closeWindowByPath(path: string, descendants?: boolean, types?: W
                 if (item.args.path.startsWith(path))
                     win.push({ id: item.id, side: 'right' });
             } else {
-                if (item.args.path === path) {
+                if (item.args.path === path)
                     win.push({ id: item.id, side: 'right' });
-                    break;
-                }
             }
         }
     }

@@ -149,7 +149,7 @@ export class BackupData extends BaseServiceModule {
                 reject(err);
             });
 
-            archive.file(node_path.join(FilePath._userDataDir, 'package.json'), { name: 'package.json' });
+            archive.file(FilePath.packageJson, { name: 'package.json' });
             archive.directory(FilePath._userCodeDir, node_path.basename(FilePath._userCodeDir));
             archive.directory(FilePath._recycleDir, node_path.basename(FilePath._recycleDir));
             archive.directory(FilePath._databaseDir, node_path.basename(FilePath._databaseDir));

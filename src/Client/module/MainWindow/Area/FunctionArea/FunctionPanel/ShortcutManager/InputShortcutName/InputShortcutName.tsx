@@ -28,12 +28,14 @@ export class InputShortcutName extends ObservableComponent<InputShortcutNameProp
         this._unobserve.push(watch([this.props.name, this.props.filePath], () => {
             //验证filePath
             const filePath = this.props.filePath.value;
-            if (filePath === '')
-                this.props.errorTip.set(0, '文件路径不能为空');
-            else if (!/^(\/user_data\/code\/).*?[^\/]$/.test(filePath))
-                this.props.errorTip.set(0, '文件路径错误');
-            else
-                this.props.errorTip.set(0, '');
+            if (!this.props.isDirectory) {
+                if (filePath === '')
+                    this.props.errorTip.set(0, '文件路径不能为空');
+                else if (!/^(\/user_data\/code\/).*?[^\/]$/.test(filePath))
+                    this.props.errorTip.set(0, '文件路径错误');
+                else
+                    this.props.errorTip.set(0, '');
+            }
 
             //验证name
             let name = this.props.name.value;

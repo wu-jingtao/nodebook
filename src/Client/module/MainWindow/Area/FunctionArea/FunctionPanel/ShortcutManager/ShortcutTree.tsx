@@ -18,7 +18,7 @@ import { openWindowByFilePath } from '../../../ContentWindow/WindowList';
 
 const less = require('./ShortcutManager.less');
 
-export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: string, isBinary: boolean, size: number }> {
+export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: string }> {
 
     /**
      * 鼠标拖拽的项目
@@ -64,29 +64,10 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
                         subItems={this._dataTree.subItem as any} />
                 ),
                 ok: {
-                    callback: async () => {
+                    callback: () => {
                         if (filePath.value.length > 0 && errorTip.every(item => item.length === 0)) {
-                            const tag = `_menu_createShortcut_${Math.random()}`;
-
-                            try {
-                                this._root._loading.add(tag);
-
-                                const status = await ServerApi.file.fileStatus(filePath.value);
-
-                                const name = shortcutName.value || filePath.value.split('/').pop() as string;
-                                (this._dataTree.subItem as any).set(name, {
-                                    name,
-                                    data: {
-                                        path: filePath.value,
-                                        isBinary: status.isBinary,
-                                        size: status.size
-                                    }
-                                });
-                            } catch (error) {
-                                showMessageBox({ icon: 'error', title: '查询文件状态信息失败', content: error.message });
-                            } finally {
-                                this._root._loading.delete(tag);
-                            }
+                            const name = shortcutName.value || filePath.value.split('/').pop() as string;
+                            (this._dataTree.subItem as any).set(name, { name, data: { path: filePath.value } });
                         }
                     }
                 }
@@ -151,10 +132,11 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
                 ok: {
                     callback: () => {
                         if (errorTip.every(item => item.length === 0)) {
-                            ((this._parent as any)._dataTree.subItem as any).delete(this._name);
+                            (this._parent as any)._dataTree.subItem.delete(this._name);
+                            this._focusedItem.delete(this);
 
                             const name = shortcutName.value || filePath.value.split('/').pop() as string;
-                            ((this._parent as any)._dataTree.subItem as any).set(name, {
+                            (this._parent as any)._dataTree.subItem.set(name, {
                                 name,
                                 data: { path: filePath.value },
                                 subItem: this._dataTree.subItem
@@ -388,14 +370,24 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
     protected async _onOpenBranch(isOpen: boolean): Promise<false | void> { }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
-        openWindowByFilePath(
-            this._dataTree.data.path,
-            this._dataTree.data.isBinary,
-            this._dataTree.data.size,
-            e.altKey ? 'right' : undefined,
-            undefined,
-            true
-        );
+        try {
+            this._loading.add('_onOpenItem');
+
+            const status = await ServerApi.file.fileStatus(this._dataTree.data.path);
+
+            openWindowByFilePath(
+                this._dataTree.data.path,
+                status.isBinary,
+                status.size,
+                e.altKey ? 'right' : undefined,
+                undefined,
+                true
+            );
+        } catch (error) {
+            showMessageBox({ icon: 'error', title: '查询文件状态信息失败', content: error.message });
+        } finally {
+            this._root._loading.delete('_onOpenItem');
+        }
     }
 
     protected _onContextMenu(): (ContextMenuItemOptions | void | false)[][] {

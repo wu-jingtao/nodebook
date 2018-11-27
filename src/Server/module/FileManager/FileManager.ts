@@ -20,10 +20,10 @@ export class FileManager extends BaseServiceModule {
      * @param notEqual 不允许路径与给定路径相同
      */
     private static _pathStartWith(path: string, startWith: string[], notEqual: boolean = true): void {
-        if (path.length > 4000 || !startWith.some(item => {
+        if (!(path.length < 4000 && startWith.some(item => {
             const result = node_path.relative(item, path);
             return !result.startsWith('../') && (notEqual ? result !== '' : true)
-        }))
+        })))
             throw new Error(`无权操作路径 '${path}'`);
     }
 
