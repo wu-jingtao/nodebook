@@ -69,6 +69,8 @@ export class ImageViewerWindowContent extends BaseWindowContent<ImageViewerWindo
             onMouseDown={this._dragStart}
             onMouseMove={this._dragging}
             onMouseUp={this._dragEnd}
+            onMouseLeave={this._dragEnd}
+            onMouseEnter={this._dragEnd}
             onWheel={this._zoom}>
             <ObservableComponentWrapper watch={[this._img_href, this._img_zoom, this._img_offset_X, this._img_offset_Y]}
                 render={() => (

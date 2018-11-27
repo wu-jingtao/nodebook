@@ -36,6 +36,7 @@ module.exports = env => {
                 { from: 'src/Client/res/img', to: './res/img' },
                 { from: 'src/Client/res/font', to: './res/font' },
                 { from: 'src/Client/res/helper', to: './res/helper' },
+                { from: 'node_modules/jquery/dist/jquery.min.js', to: './res/helper/jquery.min.js' },
             ]),
             new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/Client/module/IndexPage/index.html' }),
             new MonacoWebpackPlugin(),

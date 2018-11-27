@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import * as FilePath from '../../../../../../../../../Server/FilePath';
+
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { UserCodePanel, UserCodeTree } from '../UserCodePanel/UserCodePanel';
 import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
@@ -12,7 +14,7 @@ import { closeWindowByPath } from '../../../../../ContentWindow/WindowList';
 export class ProgramDataPanel extends UserCodePanel {
     protected renderContent(): JSX.Element {
         return <ProgramDataTree
-            name="/program_data"
+            name={FilePath._programDataDir}
             memorable={this.props.uniqueID}
             ref={(e: any) => this._tree = e}
             modifiedFiles={unsavedFiles} />

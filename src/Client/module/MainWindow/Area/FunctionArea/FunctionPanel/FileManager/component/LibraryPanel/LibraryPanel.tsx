@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import * as FilePath from '../../../../../../../../../Server/FilePath';
+
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { UserCodeTree } from '../UserCodePanel/UserCodePanel';
@@ -35,7 +37,7 @@ export class LibraryPanel extends MultipleFoldableContainerItem<MultipleFoldable
 
     protected renderContent(): JSX.Element {
         return <UserCodeTree
-            name="/user_data/node_modules/"
+            name={FilePath._libraryDir}
             memorable={this.props.uniqueID}
             ref={(e: any) => this._tree = e}
             modifiedFiles={unsavedFiles}

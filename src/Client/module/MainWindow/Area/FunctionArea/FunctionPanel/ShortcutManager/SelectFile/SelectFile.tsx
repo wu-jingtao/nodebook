@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { ObservableVariable, oVar } from "observable-variable";
 
+import * as FilePath from '../../../../../../../../Server/FilePath';
+
 import { BaseFileTree } from "../../../../../../../global/Component/Tree/BaseFileTree/BaseFileTree";
 import { FileIconTreePropsType } from "../../../../../../../global/Component/Tree/FileIconTree/FileIconTreePropsType";
 import { ScrollBar } from '../../../../../../../global/Component/ScrollBar/ScrollBar';
@@ -29,7 +31,7 @@ export function selectFile(filter: RegExp, lastPath: string = ''): Promise<strin
             content: (
                 <ScrollBar className={less.SelectFile}>
                     <div style={{ width: '2000px' }}>
-                        <SelectFileTree name="/user_data/code" modifiedFiles={unsavedFiles}
+                        <SelectFileTree name={FilePath._userCodeDir} modifiedFiles={unsavedFiles}
                             filePath={filePath} ok={ok} filter={filter} />
                     </div>
                 </ScrollBar>

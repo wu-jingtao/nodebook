@@ -1,6 +1,8 @@
 import * as React from 'react';
 import debounce = require('lodash.debounce');
 
+import * as FilePath from '../../../../../../../../../Server/FilePath';
+
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
@@ -49,7 +51,7 @@ export class RecyclePanel extends MultipleFoldableContainerItem<MultipleFoldable
     protected renderContent(): JSX.Element {
         return (
             <RecycleTree
-                name="/user_data/recycle"
+                name={FilePath._recycleDir}
                 memorable={this.props.uniqueID}
                 modifiedFiles={unsavedFiles}
                 noCreate noRename noUpload noZip noPaste
@@ -80,7 +82,7 @@ export class RecyclePanel extends MultipleFoldableContainerItem<MultipleFoldable
             e.preventDefault();
 
             const dt = (e.originalEvent as DragEvent).dataTransfer as DataTransfer;
-            if (dt.getData('editable_file_tree_drag') !== '/user_data/recycle') {
+            if (dt.getData('editable_file_tree_drag') !== FilePath._recycleDir) {
                 this._tree.deleteDragItems();
             }
         });

@@ -7,7 +7,7 @@ export class HtmlViewerWindowFunctionButtons extends BaseWindowFunctionButtons<H
 
     //在新的浏览器窗口中打开
     private readonly _openInBrowserWindow = () => {
-        window.open('/file/api/readFile?path=' + this.props.args.args.path);
+        window.open(this._communicator.href);
     };
 
     //刷新iframe

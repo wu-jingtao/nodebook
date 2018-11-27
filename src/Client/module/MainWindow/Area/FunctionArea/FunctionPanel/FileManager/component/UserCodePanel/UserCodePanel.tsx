@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { watch, ObservableVariable } from 'observable-variable';
 
+import * as FilePath from '../../../../../../../../../Server/FilePath';
+
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { EditableFileTreePropsType } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTreePropsType';
@@ -55,7 +57,7 @@ export class UserCodePanel extends MultipleFoldableContainerItem<MultipleFoldabl
 
     protected renderContent(): JSX.Element {
         return <UserCodeTree
-            name="/user_data/code"
+            name={FilePath._userCodeDir}
             memorable={this.props.uniqueID}
             ref={(e: any) => this._tree = e}
             modifiedFiles={unsavedFiles} />

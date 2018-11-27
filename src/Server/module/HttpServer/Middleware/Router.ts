@@ -117,7 +117,7 @@ function Others(router: koa_router, httpServer: HttpServer) {
         await _mailService.sendMail(
             `${_programName.value} 测试邮件`,
             `时间:${moment().format('YYYY-MM-DD HH:mm:ss')}\nhost:${_mainProcessCommunicator.domain}`,
-            [{ filename: 'logo.png', content: await fs.promises.readFile(node_path.join(FilePath._logoDir, './brand.png')) }]
+            [{ filename: 'logo.png', content: await fs.promises.readFile(FilePath._logoBrandPath) }]
         );
         ctx.body = 'ok';
     });
