@@ -38,6 +38,7 @@ export class Library extends BaseSettingGroup {
                             try {
                                 this._processingList.push('_library_title_header_');
                                 await ServerApi.library.installLibrary(name.value);
+                                this._refreshList();
                             } catch (error) {
                                 showMessageBox({ icon: 'error', title: `安装新的类库 ${name} 失败`, content: error.message });
                             } finally {

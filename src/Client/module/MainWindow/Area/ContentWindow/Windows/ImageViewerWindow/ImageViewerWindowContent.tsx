@@ -61,7 +61,7 @@ export class ImageViewerWindowContent extends BaseWindowContent<ImageViewerWindo
 
     //图片缩放
     private readonly _zoom = (e: React.WheelEvent) => {
-        this._img_zoom.value = Math.max(this._img_zoom.value - e.deltaY / 5 / 100, 0.1);
+        this._img_zoom.value = Math.max(this._img_zoom.value - e.deltaY / 3 / 100, 0.1);
     };
 
     protected _content = (

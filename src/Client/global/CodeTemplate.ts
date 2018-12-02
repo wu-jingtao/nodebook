@@ -14,6 +14,8 @@ export function codeTemplate(filename: string) {
         return clientJs(filename);
     else if (filename.endsWith('.server.js'))
         return ServerJs(filename);
+    else if (filename.endsWith('.js'))
+        return js(filename);
     else if (filename.endsWith('.sh'))
         return bash(filename);
     else
@@ -51,6 +53,10 @@ function html(filename: string) {
 </body>
 </html>
 `;
+}
+
+function js(filename: string) {
+    return `"use strict"; /* ${moment().format('YYYY-MM-DD HH:mm:ss')} */`;
 }
 
 function clientJs(filename: string) {

@@ -45,6 +45,24 @@
         padding: 0;
         border: none;
         background-color: transparent;
+        overflow-x: auto;
+        width: 100%;
+        display: block;
+
+        &::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+            background: transparent;
+        }
+    
+        &::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+    
+        &::-webkit-scrollbar-thumb {
+            background: darken(@darkFontColor, 60%, relative);
+            border-radius: 2px;
+        }
     }
 
     pre {
