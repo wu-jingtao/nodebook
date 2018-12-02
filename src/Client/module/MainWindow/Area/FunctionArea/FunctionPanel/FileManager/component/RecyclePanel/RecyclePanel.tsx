@@ -3,7 +3,7 @@ import debounce = require('lodash.debounce');
 
 import * as FilePath from '../../../../../../../../../Server/FilePath';
 
-import { EditableFileTree } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
+import { EditableFileTree, checkIsBusy, processingItems } from '../../../../../../../../global/Component/Tree/EditableFileTree/EditableFileTree';
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { ServerApi } from '../../../../../../../../global/ServerApi';
@@ -119,16 +119,17 @@ class RecycleTree extends UserCodeTree {
             content: <span>确定要清空回收站吗?</span>,
             ok: {
                 callback: async () => {
-                    try {
-                        closeWindowByPath(this._root._fullNameString, true);
-                        await ServerApi.file.cleanRecycle();
-                        this._root._refreshFolder();
-                    } catch (error) {
-                        showMessageBox({
-                            icon: 'error',
-                            title: `清空回收站失败`,
-                            content: error.message
-                        });
+                    if (checkIsBusy(this._root._fullNameString, true)) {
+                        try {
+                            processingItems.add(this._root._fullNameString);
+                            closeWindowByPath(this._root._fullNameString, true);
+                            await ServerApi.file.cleanRecycle();
+                            this._root._refreshFolder();
+                        } catch (error) {
+                            showMessageBox({ icon: 'error', title: `清空回收站失败`, content: error.message });
+                        } finally {
+                            processingItems.delete(this._root._fullNameString);
+                        }
                     }
                 }
             }
