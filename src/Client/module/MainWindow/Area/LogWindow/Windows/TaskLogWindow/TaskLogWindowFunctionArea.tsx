@@ -31,10 +31,12 @@ export class TaskLogWindowFunctionArea extends ObservableComponent {
             <div className={less.TaskLogWindowFunctionArea} style={{ display: displayType.value === 'log' ? 'flex' : 'none' }}>
                 <DropDownList className={less.dropDownList} value={focusedTaskLogWindow}
                     options={taskLogWindowList.map(item => ({ text: item, value: item }))} />
-                <img className={less.functionButton} src="/static/res/img/buttons_icon/clear-inverse.svg"
-                    title="清空任务日志" onClick={this._cleanTaskLog} />
-                <img className={less.functionButton} src="/static/res/img/buttons_icon/kill-inverse.svg"
-                    title="关闭任务日志" onClick={this._closeTaskLogWindow} />
+                {!!focusedTaskLogWindow.value && <>
+                    <img className={less.functionButton} src="/static/res/img/buttons_icon/clear-inverse.svg"
+                        title="清空任务日志" onClick={this._cleanTaskLog} />
+                    <img className={less.functionButton} src="/static/res/img/buttons_icon/kill-inverse.svg"
+                        title="关闭任务日志" onClick={this._closeTaskLogWindow} />
+                </>}
             </div>
         );
     }

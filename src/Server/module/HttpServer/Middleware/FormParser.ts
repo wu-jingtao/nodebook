@@ -2,6 +2,7 @@ import * as KoaBody from 'koa-body';
 import { ObservableVariable } from 'observable-variable';
 
 import { SystemSetting } from '../../SystemSetting/SystemSetting';
+import { HttpServer } from '../HttpServer';
 
 //设置系统变量默认值
 SystemSetting.addSystemSetting('http.uploadFileSizeLimit', 100, false, 'number');    //文件数据上传大小限制，单位MB，默认100MB，最小1MB
@@ -9,8 +10,8 @@ SystemSetting.addSystemSetting('http.uploadFileSizeLimit', 100, false, 'number')
 /**
  * 表单内容解析工具
  */
-export function FormParser(systemSetting: SystemSetting) {
-    const _uploadFileSizeLimit = systemSetting.normalSettings.get('http.uploadFileSizeLimit') as ObservableVariable<number>;
+export function FormParser(httpServer: HttpServer) {
+    const _uploadFileSizeLimit = httpServer.services.SystemSetting.normalSettings.get('http.uploadFileSizeLimit') as ObservableVariable<number>;
 
     _uploadFileSizeLimit.on('beforeSet', newValue => {
         if (newValue < 1)

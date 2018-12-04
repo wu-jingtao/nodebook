@@ -83,6 +83,9 @@ monaco.languages.typescript.javascriptDefaults.addExtraLib('declare module "loda
 //@types/mocha 5.2.5
 monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/mocha/index.d.ts'), '/node_modules/@types/mocha/index.d.ts');
 
+//@types/expect.js 0.3.29
+monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/expect.js/index.d.ts'), '/node_modules/@types/expect.js/index.d.ts');
+
 //@types/node 10.12.11
 monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/node/index.d.ts'), '/node_modules/@types/node/index.d.ts');
 monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/node/inspector.d.ts'), '/node_modules/@types/node/inspector.d.ts');

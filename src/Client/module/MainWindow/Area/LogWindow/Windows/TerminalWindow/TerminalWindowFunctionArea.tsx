@@ -36,8 +36,9 @@ export class TerminalWindowFunctionArea extends ObservableComponent {
             <div className={less.TaskLogWindowFunctionArea} style={{ display: displayType.value === 'terminal' ? 'flex' : 'none' }}>
                 <DropDownList className={less.dropDownList} value={focusedTerminalWindow}
                     options={terminalWindowList.map(item => ({ text: item, value: item }))} />
-                <img className={less.functionButton} src="/static/res/img/buttons_icon/kill-inverse.svg"
-                    title="关闭终端" onClick={this._closeTerminal} />
+                {!!focusedTerminalWindow.value &&
+                    <img className={less.functionButton} src="/static/res/img/buttons_icon/kill-inverse.svg"
+                        title="关闭终端" onClick={this._closeTerminal} />}
                 <img className={less.functionButton} src="/static/res/img/buttons_icon/add_inverse.svg"
                     title="新建终端" onClick={this._createTerminal} />
             </div>
