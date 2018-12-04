@@ -7,6 +7,7 @@ import * as request from 'request-promise-native';
 import * as koa_compress from 'koa-compress';
 import * as koa_router from 'koa-router';
 import * as ws from 'ws';
+import log from 'log-formatter';
 import koa_response_time = require('koa-response-time');
 import { BaseServiceModule } from "service-starter";
 
@@ -91,7 +92,9 @@ export class HttpServer extends BaseServiceModule {
             //模拟Koa调用中间件
             wsMiddleware(ctx).catch(err => {
                 socket.end();   //出现错误则断开连接
-                console.error(err);
+
+                if (this._mainProcessCommunicator.isDebug)
+                    log.error.location.content(ctx.request.path, err);
             });
         });
 
