@@ -85,6 +85,17 @@ export class TaskTree extends FileIconTree<FileIconTreePropsType, { status: Obse
         }
     }
 
-    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>) { return parentProps }
+    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>):
+        React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+        if (this._isRoot)
+            return parentProps;
+        else {
+            return {
+                ...parentProps,
+                title: this._name
+            }
+        }
+    }
+    
     protected async _onOpenBranch(): Promise<false | void> { }
 }

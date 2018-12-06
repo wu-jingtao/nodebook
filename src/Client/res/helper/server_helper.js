@@ -15,7 +15,7 @@ process.on('message', msg => {
             const func = exportFunctionList.get(functionName);
 
             if (func) {
-                func(JSON.parse(data))
+                func(JSON.parse(data || 'null'))
                     .then(data => {
                         process.send({
                             type: 'response', id: msg.id,
@@ -38,7 +38,7 @@ process.on('message', msg => {
             const callback = callbackList.get(msg.id);
             if (callback) {
                 callbackList.delete(msg.id);
-                callback(JSON.parse(msg.responseData));
+                callback(JSON.parse(msg.responseData || 'null'));
             }
         }
     } catch (error) {

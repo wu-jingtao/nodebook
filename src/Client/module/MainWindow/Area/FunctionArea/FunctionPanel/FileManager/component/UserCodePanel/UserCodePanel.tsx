@@ -137,6 +137,14 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
         );
     }
 
+    protected _props(parentProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>)
+        : React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+        return {
+            ...parentProps,
+            title: this._fullNameString
+        };
+    }
+
     /**
      * 上传文件到根
      */

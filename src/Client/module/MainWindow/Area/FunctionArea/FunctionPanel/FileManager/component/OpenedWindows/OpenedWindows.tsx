@@ -156,7 +156,8 @@ class OpenedWindowItem extends ObservableComponent<{ side: 'left' | 'right', arg
             })}
                 onClick={() => focusWindow(this.props.args.id, this.props.side)}
                 onDoubleClick={() => this.props.args.fixed.value = true}
-                onContextMenu={this._contextMenu}>
+                onContextMenu={this._contextMenu}
+                title={this.props.args.args.path}>
                 {this._closeWindow}
                 {this._icon}
                 {this._fileName}

@@ -34,8 +34,25 @@ monaco.editor.setTheme('nodebook');
 
 //阻止键盘默认行为
 $(document).on('keydown', e => {
-    if (e.ctrlKey && e.key === 's')
-        e.preventDefault();
+    if (e.ctrlKey) {
+        if (e.shiftKey) {
+            switch (e.keyCode) {
+                case 109: //NUMPAD_SUBTRACT
+                case 189: //US_MINUS
+                case 107: //NUMPAD_ADD
+                case 187: //US_EQUAL
+                    e.preventDefault();
+                    break;
+            }
+        } else {
+            switch (e.keyCode) {
+                case 83: //KEY_S
+                case 82: //KEY_R
+                    e.preventDefault();
+                    break;
+            }
+        }
+    }
 });
 
 //语法解析器配置
@@ -125,6 +142,34 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
     //键盘快捷键
     private _setKeyboardShortcut(ed: monaco.editor.IStandaloneCodeEditor) {
         ed.addAction({
+            id: '全部折叠1', label: '全部折叠',
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.NUMPAD_SUBTRACT], //ctrl+shift+-
+            precondition: 'editorTextFocus',
+            run: (ed) => { ed.getAction('editor.foldAll').run() }
+        });
+
+        ed.addAction({
+            id: '全部折叠2', label: '全部折叠',
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.US_MINUS], //ctrl+shift+-
+            precondition: 'editorTextFocus',
+            run: (ed) => { ed.getAction('editor.foldAll').run() }
+        });
+
+        ed.addAction({
+            id: '全部展开1', label: '全部展开',
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.NUMPAD_ADD], //ctrl+shift++
+            precondition: 'editorTextFocus',
+            run: (ed) => { ed.getAction('editor.unfoldAll').run() }
+        });
+
+        ed.addAction({
+            id: '全部展开2', label: '全部展开',
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.US_EQUAL], //ctrl+shift++
+            precondition: 'editorTextFocus',
+            run: (ed) => { ed.getAction('editor.unfoldAll').run() }
+        });
+
+        ed.addAction({
             id: '格式化代码', label: '格式化代码',
             keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.US_QUOTE], //alt+'
             precondition: 'editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly',
@@ -140,9 +185,16 @@ export abstract class CodeEditorWindowContent extends BaseWindowContent<CodeEdit
 
         ed.addAction({
             id: '块注释', label: '块注释',
-            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.US_SLASH],
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.US_SLASH], //ctrl+shift+/
             precondition: 'editorTextFocus && !editorReadonly',
             run: (ed) => { ed.getAction('editor.action.blockComment').run() }
+        });
+
+        ed.addAction({
+            id: '替换', label: '替换',
+            keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_R],
+            precondition: 'editorTextFocus && !editorReadonly',
+            run: (ed) => { ed.getAction('editor.action.startFindReplaceAction').run() }
         });
 
         ed.addAction({

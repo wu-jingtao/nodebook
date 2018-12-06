@@ -150,7 +150,7 @@ export class TaskManager extends BaseServiceModule {
      * @param functionName 要调用的方法名称
      * @param jsonArgs json参数，到达任务进程中后会自动反序列化，然后传给要调用的方法
      */
-    invokeTaskFunction(taskFilePath: string, functionName: string, jsonArgs: string): Promise<string> {
+    invokeTaskFunction(taskFilePath: string, functionName: string, jsonArgs?: string): Promise<string> {
         return new Promise(resolve => {
             const task = this._taskList.get(taskFilePath);
             if (task && task.process.connected) {
@@ -206,6 +206,6 @@ interface MessageType {
          */
         taskFilePath: string;
         functionName: string;
-        data: string;
+        data?: string;
     }
 }

@@ -27,10 +27,7 @@ window.nodebook = {
                     reject(err);
                 },
                 success(data) {
-                    if (data.data)
-                        resolve(data.data);
-                    else
-                        reject(data.error ? new Error(data.error) : new Error('调用失败'));
+                    data.error !== undefined ? reject(new Error(data.error)) : resolve(data.data);
                 }
             });
         });

@@ -137,7 +137,7 @@ class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
 
     render() {
         return (
-            <div className={less.contentItem} onClick={this._openEditor} onContextMenu={this._contextMenu}>
+            <div className={less.contentItem} onClick={this._openEditor} onContextMenu={this._contextMenu} title={this.props.path}>
                 {this._undoAndLoading}
                 <FileIcon className={less.fileIcon} filename={this._name} />
                 <div className={`${less.fileName} ${less.fileModified}`}>{this._name}</div>
