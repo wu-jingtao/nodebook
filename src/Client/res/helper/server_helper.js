@@ -46,6 +46,12 @@ process.on('message', msg => {
     }
 });
 
+//未捕获的promise异常。使得程序退出
+process.on('unhandledRejection', error => {
+    console.error(error);
+    process.exit(1);
+});
+
 /**
  * 调用其他任务暴露出来的方法
  * @param {string} taskFilePath 任务文件的完整路径
