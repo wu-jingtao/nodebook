@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
 import { ObservableVariable, oVar, watch } from 'observable-variable';
+import debounce = require('lodash.debounce');
 
 import { ObservableComponent } from '../../../../global/Tools/ObservableComponent';
 import { normalSettings } from '../../../../global/SystemSetting';
@@ -51,8 +52,9 @@ export class SideBar extends ObservableComponent {
     componentDidMount() {
         this.watch([this._showLogo, this._logoPadding, displayType, showLogWindow, unsavedFiles, this._crashedServiceNumber]);
 
-        //计算崩溃的服务数量
-        this._unobserve.push(watch([taskList, serviceList], () => {
+        //#region 计算崩溃的服务数量
+
+        const calculator = debounce(() => {
             let number = 0;
 
             for (const path of serviceList.keys()) {
@@ -61,7 +63,32 @@ export class SideBar extends ObservableComponent {
             }
 
             this._crashedServiceNumber.value = number;
-        }));
+        }, 10);
+
+        //监控serviceList的变化
+        const serviceList_onAdd = (_: any, path: string) => {
+            taskList.get(path).on('set', calculator);
+            calculator();
+        };
+
+        const serviceList_onRemove = (_: any, path: string) => {
+            if (taskList.has(path))
+                taskList.get(path).off('set', calculator);
+            calculator();
+        };
+
+        serviceList.on('add', serviceList_onAdd);
+        serviceList.on('remove', serviceList_onRemove);
+
+        this._unobserve.push(() => {
+            serviceList.off('add', serviceList_onAdd);
+            serviceList.off('remove', serviceList_onRemove);
+            serviceList.forEach(serviceList_onRemove);
+        });
+
+        serviceList.forEach(serviceList_onAdd);
+
+        //#endregion
     }
 
     render() {

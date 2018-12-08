@@ -263,15 +263,31 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
             e.stopPropagation();
             e.preventDefault();
 
-            for (const item of ShortcutTree._dragItems) {
-                (item._parent as any)._dataTree.subItem.delete(item._name);
+            if (ShortcutTree._dragItems.every(item => {
+                if (item._isBranch) {
+                    const result = item._fullName.length <= this._fullName.length && item._fullName.every((name, index) => this._fullName[index] === name);
 
-                const name = this._deduplicateShortcutName(this._dataTree.subItem, item._name);
-                this._dataTree.subItem.set(name, {
-                    name,
-                    data: item._dataTree.data,
-                    subItem: item._dataTree.subItem
-                });
+                    if (result)
+                        showMessageBox({
+                            icon: 'warning',
+                            title: '递归剪切',
+                            content: `文件夹'${item._fullNameString}'不能剪切自己到自己内部`
+                        });
+
+                    return !result;
+                } else
+                    return true;
+            })) {
+                for (const item of ShortcutTree._dragItems) {
+                    (item._parent as any)._dataTree.subItem.delete(item._name);
+
+                    const name = this._deduplicateShortcutName(this._dataTree.subItem, item._name);
+                    this._dataTree.subItem.set(name, {
+                        name,
+                        data: item._dataTree.data,
+                        subItem: item._dataTree.subItem
+                    });
+                }
             }
         }
     };

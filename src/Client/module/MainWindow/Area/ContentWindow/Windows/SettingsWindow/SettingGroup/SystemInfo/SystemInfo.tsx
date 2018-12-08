@@ -220,8 +220,8 @@ export class SystemInfo extends BaseSettingGroup {
         const updateChart = () => {
             timeData.push(moment().format('HH:mm:ss'));
 
-            cpuUsed.push(+this._cpuUsage.value.toFixed(2));
-            cpuRemain.push(+(100 - this._cpuUsage.value).toFixed(2));
+            cpuUsed.push(+(this._cpuUsage.value * 100).toFixed(2));
+            cpuRemain.push(+(100 - this._cpuUsage.value * 100).toFixed(2));
             memoryUsed.push(+((this._totalMemory.value - this._freeMemory.value) / 1024 / 1024).toFixed(2));
             memoryRemain.push(+(this._freeMemory.value / 1024 / 1024).toFixed(2));
             userDataUsed.push(+((this._userDataDir.value.total - this._userDataDir.value.free) / 1024 / 1024 / 1024).toFixed(2));

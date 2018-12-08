@@ -132,7 +132,7 @@ export class TaskManager extends BaseServiceModule {
                     resolve({
                         cpuNumber: this._cpuInfo.length,                                    //CPU核心数
                         cpuName: this._cpuInfo[0].model,                                    //CPU名称
-                        cpuUsage,                                                           //CPU使用百分比
+                        cpuUsage,                                                           //CPU使用百分比(0-1)
                         totalMemory: os.totalmem(),                                         //内存总量
                         freeMemory: os.freemem(),                                           //剩余内存大小
                         uptime: this._mainProcessCommunicator.systemUpTime,                 //系统的启动时间
