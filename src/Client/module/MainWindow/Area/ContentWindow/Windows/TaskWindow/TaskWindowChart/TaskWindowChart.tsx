@@ -169,7 +169,8 @@ export class TaskWindowChart extends ObservableComponent<{ taskPath: string, cla
                             chartOption.series[0].data.push((status.cpu).toFixed(2));
                             chartOption.series[1].data.push((status.memory / 1024 / 1024).toFixed(2));
 
-                            this._chart.setOption(chartOption);
+                            if (!this._chart.isDisposed())
+                                this._chart.setOption(chartOption);
                         }
                     } catch (error) {
                         showMessageBox({ icon: 'error', title: '获取任务资源消耗信息失败', content: `任务: ${this.props.taskPath}\n${error.message}` });

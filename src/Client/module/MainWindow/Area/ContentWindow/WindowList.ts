@@ -153,7 +153,7 @@ export function openWindowByFilePath(path: string, isBinary: boolean, size: numb
                     fixed: oVar(false),
                     name: `(查看) ${path.split('/').pop()}`,
                     type: WindowType.markdown_viewer,
-                    args: { path, readonly }
+                    args: { path, readonly: !!readonly }
                 };
 
                 openWindow(winArgs, side);
@@ -163,7 +163,7 @@ export function openWindowByFilePath(path: string, isBinary: boolean, size: numb
                     fixed: oVar(false),
                     name: path.split('/').pop() as string,
                     type: WindowType.code_editor,
-                    args: { path, readonly }
+                    args: { path, readonly: !!readonly }
                 };
 
                 openWindow(winArgs, side);

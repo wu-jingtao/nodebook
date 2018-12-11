@@ -43,7 +43,7 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
         }
     };
 
-    //#region 创建、重命名、删除
+    //#region 创建、修改、删除
 
     /**
      * 创建新的快捷方式
@@ -110,16 +110,16 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
     };
 
     /**
-     * 重命名
+     * 修改
      */
-    protected readonly _menu_rename = () => {
+    protected readonly _menu_modify = () => {
         if (!this._isRoot) {
             const shortcutName = oVar(this._name);
             const filePath = oVar(this._dataTree.data.path);
             const errorTip = oArr(['', '']);
 
             showPopupWindow({
-                title: '重命名',
+                title: '修改快捷方式',
                 content: (
                     <InputShortcutName
                         isRename
@@ -132,15 +132,20 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
                 ok: {
                     callback: () => {
                         if (errorTip.every(item => item.length === 0)) {
-                            (this._parent as any)._dataTree.subItem.delete(this._name);
-                            this._focusedItem.delete(this);
-
                             const name = shortcutName.value || filePath.value.split('/').pop() as string;
-                            (this._parent as any)._dataTree.subItem.set(name, {
-                                name,
-                                data: { path: filePath.value },
-                                subItem: this._dataTree.subItem
-                            });
+
+                            if (this._name !== name || this._dataTree.data.path !== filePath.value) {
+                                this._focusedItem.delete(this);
+                                (this._parent as any)._dataTree.subItem.delete(this._name);
+
+                                setTimeout(() => {  //避免React key属性相同导致无法更新的情况
+                                    (this._parent as any)._dataTree.subItem.set(name, {
+                                        name,
+                                        data: { path: filePath.value },
+                                        subItem: this._dataTree.subItem
+                                    });
+                                }, 10);
+                            }
                         }
                     }
                 }
@@ -389,13 +394,14 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
         try {
             this._loading.add('_onOpenItem');
 
+            const altKey = e.altKey;    //由于用到了异步，react合成事件会在异步完成之前被清除
             const status = await ServerApi.file.fileStatus(this._dataTree.data.path);
 
             openWindowByFilePath(
                 this._dataTree.data.path,
                 status.isBinary,
                 status.size,
-                e.altKey ? 'right' : undefined,
+                altKey ? 'right' : undefined,
                 undefined,
                 true
             );
@@ -416,7 +422,7 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
                 this._isRoot ? undefined : { name: '删除', callback: this._menu_delete },
             ],
             [   //重命名
-                this._isRoot ? undefined : { name: '重命名', callback: this._menu_rename },
+                this._isRoot ? undefined : { name: '修改', callback: this._menu_modify },
             ],
             [   //复制对应文件的路径
                 this._isBranch ? undefined : { name: '复制绝对路径', callback: this._menu_copyPath },

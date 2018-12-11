@@ -62,6 +62,7 @@ export class SystemInfo extends BaseSettingGroup {
         //#region 图表配置
 
         this._chart = echarts.init(this._chart_div, 'dark');
+        this._unobserve.push(() => this._chart.dispose());
 
         //更改图表大小
         const observer: MutationObserver = new (window as any).ResizeObserver(debounce(() => this._chart.resize(), 100, { leading: true }));
@@ -229,7 +230,8 @@ export class SystemInfo extends BaseSettingGroup {
             programDataUsed.push(+((this._programDataDir.value.total - this._programDataDir.value.free) / 1024 / 1024 / 1024).toFixed(2));
             programDataRemain.push(+((this._programDataDir.value.available) / 1024 / 1024 / 1024).toFixed(2));
 
-            this._chart.setOption(chartOption);
+            if (!this._chart.isDisposed())
+                this._chart.setOption(chartOption);
         };
 
         //#endregion
