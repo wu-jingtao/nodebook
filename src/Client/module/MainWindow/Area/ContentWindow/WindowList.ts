@@ -104,7 +104,7 @@ export function openWindow(args: WindowArgs, side?: 'left' | 'right'): void {
  * @param readonly 文本文件是否以只读方式打开
  * @param viewerFirst 对于某些文本文件是否优先使用查看器打开
  */
-export function openWindowByFilePath(path: string, isBinary: boolean, size: number, side?: 'left' | 'right', readonly?: boolean, viewerFirst?: boolean) {
+export function openWindowByFilePath(path: string, isBinary: boolean, size: number, side?: 'left' | 'right', readonly: boolean = false, viewerFirst?: boolean) {
     if (path.endsWith('.pdf')) {
         const winArgs: PDFViewerWindowArgs = {
             id: Math.random().toString(),
@@ -153,7 +153,7 @@ export function openWindowByFilePath(path: string, isBinary: boolean, size: numb
                     fixed: oVar(false),
                     name: `(查看) ${path.split('/').pop()}`,
                     type: WindowType.markdown_viewer,
-                    args: { path, readonly: !!readonly }
+                    args: { path, readonly }
                 };
 
                 openWindow(winArgs, side);
@@ -163,7 +163,7 @@ export function openWindowByFilePath(path: string, isBinary: boolean, size: numb
                     fixed: oVar(false),
                     name: path.split('/').pop() as string,
                     type: WindowType.code_editor,
-                    args: { path, readonly: !!readonly }
+                    args: { path, readonly }
                 };
 
                 openWindow(winArgs, side);

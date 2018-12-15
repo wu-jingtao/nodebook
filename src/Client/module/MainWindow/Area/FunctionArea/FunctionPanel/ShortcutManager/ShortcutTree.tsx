@@ -32,6 +32,9 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
     private readonly _saveFolderData: () => void = this._root._saveFolderData ||
         debounce(() => { this._originalData.value = JSON.stringify(this._dataTree.subItem) }, 1000);
 
+    //当前快捷方式对应文件的状态信息
+    private _fileStatus: { isBinary: boolean, modifyTime: number, size: number } | undefined;
+
     /**
      * 复制当前快捷方式的绝对路径
      */
@@ -391,16 +394,18 @@ export class ShortcutTree extends FileIconTree<FileIconTreePropsType, { path: st
     protected async _onOpenBranch(isOpen: boolean): Promise<false | void> { }
 
     protected async _onOpenItem(e: React.MouseEvent<HTMLDivElement>): Promise<void> {
+        const altKey = e.altKey;    //由于用到了异步，react合成事件会在异步完成之前被清除
+
         try {
             this._loading.add('_onOpenItem');
 
-            const altKey = e.altKey;    //由于用到了异步，react合成事件会在异步完成之前被清除
-            const status = await ServerApi.file.fileStatus(this._dataTree.data.path);
+            if (this._fileStatus === undefined)
+                this._fileStatus = await ServerApi.file.fileStatus(this._dataTree.data.path);
 
             openWindowByFilePath(
                 this._dataTree.data.path,
-                status.isBinary,
-                status.size,
+                this._fileStatus.isBinary,
+                this._fileStatus.size,
                 altKey ? 'right' : undefined,
                 undefined,
                 true

@@ -15,7 +15,13 @@ const less = require('./MarkdownViewerWindow.less');
 
 export class MarkdownViewerWindowContent extends BaseWindowContent<MarkdownViewerWindowArgs> {
 
+    //文件状态信息缓存
+    private readonly _fileStatusCache = new Map<string, { isBinary: boolean, modifyTime: number, size: number }>();
+
+    //容器是否已卸载
     private _unmounted = false;
+
+    //要显示的正文内容
     protected _content: JSX.Element;
 
     //转换图片的地址
@@ -38,7 +44,13 @@ export class MarkdownViewerWindowContent extends BaseWindowContent<MarkdownViewe
                         if (!this._communicator.processing.has(filePath)) {
                             try {
                                 this._communicator.processing.add(filePath);
-                                const status = await ServerApi.file.fileStatus(filePath);
+
+                                let status = this._fileStatusCache.get(filePath);
+                                if (status === undefined) {
+                                    status = await ServerApi.file.fileStatus(filePath);
+                                    this._fileStatusCache.set(filePath, status);
+                                }
+                                
                                 openWindowByFilePath(filePath, status.isBinary, status.size, undefined, true, true);
                             } catch (error) {
                                 showMessageBox({ icon: 'error', title: '获取文件信息失败', content: error.message });
