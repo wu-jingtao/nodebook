@@ -1,7 +1,6 @@
 import * as os from 'os';
 import * as child_process from 'child_process';
 import * as diskusage from 'diskusage';
-import * as util from 'util';
 import * as getPort from 'get-port';
 import log from 'log-formatter';
 import pidusage_type, { Stat } from 'pidusage';
@@ -14,7 +13,6 @@ import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator'
 
 const pidusage: typeof pidusage_type = require('pidusage');
 const os_utils = require('os-utils');
-const diskusage_check = util.promisify(diskusage.check);
 
 /**
  * 用户任务管理器
@@ -136,8 +134,8 @@ export class TaskManager extends BaseServiceModule {
                         totalMemory: os.totalmem(),                                         //内存总量
                         freeMemory: os.freemem(),                                           //剩余内存大小
                         uptime: this._mainProcessCommunicator.systemUpTime,                 //系统的启动时间
-                        userDataDir: await diskusage_check(FilePath._userDataDir),          //查看用户数据目录还有多少可用空间
-                        programDataDir: await diskusage_check(FilePath._programDataDir)     //查看程序数据目录还有多少可用空间。这两个目录如果位于同一个分区下则大小一样
+                        userDataDir: await diskusage.check(FilePath._userDataDir),          //查看用户数据目录还有多少可用空间
+                        programDataDir: await diskusage.check(FilePath._programDataDir)     //查看程序数据目录还有多少可用空间。这两个目录如果位于同一个分区下则大小一样
                     });
                 } catch (error) { reject(error); }
             });

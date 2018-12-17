@@ -8,6 +8,7 @@
     flex-shrink: 0;
     background-color: @darkBackColor;
     position: relative;
+    will-change: width;
 }
 
 :local(.content) {
@@ -18,10 +19,10 @@
 
 //分割条
 :local(.splitter) {
-    width: 5px;
+    width: 6px;
     height: 100%;
     position: absolute;
-    right: 0;
+    right: -3px;
     top: 0;
     z-index: 10;
 }

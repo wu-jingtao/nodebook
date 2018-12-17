@@ -1,4 +1,4 @@
-FROM node:10-stretch
+FROM node:11-stretch
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     dos2unix \

@@ -46,11 +46,11 @@ export class MessageBox extends ObservableComponent {
 
         _messageList.on('remove', (config, id) => {
             const node = this._messageBox.children(`[data-tag="${id}"]`);
-            node.one('transitionend', () => {
+            node.addClass('moveOut');
+            setTimeout(() => {  //退出动画有400ms
                 ReactDom.unmountComponentAtNode(node[0]);
                 node.remove();
-            });
-            node.addClass('moveOut');
+            }, 500);
         });
     }
 

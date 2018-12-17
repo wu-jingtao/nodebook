@@ -1,6 +1,6 @@
-import * as http from 'http';
 import * as net from 'net';
-import * as https from 'https';
+import * as http from 'http';
+import * as http2 from 'http2';
 import * as koa from 'koa';
 import * as koa_compose from 'koa-compose';
 import * as request from 'request-promise-native';
@@ -28,7 +28,7 @@ export class HttpServer extends BaseServiceModule {
     private _openSSLCertificate: OpenSSLCertificate;
     private _mainProcessCommunicator: MainProcessCommunicator;
 
-    private _httpServer: https.Server;
+    private _httpServer: http2.Http2SecureServer;
     private _koaServer: koa;
     private _wsServer: ws.Server;
 
@@ -39,10 +39,11 @@ export class HttpServer extends BaseServiceModule {
         //创建服务器
         this._koaServer = new koa();
 
-        this._httpServer = https.createServer({
+        this._httpServer = http2.createSecureServer({
             key: this._openSSLCertificate.privkey,
             cert: this._openSSLCertificate.cert,
-            passphrase: this._openSSLCertificate.password
+            passphrase: this._openSSLCertificate.password,
+            allowHTTP1: true
         }, this._koaServer.callback());
 
         this._wsServer = new ws.Server({
