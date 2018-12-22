@@ -1,10 +1,10 @@
 import * as os from 'os';
 import * as child_process from 'child_process';
 import * as diskusage from 'diskusage';
-import * as getPort from 'get-port';
 import log from 'log-formatter';
 import pidusage_type, { Stat } from 'pidusage';
 import { BaseServiceModule } from "service-starter";
+import getPort = require('get-port');
 
 import * as FilePath from '../../FilePath';
 
