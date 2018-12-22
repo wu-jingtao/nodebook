@@ -111,7 +111,7 @@ function Static(router_no_login: koa_router) {
     router_no_login.get('/static/:path(.+?\\..+)',
         koa_conditional(),
         koa_etag(),
-        koa_cache({ maxAge: 60 * 60 }),
+        koa_cache({ maxAge: 31536000 }),    //缓存一年
         async function StaticFileSender(ctx) {
             const path = node_path.join(FilePath._appClientFileDir, ctx.params.path);
             await FileManager._isFile(path);

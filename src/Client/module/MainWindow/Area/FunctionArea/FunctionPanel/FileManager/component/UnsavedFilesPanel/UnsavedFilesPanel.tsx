@@ -68,8 +68,8 @@ class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
     private readonly _name = this.props.path.split('/').pop() as string;
 
     //显示放弃保存提示窗口
-    private readonly _showPromptWindow = (e: React.MouseEvent) => {
-        e.stopPropagation();
+    private readonly _showPromptWindow = (e?: React.MouseEvent) => {
+        e && e.stopPropagation();
 
         showPopupWindow({
             title: '确认要放弃保存吗?',
@@ -105,7 +105,7 @@ class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
                 items: [
                     [
                         { name: '保存', callback: () => saveToServer(this.props.path) },
-                        { name: '放弃保存', callback: () => discardChange(this.props.path) }
+                        { name: '放弃保存', callback: this._showPromptWindow }
                     ]
                 ]
             });

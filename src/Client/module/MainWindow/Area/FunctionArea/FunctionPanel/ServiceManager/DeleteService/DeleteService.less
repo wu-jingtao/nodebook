@@ -1,0 +1,27 @@
+@import "../../../../../../../global/ThemeColor.less";
+
+:local(.DeleteService) {
+    width: 30vw;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 1px;
+    background-color: @borderColor;
+}
+
+:local(.icon) {
+    width: 20px;
+    height: 30px;
+    padding: 0 10px;
+    background-color: @lightBackColor;
+}
+
+:local(.serviceName) {
+    height: 30px;
+    line-height: 30px;
+    width: ~"calc(100% - 40px)";
+    background-color: @lightBackColor;
+    color: @fontColor;
+    padding-right: 10px;
+    border: none;
+    box-sizing: border-box;
+}

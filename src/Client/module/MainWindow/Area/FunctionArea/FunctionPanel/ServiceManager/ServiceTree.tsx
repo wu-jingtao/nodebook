@@ -4,7 +4,6 @@ import { ObservableVariable, watch, oVar, oArr } from 'observable-variable';
 import { ServerApi } from '../../../../../../global/ServerApi';
 import { FileIconTree } from '../../../../../../global/Component/Tree/FileIconTree/FileIconTree';
 import { FileIconTreePropsType } from '../../../../../../global/Component/Tree/FileIconTree/FileIconTreePropsType';
-import { DeleteFiles } from '../../../../../../global/Component/Tree/EditableFileTree/DeleteFiles/DeleteFiles';
 import { ContextMenuItemOptions } from '../../../../../ContextMenu/ContextMenuOptions';
 import { showMessageBox } from '../../../../../MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../../PopupWindow/PopupWindow';
@@ -13,6 +12,7 @@ import { openWindow, closeWindowByPath } from '../../../ContentWindow/WindowList
 import { taskList, startTask, stopTask, restartTask, _processingTask, refreshTaskList } from '../TaskManager/TaskList';
 import { serviceList, ServiceListValueType } from './ServiceManager';
 import { CreateService } from './CreateService/CreateService';
+import { DeleteService } from './DeleteService/DeleteService';
 
 const less = require('./ServiceManager.less');
 
@@ -29,11 +29,10 @@ export class ServiceTree extends FileIconTree<FileIconTreePropsType, ServiceList
 
         if (deleteItems.every(item => item._loading.size === 0)) {
             showPopupWindow({
-                title: '确定要删除一下服务吗?',
-                content: <DeleteFiles items={deleteItems.map(item => ({
-                    name: item._dataTree.data.name.value,
-                    fullName: item._name,
-                    isDirectory: false
+                title: '确定要删除以下服务吗?',
+                content: <DeleteService items={deleteItems.map(item => ({
+                    serviceName: item._dataTree.data.name.value,
+                    taskPath: item._name
                 }))} />,
                 ok: {
                     callback: async () => {
