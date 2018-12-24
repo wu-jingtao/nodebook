@@ -38,8 +38,8 @@ export class BackupData extends BaseServiceModule {
     private _programName: ObservableVariable<string>;
     private _userPassword: ObservableVariable<string>;
 
-    private _lastBackupTime: moment.Moment = moment();  //上一次备份的时间
-    private _timer: any;                                //计时器
+    private _lastBackupTime: moment.Moment;     //上一次备份的时间
+    private _timer: any;                        //计时器
 
     async onStart(): Promise<void> {
         const _systemSetting: SystemSetting = this.services.SystemSetting;
@@ -65,9 +65,9 @@ export class BackupData extends BaseServiceModule {
         });
 
         this._interval.on('set', this._resetTimer.bind(this));
-        this._maxNumber.on('set', () => this._cleanOldBackup());
+        this._maxNumber.on('set', this._cleanOldBackup.bind(this));
 
-        this._resetTimer(this._interval.value, this._interval.value);    //初始化计时器
+        this._resetTimer(this._interval.value, 0);    //初始化计时器
     }
 
     async onStop(): Promise<void> {
@@ -194,8 +194,7 @@ export class BackupData extends BaseServiceModule {
             const filename = await this.createBackupFile();
             await this._cleanOldBackup();
 
-            this._lastBackupTime = moment();
-            this._resetTimer(this._interval.value, this._interval.value);    //重置计时器
+            this._resetTimer(this._interval.value, 0);    //重置计时器
 
             if (this._autoSendEmail.value) await this.sendBackupEmail(filename);
         } catch (error) {

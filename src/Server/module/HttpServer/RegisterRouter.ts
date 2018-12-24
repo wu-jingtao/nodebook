@@ -40,7 +40,7 @@ export function registerRouter(router_login: koa_router, router_no_login: koa_ro
     Backup(router_login, httpServer);
     Library(router_login, httpServer);
     Task(router_login, router_ws, httpServer);
-    Terminal(router_ws);
+    Terminal(router_login, router_ws);
 
     router_no_login.redirect('/', '/static/index.html');
     router_no_login.redirect('/favicon.ico', '/logo/favicon.ico');
@@ -724,21 +724,55 @@ function Task(router_login: koa_router, router_ws: koa_router, httpServer: HttpS
 /**
  * websocket终端
  */
-function Terminal(router_ws: koa_router) {
-    router_ws.get('/terminal', ctx => {
-        ctx.handleWs((client: ws) => {
-            let terminal = node_pty.spawn('bash', [], { cwd: '/', cols: 120, rows: 30 });
+function Terminal(router_login: koa_router, router_ws: koa_router) {
+    const _prefix = '/terminal';
+    const terminalList = new Map<string, node_pty.IPty>();
 
-            terminal.on('exit', () => client.close());
+    /**
+     * 改变某个终端的视图大小
+     * @param id 终端的唯一随机编号
+     * @param columns 终端的列宽
+     * @param rows 终端的行高
+     */
+    router_login.post(_prefix + '/resize', ctx => {
+        const terminal = terminalList.get(ctx.request.body.id);
+
+        if (terminal) {
+            const columns = +ctx.request.body.columns;
+            const rows = +ctx.request.body.rows;
+
+            if (Number.isSafeInteger(columns) && Number.isSafeInteger(rows))
+                terminal.resize(columns, rows);
+            else
+                throw new Error('`columns`或`rows`的数据类型不正确');
+        }
+
+        ctx.body = 'ok';
+    });
+    
+    /**
+     * 打开新的终端
+     * @param id 终端的唯一随机编号
+     */
+    router_ws.get(_prefix + '/open', ctx => {
+        const id = ctx.request.query.id;
+
+        ctx.handleWs((client: ws) => {
+            const terminal = node_pty.spawn('bash', [], { cwd: '/', cols: 120, rows: 30 });
+
+            terminal.on('exit', () => {
+                client.close();
+                terminalList.delete(id);
+            });
             terminal.on('data', data => {
                 if (client.readyState === ws.OPEN)
                     client.send(data)
             });
 
             client.once('close', () => terminal.kill());
-            client.on('message', data => {
-                terminal.write(data.toString());
-            });
+            client.on('message', data => terminal.write(data.toString()));
+
+            terminalList.set(id, terminal);
         });
     });
 }

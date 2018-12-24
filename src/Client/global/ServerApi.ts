@@ -396,6 +396,20 @@ export const ServerApi = {
         async updateLibrary(name: string): Promise<void> {
             expect(await Post('/library/updateLibrary', { name }), 'ok', `更新类库 (${name}) 失败`);
         },
+    },
+    /**
+     * 终端
+     */
+    terminal: {
+        /**
+         * 改变某个终端的视图大小
+         * @param terminalID 终端的唯一编号
+         * @param columns 终端的列宽
+         * @param rows 终端的行高
+         */
+        async resize(terminalID: string, columns: number, rows: number): Promise<void> {
+            expect(await Post('/terminal/resize', { id: terminalID, columns, rows }), 'ok', '改变终端视图窗口大小失败');
+        }
     }
 };
 

@@ -1,12 +1,14 @@
 import * as React from 'react';
-import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import * as attach from 'xterm/lib/addons/attach/attach';
+import { Terminal } from 'xterm';
 import { ObservableVariable, watch, oArr, oVar } from 'observable-variable';
-import throttle = require('lodash.throttle');
+import debounce = require('lodash.debounce');
 
+import { ServerApi } from '../../../../../../global/ServerApi';
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
 import { normalSettings } from '../../../../../../global/SystemSetting';
+import { showMessageBox } from '../../../../../MessageBox/MessageBox';
 import { displayType } from '../../LogWindow';
 
 require('xterm/dist/xterm.css');
@@ -45,6 +47,7 @@ class TerminalWindow extends ObservableComponent<{ name: string }> {
 
     private readonly _fontSize = normalSettings.get('client.terminal.fontSize') as ObservableVariable<number>;
     private readonly _bellSound = normalSettings.get('client.terminal.bellSound') as ObservableVariable<boolean>;
+    private readonly _terminalID = Math.random().toString().split('.')[1] as string;    //当前终端的随机编号
 
     private _ref: HTMLDivElement;
     private _terminal: Terminal;
@@ -65,13 +68,18 @@ class TerminalWindow extends ObservableComponent<{ name: string }> {
         this._unobserve.push(watch([this._fontSize], () => this._terminal.setOption('fontSize', this._fontSize.value)));
         this._unobserve.push(watch([this._bellSound], () => this._terminal.setOption('bellStyle', this._bellSound.value ? 'sound' : 'none')));
 
+        this._websocket = new WebSocket(`wss://${window.location.host}/terminal/open?id=${this._terminalID}`);
+        attach.attach(this._terminal, this._websocket, true, false);
+
+        this._terminal.on('resize', debounce(data => {
+            ServerApi.terminal.resize(this._terminalID, data.cols, data.rows)
+                .catch(err => showMessageBox({ icon: 'error', title: '改变终端视图窗口大小失败', content: err.message }));
+        }, 500));
+
         fit.fit(this._terminal);
-        const observer: MutationObserver = new (window as any).ResizeObserver(throttle(() => fit.fit(this._terminal), 10));
+        const observer: MutationObserver = new (window as any).ResizeObserver(debounce(() => fit.fit(this._terminal), 500));
         observer.observe(this._ref);
         this._unobserve.push(() => observer.disconnect());
-
-        this._websocket = new WebSocket(`wss://${window.location.host}/terminal`);
-        attach.attach(this._terminal, this._websocket, true, false);
     }
 
     componentWillUnmount() {

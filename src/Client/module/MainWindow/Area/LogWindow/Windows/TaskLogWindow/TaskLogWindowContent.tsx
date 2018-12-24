@@ -3,7 +3,7 @@ import { Terminal } from 'xterm';
 import * as fit from 'xterm/lib/addons/fit/fit';
 import * as moment from 'moment';
 import { ObservableVariable, watch, oMap } from 'observable-variable';
-import throttle = require('lodash.throttle');
+import debounce = require('lodash.debounce');
 
 import { ObservableComponent } from '../../../../../../global/Tools/ObservableComponent';
 import { normalSettings } from '../../../../../../global/SystemSetting';
@@ -71,6 +71,7 @@ class TaskLogDisplay extends ObservableComponent<{ taskFilePath: string }> {
 
         this._terminal = new Terminal({
             disableStdin: true,
+            convertEol: true,
             fontSize: this._fontSize.value,
             theme: { background: '#272822' }
         });
@@ -80,7 +81,7 @@ class TaskLogDisplay extends ObservableComponent<{ taskFilePath: string }> {
         this._unobserve.push(watch([this._fontSize], () => this._terminal.setOption('fontSize', this._fontSize.value)));
 
         fit.fit(this._terminal);
-        const observer: MutationObserver = new (window as any).ResizeObserver(throttle(() => fit.fit(this._terminal), 10));
+        const observer: MutationObserver = new (window as any).ResizeObserver(debounce(() => fit.fit(this._terminal), 500));
         observer.observe(this._ref);
         this._unobserve.push(() => observer.disconnect());
 
@@ -104,7 +105,7 @@ class TaskLogDisplay extends ObservableComponent<{ taskFilePath: string }> {
                             else
                                 this._terminal.writeln(item.text);
                         });
-                        
+
                         lastLogTime = logs[logs.length - 1].date;
                     }
                 } catch (error) {
