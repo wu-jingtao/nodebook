@@ -118,6 +118,8 @@ export async function getCache(path: string) {
  * @param descendants 是否包含后代，这个主要是针对于文件夹
  */
 export async function discardChange(path: string, descendants?: boolean) {
+    if (descendants) path += '/'; //在路径的末尾加上'/'是为了避免误把同级同名文件误认为子级文件的情况
+
     for (const item of unsavedFiles.value) {
         if (descendants ? item.startsWith(path) : item === path) {
             const cache = cacheList.get(item);

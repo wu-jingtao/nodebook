@@ -39,10 +39,11 @@ export abstract class FileIconTree<P extends FileIconTreePropsType, D = any> ext
      * 渲染FileIconTree的内容
      */
     private _FileIconTree_render = () => {
+        const path = this._isBranch ? this._fullNameString + '/' : this._fullNameString;
         let modified = false;
 
         for (const item of this._modifiedFiles.values()) {
-            if (item.startsWith(this._fullNameString)) {
+            if (item.startsWith(path)) {
                 modified = true;
                 break;
             }

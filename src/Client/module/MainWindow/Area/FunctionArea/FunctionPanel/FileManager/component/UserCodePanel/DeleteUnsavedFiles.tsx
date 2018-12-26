@@ -31,6 +31,8 @@ const DeleteUnsavedFiles: React.StatelessComponent<{ action: 'delete' | 'cut', i
  */
 export function checkUnsavedFile(path: string, action: 'delete' | 'cut', descendants?: boolean): Promise<boolean> {
     return new Promise(resolve => {
+        if (descendants) path += '/'; //在路径的末尾加上'/'是为了避免误把同级同名文件误认为子级文件的情况
+
         const unsaved = descendants ? [...unsavedFiles.value].filter(item => item.startsWith(path)) :
             unsavedFiles.has(path) ? [path] : [];
 

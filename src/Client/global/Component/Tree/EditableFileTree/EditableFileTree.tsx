@@ -31,6 +31,8 @@ export const processingItems = oSet<string>([]);
  * @param isDirectory 是否是目录
  */
 export function checkIsBusy(path: string, isDirectory?: boolean): boolean {
+    if (isDirectory) path += '/'; //在路径的末尾加上'/'是为了避免误把同级同名文件误认为子级文件的情况
+
     for (const fullNameString of processingItems.value) {
         let result = true;
 
@@ -148,7 +150,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                         if (action === 'copy')
                             await Promise.all(tasks.map(item => ServerApi.file.copy(item.from._fullNameString, item.to)));
                         else
-                            await Promise.all(tasks.map(item => item.from._onCut(item.to)));
+                            await Promise.all(tasks.map(item => item.from._onCut(item.to).then(() => item.from._markFolderIsNotLoaded())));
                     } catch (error) {
                         showMessageBox({
                             icon: 'error',
@@ -285,7 +287,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                         if (!errorTip.value && this._name !== name.value) {
                             try {
                                 processingItems.add(this._fullNameString);
-                                await this._onCut(`${(this._parent as any)._fullNameString}/${name.value}`);
+                                await this._onCut(`${(this._parent as any)._fullNameString}/${name.value}`).then(() => this._markFolderIsNotLoaded());
                             } catch (error) {
                                 showMessageBox({ icon: 'error', title: '重命名失败', content: error.message });
                             } finally {
@@ -315,7 +317,7 @@ export abstract class EditableFileTree<P extends EditableFileTreePropsType> exte
                     callback: async () => {
                         try {
                             items.forEach(item => processingItems.add(item._fullNameString));
-                            await Promise.all(items.map(item => item._onDelete()));
+                            await Promise.all(items.map(item => item._onDelete().then(() => item._markFolderIsNotLoaded())));
                         } catch (error) {
                             showMessageBox({ icon: 'error', title: '删除失败', content: error.message });
                         } finally {

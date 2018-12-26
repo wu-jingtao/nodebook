@@ -7,6 +7,8 @@ import { serviceList } from '../../../ServiceManager/ServiceManager';
  * @param descendants 是否包含后代，主要是针对文件夹
  */
 export async function checkTaskOrServiceFile(path: string, action: 'delete' | 'cut', descendants?: boolean) {
+    if (descendants) path += '/'; //在路径的末尾加上'/'是为了避免误把同级同名文件误认为子级文件的情况
+
     return await checkService(path, action, descendants) && await checkTask(path, action, descendants);
 }
 

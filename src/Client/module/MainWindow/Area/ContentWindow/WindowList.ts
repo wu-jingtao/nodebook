@@ -240,6 +240,8 @@ export function closeOtherWindow(id: string, side: 'left' | 'right'): void {
  * @param types 关闭指定类型的窗口
  */
 export function closeWindowByPath(path: string, descendants?: boolean, types?: WindowType[]): void {
+    if (descendants) path += '/'; //在路径的末尾加上'/'是为了避免误把同级同名文件误认为子级文件的情况
+
     const win: { id: string, side: 'left' | 'right' }[] = [];
 
     for (const item of windowList.leftWindows.windowList.value) {

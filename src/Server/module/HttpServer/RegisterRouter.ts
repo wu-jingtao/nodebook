@@ -726,7 +726,7 @@ function Task(router_login: koa_router, router_ws: koa_router, httpServer: HttpS
  */
 function Terminal(router_login: koa_router, router_ws: koa_router) {
     const _prefix = '/terminal';
-    const terminalList = new Map<string, node_pty.IPty>();
+    const _terminalList = new Map<string, node_pty.IPty>();
 
     /**
      * 改变某个终端的视图大小
@@ -735,7 +735,7 @@ function Terminal(router_login: koa_router, router_ws: koa_router) {
      * @param rows 终端的行高
      */
     router_login.post(_prefix + '/resize', ctx => {
-        const terminal = terminalList.get(ctx.request.body.id);
+        const terminal = _terminalList.get(ctx.request.body.id);
 
         if (terminal) {
             const columns = +ctx.request.body.columns;
@@ -762,7 +762,7 @@ function Terminal(router_login: koa_router, router_ws: koa_router) {
 
             terminal.on('exit', () => {
                 client.close();
-                terminalList.delete(id);
+                _terminalList.delete(id);
             });
             terminal.on('data', data => {
                 if (client.readyState === ws.OPEN)
@@ -772,7 +772,7 @@ function Terminal(router_login: koa_router, router_ws: koa_router) {
             client.once('close', () => terminal.kill());
             client.on('message', data => terminal.write(data.toString()));
 
-            terminalList.set(id, terminal);
+            _terminalList.set(id, terminal);
         });
     });
 }
