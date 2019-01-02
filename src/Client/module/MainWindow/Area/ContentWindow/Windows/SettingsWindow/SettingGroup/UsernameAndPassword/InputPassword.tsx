@@ -19,7 +19,7 @@ export function inputPassword(title: string, placeholder: string = '请输入用
         showPopupWindow({
             title,
             content: <ObservableComponentWrapper watch={[password]}
-                render={() => <TextInput className={less.inputUserPassword} type="password" value={password} placeholder={placeholder} />} />,
+                render={() => <TextInput className={less.inputUserPassword} type="password" value={password} placeholder={placeholder} autoFocus />} />,
             ok: {
                 callback() { resolve(password.value) }
             },

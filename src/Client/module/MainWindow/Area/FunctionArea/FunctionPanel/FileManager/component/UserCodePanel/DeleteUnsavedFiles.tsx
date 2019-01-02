@@ -17,7 +17,7 @@ const DeleteUnsavedFiles: React.StatelessComponent<{ action: 'delete' | 'cut', i
                 {props.items.map(item =>
                     <React.Fragment key={item}>
                         <FileIcon className={less_deleteFiles.icon} filename={item.split('/').pop() as string} />
-                        <input className={less_deleteFiles.filename} readOnly value={item} />
+                        <input type="text" className={less_deleteFiles.filename} readOnly value={item} />
                     </React.Fragment>
                 )}
             </div>

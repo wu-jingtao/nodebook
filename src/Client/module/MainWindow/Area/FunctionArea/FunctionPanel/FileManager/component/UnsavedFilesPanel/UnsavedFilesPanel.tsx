@@ -76,7 +76,7 @@ class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
             content: (
                 <div className={less_deleteFiles.DeleteFiles}>
                     <FileIcon className={less_deleteFiles.icon} filename={this._name} />
-                    <input className={less_deleteFiles.filename} readOnly value={this.props.path} />
+                    <input type="text" className={less_deleteFiles.filename} readOnly value={this.props.path} />
                 </div>
             ),
             ok: { callback: () => discardChange(this.props.path) }

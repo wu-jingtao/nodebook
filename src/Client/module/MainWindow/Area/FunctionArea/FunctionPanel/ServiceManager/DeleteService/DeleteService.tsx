@@ -13,7 +13,7 @@ export const DeleteService: React.StatelessComponent<{ items: { serviceName: str
             {props.items.map(item =>
                 <React.Fragment key={item.taskPath}>
                     <FileIcon className={less.icon} filename={item.taskPath}/>
-                    <input className={less.serviceName} readOnly value={item.serviceName} />
+                    <input type="text" className={less.serviceName} readOnly value={item.serviceName} />
                 </React.Fragment>
             )}
         </div>

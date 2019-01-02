@@ -17,5 +17,8 @@ alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'
 
+# 支持中文编码
+export LANG="C.UTF-8"
+
 # 设置系统时区
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

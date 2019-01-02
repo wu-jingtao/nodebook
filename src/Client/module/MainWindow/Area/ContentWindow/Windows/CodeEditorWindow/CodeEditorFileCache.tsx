@@ -174,7 +174,7 @@ export function refreshData(path: string) {
                         <div className={less_userCodePanel.DeleteUnsavedFiles}>文件并未保存，刷新将会使得更改的内容被删除，是否继续?</div>
                         <div className={less_deleteFiles.DeleteFiles}>
                             <FileIcon className={less_deleteFiles.icon} filename={path.split('/').pop() as string} />
-                            <input className={less_deleteFiles.filename} readOnly value={path} />
+                            <input type="text" className={less_deleteFiles.filename} readOnly value={path} />
                         </div>
                     </>
                 ),
