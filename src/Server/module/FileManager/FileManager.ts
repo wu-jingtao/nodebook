@@ -1,11 +1,11 @@
-import * as util from 'util';
 import * as fs from 'fs-extra';
 import * as node_path from 'path';
 import * as moment from 'moment';
 import * as archiver from 'archiver';
 import * as unzipper from 'unzipper';
+import { isBinaryFile } from 'isbinaryfile';
 import { BaseServiceModule } from "service-starter";
-const isBinaryFile: (path: string) => Promise<boolean> = util.promisify(require('isbinaryfile'));
+
 
 import * as FilePath from '../../FilePath';
 

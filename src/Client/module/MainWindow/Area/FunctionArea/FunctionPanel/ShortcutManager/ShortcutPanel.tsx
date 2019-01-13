@@ -9,6 +9,8 @@ const less = require('./ShortcutManager.less');
 
 export class ShortcutPanel extends FoldableContainer<FoldableContainerPropsType> {
 
+    protected _contentClassName = less.content;
+
     private _tree: ShortcutTree;
 
     private readonly _createShortcut = (e: React.MouseEvent) => {
@@ -44,5 +46,20 @@ export class ShortcutPanel extends FoldableContainer<FoldableContainerPropsType>
                 ref={(e: any) => this._tree = e}
                 modifiedFiles={unsavedFiles} />
         );
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+
+        //点击容器空白区域，清除所有选中选项
+        this._content_div.on('click', e => {
+            if (e.target === e.currentTarget)
+                this._tree.unfocus();
+        });
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        this._content_div.off('click');
     }
 }
