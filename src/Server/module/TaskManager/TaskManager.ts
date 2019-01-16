@@ -1,18 +1,16 @@
 import * as os from 'os';
 import * as child_process from 'child_process';
 import * as diskusage from 'diskusage';
+import * as pidusage from 'pidusage';
 import log from 'log-formatter';
-import pidusage_type, { Stat } from 'pidusage';
 import { BaseServiceModule } from "service-starter";
 import getPort = require('get-port');
+const os_utils = require('os-utils');
 
 import * as FilePath from '../../FilePath';
 
 import { LogManager } from "./LogManager/LogManager";
 import { MainProcessCommunicator } from '../MainProcess/MainProcessCommunicator';
-
-const pidusage: typeof pidusage_type = require('pidusage');
-const os_utils = require('os-utils');
 
 /**
  * 用户任务管理器
@@ -111,7 +109,7 @@ export class TaskManager extends BaseServiceModule {
     /**
      * 获取某个正在运行的任务，资源消耗的情况，如果任务不存在则返回空
      */
-    async getTaskResourcesConsumption(taskFilePath: string): Promise<Stat | undefined> {
+    async getTaskResourcesConsumption(taskFilePath: string): Promise<pidusage.Status | undefined> {
         const task = this._taskList.get(taskFilePath);
         if (task) {
             const status = await pidusage(task.process.pid);

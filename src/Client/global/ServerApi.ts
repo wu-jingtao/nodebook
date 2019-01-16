@@ -1,5 +1,5 @@
 import { ObservableVariable } from 'observable-variable';
-import { Stat } from 'pidusage';
+import * as pidusage from 'pidusage';
 import { DiskUsage } from 'diskusage';
 import md5 = require('blueimp-md5');
 
@@ -247,7 +247,7 @@ export const ServerApi = {
         /**
          * 获取某个正在运行的任务，资源消耗的情况
          */
-        async getTaskResourcesConsumption(path: string): Promise<Stat | null> {
+        async getTaskResourcesConsumption(path: string): Promise<pidusage.Status | null> {
             return JSON.parse(await Post('/task/getTaskResourcesConsumption', { path }) || 'null');
         },
         /**

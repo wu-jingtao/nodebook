@@ -53,7 +53,7 @@
         "@types/mocha": "5.2.5",
         "@types/node": "10.12.18",
         "@types/nodemailer": "^4.6.5",
-        "@types/pidusage": "^2.0.0",
+        "@types/pidusage": "^2.0.1",
         "@types/react": "^16.7.18",
         "@types/react-dom": "^16.0.11",
         "@types/request-promise-native": "^1.0.15",
