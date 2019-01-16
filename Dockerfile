@@ -13,7 +13,7 @@ WORKDIR /app
 
 # 复制代码
 COPY ["src", "/app/src/"]
-COPY ["package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "webpack.strip_dts_comment.loader.js", "LICENSE", "/app/"]
+COPY ["package.json", "gulpfile.js", "tsconfig.json", "webpack.config.js", "webpack.dts-loader.js", "LICENSE", "/app/"]
 COPY [".bashrc", "/root/.bashrc"]
 
 # 编译
