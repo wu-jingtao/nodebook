@@ -73,39 +73,32 @@ monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
  *          例如：declare module "jquery" { export = jQuery; }
  */
 
-//@types/jquery 3.3.22
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/jquery/JQueryStatic.d.ts'), '/node_modules/@types/jquery/JQueryStatic.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/jquery/JQuery.d.ts'), '/node_modules/@types/jquery/JQuery.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/jquery/misc.d.ts'), '/node_modules/@types/jquery/misc.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/jquery/legacy.d.ts'), '/node_modules/@types/jquery/legacy.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/jquery/index.d.ts'), '/node_modules/@types/jquery/index.d.ts');
+//@types/jquery
+require('!dts-loader?path=node_modules/@types/jquery/!./EMPTY').map(([filePath, content]: [string, string]) => {
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(content, `/node_modules/@types/jquery/${filePath}`);
+});
 monaco.languages.typescript.javascriptDefaults.addExtraLib('declare module "jquery" { export = jQuery; }', '/node_modules/@types/jquery/export.d.ts');
 
-//@types/lodash 4.14.118
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/common.d.ts'), '/node_modules/@types/lodash/common/common.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/array.d.ts'), '/node_modules/@types/lodash/common/array.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/collection.d.ts'), '/node_modules/@types/lodash/common/collection.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/date.d.ts'), '/node_modules/@types/lodash/common/date.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/function.d.ts'), '/node_modules/@types/lodash/common/function.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/lang.d.ts'), '/node_modules/@types/lodash/common/lang.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/math.d.ts'), '/node_modules/@types/lodash/common/math.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/number.d.ts'), '/node_modules/@types/lodash/common/number.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/object.d.ts'), '/node_modules/@types/lodash/common/object.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/seq.d.ts'), '/node_modules/@types/lodash/common/seq.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/string.d.ts'), '/node_modules/@types/lodash/common/string.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/common/util.d.ts'), '/node_modules/@types/lodash/common/util.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/lodash/index.d.ts'), '/node_modules/@types/lodash/index.d.ts');
+//@types/lodash
+require('!dts-loader?path=node_modules/@types/lodash/!./EMPTY').map(([filePath, content]: [string, string]) => {
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(content, `/node_modules/@types/lodash/${filePath}`);
+});
 monaco.languages.typescript.javascriptDefaults.addExtraLib('declare module "lodash" { export = _; }', '/node_modules/@types/lodash/export.d.ts');
 
-//@types/mocha 5.2.5
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/mocha/index.d.ts'), '/node_modules/@types/mocha/index.d.ts');
+//@types/mocha
+require('!dts-loader?path=node_modules/@types/mocha/!./EMPTY').map(([filePath, content]: [string, string]) => {
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(content, `/node_modules/@types/mocha/${filePath}`);
+});
 
-//@types/expect.js 0.3.29
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/expect.js/index.d.ts'), '/node_modules/@types/expect.js/index.d.ts');
+//@types/expect.js
+require('!dts-loader?path=node_modules/@types/expect.js/!./EMPTY').map(([filePath, content]: [string, string]) => {
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(content, `/node_modules/@types/expect.js/${filePath}`);
+});
 
-//@types/node 10.12.11
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/node/index.d.ts'), '/node_modules/@types/node/index.d.ts');
-monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!strip-dts-comment!../../../../../../../../node_modules/@types/node/inspector.d.ts'), '/node_modules/@types/node/inspector.d.ts');
+//@types/node
+require('!dts-loader?path=node_modules/@types/node!./EMPTY').map(([filePath, content]: [string, string]) => {
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(content, `/node_modules/@types/node/${filePath}`);
+});
 
 //nodebook内置模块
 monaco.languages.typescript.javascriptDefaults.addExtraLib(require('!raw-loader!../../../../../../res/helper/client_helper.d.ts'), 'client_helper.js');

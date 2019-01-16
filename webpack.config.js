@@ -43,7 +43,7 @@ module.exports = env => {
         ],
         resolveLoader: {
             alias: {
-                "strip-dts-comment": path.resolve(__dirname, './webpack.strip_dts_comment.loader.js')
+                "dts-loader": path.resolve(__dirname, './webpack.dts-loader.js')
             }
         }
     };
