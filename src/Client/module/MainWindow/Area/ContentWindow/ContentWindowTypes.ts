@@ -5,6 +5,7 @@ import { ObservableVariable } from "observable-variable";
  */
 export enum WindowType {
     'code_editor',      //monaco代码编辑器
+    'mind_map',         //思维导图
     'html_viewer',      //html查看器
     'markdown_viewer',  //markdown查看器
     'image_viewer',     //图片查看器
@@ -69,6 +70,10 @@ export interface CodeEditorWindowArgs extends FileWindowArgs {
          */
         diff?: boolean,
     }
+}
+
+export interface MindMapWindowArgs extends FileWindowArgs {
+    type: WindowType.mind_map;
 }
 
 export interface HtmlViewerWindowArgs extends FileWindowArgs {

@@ -1,4 +1,3 @@
-import * as $ from 'jquery';
 import * as React from 'react';
 import * as monaco from 'monaco-editor';
 import { ObservableVariable, watch, permanent_oArr } from 'observable-variable';

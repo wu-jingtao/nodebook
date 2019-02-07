@@ -1,4 +1,3 @@
-import * as $ from 'jquery';
 import * as React from 'react';
 import throttle = require('lodash.throttle');
 

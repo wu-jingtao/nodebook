@@ -8,7 +8,7 @@ import { ObservableComponent, ObservableComponentWrapper } from '../../../../../
 import { FileIcon } from '../../../../../../../../global/Component/FileIcon/FileIcon';
 import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
 import { showContextMenu } from '../../../../../../../ContextMenu/ContextMenu';
-import { CodeEditorWindowArgs, WindowType } from '../../../../../ContentWindow/ContentWindowTypes';
+import { CodeEditorWindowArgs, WindowType, MindMapWindowArgs } from '../../../../../ContentWindow/ContentWindowTypes';
 import { openWindow } from '../../../../../ContentWindow/WindowList';
 import { unsavedFiles, saveToServer, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 
@@ -120,18 +120,32 @@ class UnsavedFilesPanelItem extends ObservableComponent<{ path: string }> {
         e.preventDefault();
 
         if (e.button === 0) {
-            const args: CodeEditorWindowArgs = {
-                id: Math.random().toString(),
-                name: this._name,
-                type: WindowType.code_editor,
-                fixed: oVar(false),
-                args: {
-                    path: this.props.path,
-                    diff: true
-                }
-            };
+            if (this.props.path.endsWith('.mindmap')) {
+                const args: MindMapWindowArgs = {
+                    id: Math.random().toString(),
+                    name: this._name,
+                    type: WindowType.mind_map,
+                    fixed: oVar(false),
+                    args: {
+                        path: this.props.path,
+                    }
+                };
 
-            openWindow(args);
+                openWindow(args);
+            } else {
+                const args: CodeEditorWindowArgs = {
+                    id: Math.random().toString(),
+                    name: this._name,
+                    type: WindowType.code_editor,
+                    fixed: oVar(false),
+                    args: {
+                        path: this.props.path,
+                        diff: true
+                    }
+                };
+                
+                openWindow(args);
+            }
         }
     };
 

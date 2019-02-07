@@ -5,6 +5,9 @@ import { ObservableComponent } from '../../../../global/Tools/ObservableComponen
 import { CodeEditorWindowContent } from './Windows/CodeEditorWindow/CodeEditorWindowContent';
 import { CodeEditorWindowTitle } from './Windows/CodeEditorWindow/CodeEditorWindowTitle';
 import { CodeEditorWindowFunctionButtons } from './Windows/CodeEditorWindow/CodeEditorWindowFunctionButtons';
+import { MindMapWindowContent } from './Windows/MindMapWindow/MindMapWindowContent';
+import { MindMapWindowTitle } from './Windows/MindMapWindow/MindMapWindowTitle';
+import { MindMapWindowFunctionButtons } from './Windows/MindMapWindow/MindMapWindowFunctionButtons';
 import { HtmlViewerWindowContent } from './Windows/HtmlViewerWindow/HtmlViewerWindowContent';
 import { HtmlViewerWindowTitle } from './Windows/HtmlViewerWindow/HtmlViewerWindowTitle';
 import { HtmlViewerWindowFunctionButtons } from './Windows/HtmlViewerWindow/HtmlViewerWindowFunctionButtons';
@@ -64,6 +67,12 @@ export class WindowContainer extends ObservableComponent<{ side: 'left' | 'right
                     contents.push(<CodeEditorWindowContent key={item.id} args={item as any} side={this.props.side} _communicator={communicator} />);
                     titles.push(<CodeEditorWindowTitle key={item.id} args={item as any} side={this.props.side} _communicator={communicator} />);
                     functionButtons.push(<CodeEditorWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} _communicator={communicator} />);
+                    break;
+                    
+                case WindowType.mind_map:
+                    contents.push(<MindMapWindowContent key={item.id} args={item as any} side={this.props.side} _communicator={communicator} />);
+                    titles.push(<MindMapWindowTitle key={item.id} args={item as any} side={this.props.side} _communicator={communicator} />);
+                    functionButtons.push(<MindMapWindowFunctionButtons key={item.id} args={item as any} side={this.props.side} _communicator={communicator} />);
                     break;
 
                 case WindowType.html_viewer:

@@ -14,3 +14,6 @@
 
 ### 常见的文件图标冲突
 * 将`languages.ts`下的`django`扩展名改为`django.html`
+
+### MindMap图标
+* 修改`supportedExtensions.ts`下的`icon: 'apib'`，在它的`extensions`中添加`'mindmap'`

@@ -318,7 +318,7 @@ export const extensions: IFileCollection = {
     },
     {
       icon: 'apib',
-      extensions: [],
+      extensions: ['mindmap'],
       languages: [languages.apib],
       format: FileFormat.svg,
     },

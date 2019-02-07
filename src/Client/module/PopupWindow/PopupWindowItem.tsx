@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as $ from 'jquery';
 
 import { ObservableComponent } from "../../global/Tools/ObservableComponent";
 import { Button } from '../../global/Component/Button/Button';

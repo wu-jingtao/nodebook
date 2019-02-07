@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as $ from 'jquery';
 import { ObservableVariable } from 'observable-variable';
 
 import { ObservableComponentWrapper } from '../../../../../../../../global/Tools/ObservableComponent';

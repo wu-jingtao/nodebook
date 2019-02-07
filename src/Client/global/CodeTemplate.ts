@@ -18,16 +18,10 @@ export function codeTemplate(filename: string) {
         return js(filename);
     else if (filename.endsWith('.sh'))
         return bash(filename);
+    else if (filename.endsWith('.mindmap'))
+        return mindMap(filename);
     else
-        return default_file(filename);
-}
-
-function default_file(filename: string) {
-    return `/* ${moment().format('YYYY-MM-DD HH:mm:ss')} */`;
-}
-
-function bash(filename: string) {
-    return `# ${moment().format('YYYY-MM-DD HH:mm:ss')}`;
+        return '';
 }
 
 function html(filename: string) {
@@ -55,10 +49,6 @@ function html(filename: string) {
 `;
 }
 
-function js(filename: string) {
-    return `"use strict"; /* ${moment().format('YYYY-MM-DD HH:mm:ss')} */`;
-}
-
 function clientJs(filename: string) {
     return `"use strict"; /* ${moment().format('YYYY-MM-DD HH:mm:ss')} */
 
@@ -84,4 +74,16 @@ nodebook.exportFunction('functionName', async (data) => {
     
 });
 `;
+}
+
+function js(filename: string) {
+    return `"use strict"; /* ${moment().format('YYYY-MM-DD HH:mm:ss')} */`;
+}
+
+function bash(filename: string) {
+    return `# ${moment().format('YYYY-MM-DD HH:mm:ss')}`;
+}
+
+function mindMap(filename: string) {
+    return '{}';
 }

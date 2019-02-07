@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as $ from 'jquery';
 import { oSet, oVar, ObservableMap, ObservableVariable } from 'observable-variable';
 import clipboard = require('copy-text-to-clipboard');
 

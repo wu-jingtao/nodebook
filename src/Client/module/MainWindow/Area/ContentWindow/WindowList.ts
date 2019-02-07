@@ -1,7 +1,7 @@
 import { permanent_oVar, permanent_oArr, ObservableArray, oVar, watch } from "observable-variable";
 import isEqual = require('lodash.isequal');
 
-import { WindowArgs, WindowType, PDFViewerWindowArgs, ImageViewerWindowArgs, VideoPlayerWindowArgs, MarkdownViewerWindowArgs, CodeEditorWindowArgs, HtmlViewerWindowArgs } from "./ContentWindowTypes";
+import { WindowArgs, WindowType, PDFViewerWindowArgs, ImageViewerWindowArgs, VideoPlayerWindowArgs, MarkdownViewerWindowArgs, CodeEditorWindowArgs, HtmlViewerWindowArgs, MindMapWindowArgs } from "./ContentWindowTypes";
 import { showMessageBox } from "../../../MessageBox/MessageBox";
 
 //WindowList初始化方法
@@ -137,7 +137,17 @@ export function openWindowByFilePath(path: string, isBinary: boolean, size: numb
         openWindow(winArgs, side);
     } else if (!isBinary) {    //不是二进制文件就是用编辑器打开
         const openTextFile = () => {
-            if (viewerFirst && path.endsWith('.html')) {
+            if (path.endsWith('.mindmap')) {
+                const winArgs: MindMapWindowArgs = {
+                    id: Math.random().toString(),
+                    fixed: oVar(false),
+                    name: path.split('/').pop() as string,
+                    type: WindowType.mind_map,
+                    args: { path }
+                };
+
+                openWindow(winArgs, side);
+            } else if (viewerFirst && path.endsWith('.html')) {
                 const winArgs: HtmlViewerWindowArgs = {
                     id: Math.random().toString(),
                     fixed: oVar(false),
