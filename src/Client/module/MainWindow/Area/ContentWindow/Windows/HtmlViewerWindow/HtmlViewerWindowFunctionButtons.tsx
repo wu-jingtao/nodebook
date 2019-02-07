@@ -2,12 +2,13 @@ import * as React from 'react';
 
 import { BaseWindowFunctionButtons } from '../BaseWindow/BaseWindowFunctionButtons';
 import { HtmlViewerWindowArgs } from '../../ContentWindowTypes';
+import { getHref } from './HtmlViewerWindowContent';
 
 export class HtmlViewerWindowFunctionButtons extends BaseWindowFunctionButtons<HtmlViewerWindowArgs> {
 
     //在新的浏览器窗口中打开
     private readonly _openInBrowserWindow = () => {
-        window.open(this._communicator.href);
+        window.open(getHref(this.props.args.args.path));
     };
 
     //刷新iframe

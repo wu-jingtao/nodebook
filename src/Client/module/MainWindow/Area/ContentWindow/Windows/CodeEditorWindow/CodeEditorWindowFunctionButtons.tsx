@@ -8,6 +8,7 @@ import { BaseWindowFunctionButtons } from '../BaseWindow/BaseWindowFunctionButto
 import { unsavedFiles, saveToServer, refreshData } from './CodeEditorFileCache';
 import { taskList, createTask, startTask, restartTask, stopTask } from '../../../FunctionArea/FunctionPanel/TaskManager/TaskList';
 import { openTaskLogWindow } from '../../../LogWindow/Windows/TaskLogWindow/TaskLogWindowList';
+import { getHref } from '../HtmlViewerWindow/HtmlViewerWindowContent';
 
 export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<CodeEditorWindowArgs> {
 
@@ -23,6 +24,10 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
         };
 
         openWindow(args, this.props.side === 'left' ? 'right' : 'left');
+    };
+
+    private readonly _openInBrowserWindow = () => {
+        window.open(getHref(this.props.args.args.path));
     };
 
     private readonly _openMarkdownViewer = () => {
@@ -82,6 +87,11 @@ export class CodeEditorWindowFunctionButtons extends BaseWindowFunctionButtons<C
             {this.props.args.args.path.endsWith('.html') &&
                 <img src={`/static/res/img/buttons_icon/Preview_inverse.svg`}
                     title={`在HTML查看器中打开`} onClick={this._openHtmlViewer} />
+            }
+            {this.props.args.args.path.endsWith('.html') &&
+                <img src={`/static/res/img/buttons_icon/browser.svg`}
+                    style={{ width: '21px', height: '21px', padding: '7px' }}
+                    title={`在新的浏览器窗口中打开`} onClick={this._openInBrowserWindow} />
             }
             {this.props.args.args.path.endsWith('.md') &&
                 <img src={`/static/res/img/buttons_icon/Preview_inverse.svg`}

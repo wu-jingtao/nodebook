@@ -7,33 +7,35 @@ import { HtmlViewerWindowArgs } from '../../ContentWindowTypes';
 
 const less = require('./HtmlViewerWindow.less');
 
+/**
+ * 由于html中会用到相对路径所以必须更改路径形式
+ */
+export function getHref(path: string) {
+    if (path.startsWith(FilePath._userCodeDir))
+        return `/file/data/code${path.replace(FilePath._userCodeDir, '')}`;
+    else if (path.startsWith(FilePath._programDataDir))
+        return `/file/data/programData${path.replace(FilePath._programDataDir, '')}`;
+    else if (path.startsWith(FilePath._recycleDir))
+        return `/file/data/recycle${path.replace(FilePath._recycleDir, '')}`;
+    else if (path.startsWith(FilePath._libraryDir))
+        return `/file/data/library${path.replace(FilePath._libraryDir, '')}`;
+    else
+        return path;
+}
+
 export class HtmlViewerWindowContent extends BaseWindowContent<HtmlViewerWindowArgs> {
 
-    private readonly _href: string;
     private _ref_iframe: HTMLIFrameElement;
-    protected _content: React.ReactNode;
+
+    protected _content = (
+        <iframe className={less.iframe}
+            src={getHref(this.props.args.args.path)}
+            onLoad={() => this._communicator.loading.value = false}
+            ref={(e: any) => this._ref_iframe = e} />
+    );
 
     constructor(props: any, context: any) {
         super(props, context);
-
-        //由于html中会用到相对路径所以必须更改路径形式
-        if (this.props.args.args.path.startsWith(FilePath._userCodeDir))
-            this._href = this._communicator.href = `/file/data/code${this.props.args.args.path.replace(FilePath._userCodeDir, '')}`;
-        else if (this.props.args.args.path.startsWith(FilePath._programDataDir))
-            this._href = this._communicator.href = `/file/data/programData${this.props.args.args.path.replace(FilePath._programDataDir, '')}`;
-        else if (this.props.args.args.path.startsWith(FilePath._recycleDir))
-            this._href = this._communicator.href = `/file/data/recycle${this.props.args.args.path.replace(FilePath._recycleDir, '')}`;
-        else if (this.props.args.args.path.startsWith(FilePath._libraryDir))
-            this._href = this._communicator.href = `/file/data/library${this.props.args.args.path.replace(FilePath._libraryDir, '')}`;
-        else
-            this._href = this._communicator.href = this.props.args.args.path;
-
-        this._content = (
-            <iframe className={less.iframe}
-                src={this._href}
-                onLoad={() => this._communicator.loading.value = false}
-                ref={(e: any) => this._ref_iframe = e} />
-        );
 
         //刷新
         this._communicator.refresh = () => {
