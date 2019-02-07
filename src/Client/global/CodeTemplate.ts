@@ -85,5 +85,5 @@ function bash(filename: string) {
 }
 
 function mindMap(filename: string) {
-    return '{}';
+    return '{"root":{"data":{"id":"brtkagdorns0","created":1549557500385,"text":"中心主题"},"children":[]},"template":"default","theme":"fresh-blue","version":"1.4.43"}';
 }
