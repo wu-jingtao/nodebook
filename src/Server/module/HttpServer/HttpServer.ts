@@ -91,7 +91,7 @@ export class HttpServer extends BaseServiceModule {
             };
 
             //模拟Koa调用中间件
-            wsMiddleware(ctx as any).catch(err => {
+            wsMiddleware(ctx as any, Promise.resolve).catch((err: any) => {
                 socket.end();   //出现错误则断开连接
 
                 if (this._mainProcessCommunicator.isDebug)
