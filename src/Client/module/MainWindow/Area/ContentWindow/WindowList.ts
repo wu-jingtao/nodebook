@@ -143,7 +143,7 @@ export function openWindowByFilePath(path: string, isBinary: boolean, size: numb
                     fixed: oVar(false),
                     name: path.split('/').pop() as string,
                     type: WindowType.mind_map,
-                    args: { path }
+                    args: { path, readonly }
                 };
 
                 openWindow(winArgs, side);

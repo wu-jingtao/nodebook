@@ -29,7 +29,9 @@ export class MindMapWindowContent extends BaseWindowContent<MindMapWindowArgs> {
 
         (this._ref.contentWindow as any).editorReady = () => {
             this._communicator.iframeReady();
+
             const minder = (this._ref.contentWindow as any).minder;
+            minder.disable();   //在未加载完数据之前只读
 
             getCache(this.props.args.args.path).then(cache => {
                 if (cache) {
@@ -55,7 +57,12 @@ export class MindMapWindowContent extends BaseWindowContent<MindMapWindowArgs> {
                         }
                     }, 500);
 
-                    minder.on('contentchange', onSave); //编辑器内容发生改变
+                    if (!this.props.args.args.readonly) {
+                        minder.on('contentchange', onSave); //编辑器内容发生改变
+
+                        minder.enable();    //这两行使编辑器恢复到编辑状态
+                        minder.setStatus('normal', true);
+                    }
 
                     onChange();
                     const unWatch = cache.modified.onDidChangeContent(onChange);

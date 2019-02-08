@@ -74,6 +74,17 @@ export interface CodeEditorWindowArgs extends FileWindowArgs {
 
 export interface MindMapWindowArgs extends FileWindowArgs {
     type: WindowType.mind_map;
+
+    args: {
+        /**
+         * 文件的绝对路径
+         */
+        path: string,
+        /**
+         * 是否是只读
+         */
+        readonly?: boolean
+    }
 }
 
 export interface HtmlViewerWindowArgs extends FileWindowArgs {
