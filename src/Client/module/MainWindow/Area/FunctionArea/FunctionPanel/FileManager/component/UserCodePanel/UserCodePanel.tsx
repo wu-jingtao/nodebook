@@ -9,7 +9,7 @@ import { EditableFileTreePropsType } from '../../../../../../../../global/Compon
 import { MultipleFoldableContainerItem } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainer';
 import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../global/Component/MultipleFoldableContainer/MultipleFoldableContainerPropsType';
 import { closeWindowByPath, openWindowByFilePath } from '../../../../../ContentWindow/WindowList';
-import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
+import { unsavedFiles, deleteCache } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 import { taskList } from '../../../TaskManager/TaskList';
 import { refreshRecycle } from '../RecyclePanel/RefreshRecycle';
 import { checkUnsavedFile } from './DeleteUnsavedFiles';
@@ -112,7 +112,7 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
                 await ServerApi.file.deleteCodeData(this._fullNameString);
                 refreshRecycle();
                 closeWindowByPath(this._fullNameString, this._isBranch);
-                discardChange(this._fullNameString, this._isBranch);
+                deleteCache(this._fullNameString, this._isBranch);
             }
         }
     }
@@ -122,7 +122,7 @@ export class UserCodeTree extends EditableFileTree<EditableFileTreePropsType> {
             if (await checkTaskOrServiceFile(this._fullNameString, 'cut', this._isBranch)) {
                 await super._onCut(to);
                 closeWindowByPath(this._fullNameString, this._isBranch);
-                discardChange(this._fullNameString, this._isBranch);
+                deleteCache(this._fullNameString, this._isBranch);
             }
         }
     }

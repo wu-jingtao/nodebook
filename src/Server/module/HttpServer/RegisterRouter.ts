@@ -108,7 +108,7 @@ function Others(router_login: koa_router, httpServer: HttpServer) {
  * 客户端静态文件发送
  */
 function Static(router_no_login: koa_router) {
-    router_no_login.get('/static/:path(.+?\\..+)',
+    router_no_login.get('/static/:path+',
         koa_conditional(),
         koa_etag(),
         koa_cache({ maxAge: 31536000 }),    //缓存一年
@@ -179,7 +179,7 @@ function File(router_login: koa_router, httpServer: HttpServer) {
      * 读取用户代码目录下的文件
      * @param path 相对于用户代码目录
      */
-    router_etag.get(_prefix_data + '/code/:path(.+?\\..+)', async (ctx) => {
+    router_etag.get(_prefix_data + '/code/:path+', async (ctx) => {
         ctx.body = await _fileManager.readFile(node_path.join(FilePath._userCodeDir, ctx.params.path));
     });
 
@@ -187,7 +187,7 @@ function File(router_login: koa_router, httpServer: HttpServer) {
      * 读取用户程序数据目录下的文件
      * @param path
      */
-    router_etag.get(_prefix_data + '/programData/:path(.+?\\..+)', async (ctx) => {
+    router_etag.get(_prefix_data + '/programData/:path+', async (ctx) => {
         ctx.body = await _fileManager.readFile(node_path.join(FilePath._programDataDir, ctx.params.path));
     });
 
@@ -195,7 +195,7 @@ function File(router_login: koa_router, httpServer: HttpServer) {
      * 读取用户回收站目录下的文件
      * @param path 
      */
-    router_etag.get(_prefix_data + '/recycle/:path(.+?\\..+)', async (ctx) => {
+    router_etag.get(_prefix_data + '/recycle/:path+', async (ctx) => {
         ctx.body = await _fileManager.readFile(node_path.join(FilePath._recycleDir, ctx.params.path));
     });
 
@@ -203,7 +203,7 @@ function File(router_login: koa_router, httpServer: HttpServer) {
      * 读取用户类库目录下的文件
      * @param path
      */
-    router_etag.get(_prefix_data + '/library/:path(.+?\\..+)', async (ctx) => {
+    router_etag.get(_prefix_data + '/library/:path+', async (ctx) => {
         ctx.body = await _fileManager.readFile(node_path.join(FilePath._libraryDir, ctx.params.path));
     });
 

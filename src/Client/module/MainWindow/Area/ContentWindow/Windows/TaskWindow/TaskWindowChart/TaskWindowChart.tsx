@@ -199,8 +199,8 @@ export class TaskWindowChart extends ObservableComponent<{ taskPath: string, cla
                 <Container className={less.info}>
                     <div className={less.infoItem}>进程号: {this._pid.value}</div>
                     <div className={less.infoItem}>启动时间: {moment(this._createTime.value).format('YYYY-MM-DD HH:mm:ss')}</div>
-                    <div className={less.infoItem}>运行时间:
-                        {elapsed.asDays() > 1 && `${Math.trunc(elapsed.asDays())}天&nbsp;`}
+                    <div className={less.infoItem}>运行时间: 
+                        {elapsed.asDays() > 1 && <>{Math.trunc(elapsed.asDays())}天&nbsp;</>}
                         {elapsed.hours()}小时&nbsp;
                         {elapsed.minutes()}分钟&nbsp;
                         {elapsed.seconds()}秒

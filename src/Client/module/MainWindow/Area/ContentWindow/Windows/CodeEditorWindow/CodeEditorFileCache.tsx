@@ -25,6 +25,9 @@ const cacheList = new Map<string, { original: monaco.editor.ITextModel, modified
  */
 export const unsavedFiles = oSet<string>([]);
 
+//sessionStorage中缓存的文件
+const sessionStorageFiles = new Set<string>();
+
 unsavedFilesCache.keys()
     .then(value => { unsavedFiles.value = new Set(value); })
     .catch(err => console.log('读取未保存文件列表失败', err));
@@ -54,6 +57,7 @@ export async function getCache(path: string) {
                     if (data === null) {
                         data = await ServerApi.file.readFile(path);
                         sessionStorage.setItem(`fileCache-${path}`, data as any);
+                        sessionStorageFiles.add(path);
                     }
 
                     modified = monaco.editor.createModel(data as string, undefined, monaco.Uri.parse(`modified:/${path}`));
@@ -81,20 +85,23 @@ export async function getCache(path: string) {
                     }
                 }, 1000));
 
+                cache = { modified, original, refNumber };
+
                 let disposeTimer: any;
                 refNumber.on('set', value => {
                     if (value === 0) {  //当没有编辑器引用时清除资源
                         disposeTimer = setTimeout(() => {
                             modified.dispose();
                             original.dispose();
-                            cacheList.delete(path);
+
+                            if (cacheList.get(path) === cache)  //加一个这个是为了防止旧的缓存在清除时，清除掉了新的正在使用的缓存
+                                cacheList.delete(path);
                         }, 1000 * 60);
                     } else
                         clearTimeout(disposeTimer);
                 });
 
-                cacheList.set(path, { modified, original, refNumber });
-                cache = { modified, original, refNumber };
+                cacheList.set(path, cache);
             }
 
             cache.refNumber.value++;
@@ -120,23 +127,47 @@ export async function getCache(path: string) {
 export async function discardChange(path: string, descendants?: boolean) {
     if (descendants) path += '/'; //在路径的末尾加上'/'是为了避免误把同级同名文件误认为子级文件的情况
 
-    for (const item of unsavedFiles.value) {
-        if (descendants ? item.startsWith(path) : item === path) {
-            const cache = cacheList.get(item);
+    const files = descendants ? [...unsavedFiles.value].filter(item => item.startsWith(path)) : [path];
 
-            if (cache)
-                cache.modified.setValue(cache.original.getValue());
-            else {
-                try {
-                    await originalFilesCache.removeItem(item);
-                    await unsavedFilesCache.removeItem(item);
-                    unsavedFiles.delete(item);
-                } catch (err) {
-                    showMessageBox({ icon: 'error', title: '删除文件缓存失败', content: `文件：${item}。${err.message}` });
-                }
+    for (const item of files) {
+        const cache = cacheList.get(item);
+
+        if (cache)
+            cache.modified.setValue(cache.original.getValue());
+        else {
+            try {
+                await originalFilesCache.removeItem(item);
+                await unsavedFilesCache.removeItem(item);
+                unsavedFiles.delete(item);
+            } catch (err) {
+                showMessageBox({ icon: 'error', title: '删除文件缓存失败', content: `文件：${item}。${err.message}` });
             }
+        }
+    }
+}
 
-            if (!descendants) break;
+/**
+ * 删除文件缓存
+ * @param descendants 是否包含后代，这个主要是针对于文件夹
+ */
+export async function deleteCache(path: string, descendants?: boolean) {
+    if (descendants) path += '/'; //在路径的末尾加上'/'是为了避免误把同级同名文件误认为子级文件的情况
+
+    //要删除的缓存
+    const caches = descendants ? [...sessionStorageFiles].filter(item => item.startsWith(path)) : [path];
+
+    for (const item of caches) {
+        try {
+            cacheList.delete(item);
+
+            sessionStorage.removeItem(`fileCache-${item}`);
+            sessionStorageFiles.delete(item);
+
+            await originalFilesCache.removeItem(item);
+            await unsavedFilesCache.removeItem(item);
+            unsavedFiles.delete(item);
+        } catch (err) {
+            showMessageBox({ icon: 'error', title: '删除文件缓存失败', content: `文件：${item}。${err.message}` });
         }
     }
 }

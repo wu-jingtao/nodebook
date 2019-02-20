@@ -4,7 +4,7 @@ import * as FilePath from '../../../../../../../../../Server/FilePath';
 
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { UserCodePanel, UserCodeTree } from '../UserCodePanel/UserCodePanel';
-import { unsavedFiles, discardChange } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
+import { unsavedFiles, deleteCache } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 import { refreshRecycle } from '../RecyclePanel/RefreshRecycle';
 import { closeWindowByPath } from '../../../../../ContentWindow/WindowList';
 
@@ -26,6 +26,6 @@ class ProgramDataTree extends UserCodeTree {
         await ServerApi.file.deleteProgramData(this._fullNameString);
         refreshRecycle();
         closeWindowByPath(this._fullNameString, this._isBranch);
-        discardChange(this._fullNameString, this._isBranch);
+        deleteCache(this._fullNameString, this._isBranch);
     }
 }
