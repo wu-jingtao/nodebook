@@ -9,7 +9,7 @@ import { MultipleFoldableContainerItemPropsType } from '../../../../../../../../
 import { ServerApi } from '../../../../../../../../global/ServerApi';
 import { showMessageBox } from '../../../../../../../MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../../../../PopupWindow/PopupWindow';
-import { unsavedFiles } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
+import { unsavedFiles, deleteCache } from '../../../../../ContentWindow/Windows/CodeEditorWindow/CodeEditorFileCache';
 import { closeWindowByPath } from '../../../../../ContentWindow/WindowList';
 import { UserCodeTree } from '../UserCodePanel/UserCodePanel';
 import { _setRefreshRecycle } from './RefreshRecycle';
@@ -99,6 +99,7 @@ class RecycleTree extends UserCodeTree {
     protected async _onDelete(): Promise<void> {
         await ServerApi.file.deleteRecycleData(this._fullNameString);
         closeWindowByPath(this._fullNameString, this._isBranch);
+        deleteCache(this._fullNameString, this._isBranch);
     }
 
     componentDidMount() {
