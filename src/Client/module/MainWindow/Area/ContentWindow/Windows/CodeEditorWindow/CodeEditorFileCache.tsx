@@ -154,7 +154,7 @@ export async function deleteCache(path: string, descendants?: boolean) {
     if (descendants) path += '/'; //在路径的末尾加上'/'是为了避免误把同级同名文件误认为子级文件的情况
 
     //要删除的缓存
-    const caches = descendants ? [...sessionStorageFiles].filter(item => item.startsWith(path)) : [path];
+    const caches = descendants ? new Set([...sessionStorageFiles, ...unsavedFiles.value].filter(item => item.startsWith(path))) : [path];
 
     for (const item of caches) {
         try {
