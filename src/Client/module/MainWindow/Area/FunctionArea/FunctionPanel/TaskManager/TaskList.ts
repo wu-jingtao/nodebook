@@ -1,5 +1,5 @@
+import clipboard from 'copy-text-to-clipboard';
 import { ObservableVariable, oMap, oArr, oVar } from 'observable-variable';
-import clipboard = require('copy-text-to-clipboard');
 
 import { ServerApi } from '../../../../../../global/ServerApi';
 import { showMessageBox, closeMessageBox } from '../../../../../MessageBox/MessageBox';

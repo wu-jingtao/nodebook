@@ -1,6 +1,6 @@
 import * as React from 'react';
+import clipboard from 'copy-text-to-clipboard';
 import { oSet, oVar, ObservableMap, ObservableVariable } from 'observable-variable';
-import clipboard = require('copy-text-to-clipboard');
 
 import { showMessageBox } from '../../../../module/MessageBox/MessageBox';
 import { showPopupWindow } from '../../../../module/PopupWindow/PopupWindow';

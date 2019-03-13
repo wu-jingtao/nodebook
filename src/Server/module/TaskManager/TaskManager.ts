@@ -3,8 +3,8 @@ import * as child_process from 'child_process';
 import * as diskusage from 'diskusage';
 import * as pidusage from 'pidusage';
 import log from 'log-formatter';
+import getPort from 'get-port';
 import { BaseServiceModule } from "service-starter";
-import getPort = require('get-port');
 const os_utils = require('os-utils');
 
 import * as FilePath from '../../FilePath';
@@ -54,8 +54,11 @@ export class TaskManager extends BaseServiceModule {
             const logger = this._logManager.createTaskLogger(taskFilePath);
             logger.addLog(log.location.bold.green.text.bold.format('启动', taskFilePath));
 
-            child.stdout.on('data', chunk => logger.addLog(chunk.toString()));
-            child.stderr.on('data', chunk => logger.addLog(chunk.toString()));
+            if (child.stdout !== null && child.stderr !== null) {
+                child.stdout.on('data', chunk => logger.addLog(chunk.toString()));
+                child.stderr.on('data', chunk => logger.addLog(chunk.toString()));
+            } else
+                logger.addLog(log.location.bold.red.text.bold.format('系统异常：无法获取到子进程的stdio', taskFilePath));
 
             child.on('close', (code, signal) => {
                 logger.status.value = code === 0 || signal === 'SIGTERM' ? 'stop' : 'crashed';

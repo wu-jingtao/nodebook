@@ -67,7 +67,10 @@ export abstract class BaseFileTree<P extends FileIconTreePropsType> extends File
      * 标记当前目录并未加载过，使得下次打开当前目录时重新向服务器获取目录数据。主要用于当前目录被删除或移动时使用
      */
     protected _markFolderIsNotLoaded() {
-        this._loadedFolder.delete(this._fullNameString);
+        for (const item of this._loadedFolder) {
+            if (item.startsWith(this._fullNameString))
+                this._loadedFolder.delete(item);
+        }
     }
 
     /**

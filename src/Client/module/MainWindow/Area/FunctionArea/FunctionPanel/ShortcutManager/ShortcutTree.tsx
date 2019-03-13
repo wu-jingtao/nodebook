@@ -1,7 +1,7 @@
 import * as React from 'react';
+import clipboard from 'copy-text-to-clipboard';
 import { ObservableVariable, oMap, oVar, oArr, ObservableMap } from "observable-variable";
 import debounce = require('lodash.debounce');
-import clipboard = require('copy-text-to-clipboard');
 
 import { FileIconTree } from "../../../../../../global/Component/Tree/FileIconTree/FileIconTree";
 import { FileIconTreePropsType } from "../../../../../../global/Component/Tree/FileIconTree/FileIconTreePropsType";
