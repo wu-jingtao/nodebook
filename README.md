@@ -39,3 +39,7 @@
     * `./privkey.pem`    openssl私钥密码
     * `./cert.pem`       openssl公钥路径
     * `./password.pem`   openssl私钥密码（没有可以忽略）
+
+# 版本依赖提示
+* "video-react": "0.13.2" 就使用这个版本，新版本用babel打包，大小会增大许多
+* "monaco-editor": "0.16.0" 高于这个版本会与 "monaco-editor-webpack-plugin": "1.7.0" 出现兼容性问题
