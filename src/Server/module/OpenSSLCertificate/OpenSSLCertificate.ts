@@ -65,7 +65,7 @@ export class OpenSSLCertificate extends BaseServiceModule {
      */
     generateCert(): Promise<void> {
         return new Promise((resolve, reject) => {
-            const password = randomString(1024);
+            const password = randomString({ length: 1024 });
             child_process.exec(
                 `openssl req -x509 -newkey rsa:4096 -keyout privkey.pem -out cert.pem -days 365 -subj '/CN=${this._mainProcessCommunicator.domain}' -passout pass:${password}`
                 , { cwd: FilePath._opensslKeyDir }

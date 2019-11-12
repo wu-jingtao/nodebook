@@ -92,7 +92,7 @@ export class BackupData extends BaseServiceModule {
 
         if (this._encryptEmailFile.value) {
             return new Promise<void>((resolve, reject) => {
-                const temp_path = node_path.join(os.tmpdir(), `nodebook_${randomString(20)}.zip`);   //临时文件目录
+                const temp_path = node_path.join(os.tmpdir(), `nodebook_${randomString({ length: 20 })}.zip`);   //临时文件目录
                 const process = node_pty.spawn('zipcloak', ['-O', temp_path, path], {});             //加密备份文件
 
                 process.on('data', data => {

@@ -65,7 +65,7 @@ export class UserManager extends BaseServiceModule {
      * 当有新的令牌被添加之后，旧的令牌将在10秒后被删除。这样做是为了避免令牌的突然改变导致后续紧随而来的其他请求被拒绝
      */
     updateToken(): string {
-        const token = randomString(64);
+        const token = randomString({ length: 64 });
         this._tokenList.unshift([token, setTimeout(() => this._tokenList.pop(), 10 * 60 * 1000)]);
 
         const second = this._tokenList[1];
