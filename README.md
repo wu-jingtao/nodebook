@@ -1,6 +1,8 @@
 # nodebook
 ![nodebook](./src/Client/res/img/logo/brand.png)
 
+> sudo docker pull registry.cn-hangzhou.aliyuncs.com/wujingtao/nodebook:[发布版本号]
+
 ## 使用 NodeBook 时代码命名规范
 
 * 所有服务器端代码全部以`*.server.js`命名
@@ -22,7 +24,7 @@
 * npm run resumeFromBackup 从备份文件恢复用户数据。使用时需要传入备份文件的文件名(不是文件的绝对路径)
 
 ## 更新或添加浏览器端编辑器的代码提示依赖
-[`src/Client/module/MainWindow/Area/ContentWindow/Windows/CodeEditorWindow/CodeEditorWindowContent.tsx`](../src/Client/module/MainWindow/Area/ContentWindow/Windows/CodeEditorWindow/CodeEditorWindowContent.tsx)
+[`src/Client/module/MainWindow/Area/ContentWindow/Windows/CodeEditorWindow/CodeEditorWindowContent.tsx`](./src/Client/module/MainWindow/Area/ContentWindow/Windows/CodeEditorWindow/CodeEditorWindowContent.tsx)
 
 ## 加密备份文件编码
 在使用解压软件打开加密备份文件时可能会出现乱码，将解压软件的字符编码选择为`UTF8`即可
