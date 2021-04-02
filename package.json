@@ -16,12 +16,12 @@
     "license": "GPL-3.0",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mx601595686/nodebook.git"
+        "url": "git+https://github.com/wu-jingtao/nodebook.git"
     },
     "bugs": {
-        "url": "https://github.com/mx601595686/nodebook/issues"
+        "url": "https://github.com/wu-jingtao/nodebook/issues"
     },
-    "homepage": "https://github.com/mx601595686/nodebook#readme",
+    "homepage": "https://github.com/wu-jingtao/nodebook#readme",
     "devDependencies": {
         "@types/archiver": "2.1.2",
         "@types/blueimp-md5": "2.7.0",
